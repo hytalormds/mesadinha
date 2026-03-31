@@ -3,10 +3,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Text,
   View,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
   TextInput,
+  TouchableOpacity,
+  StyleSheet,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
@@ -20,17 +19,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
   },
-  logoContainer: {
-    marginBottom: 32,
-    alignItems: "center",
-  },
-  logo: {
-    width: 100,
-    height: 100,
-    marginBottom: 20,
-  },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "700",
     color: "#1a1a1a",
     marginBottom: 6,
@@ -112,35 +102,44 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function Login() {
+export default function Cadastro() {
   const navigation = useNavigation<any>();
+  const [nameFocus, setNameFocus] = React.useState(false);
   const [emailFocus, setEmailFocus] = React.useState(false);
   const [passwordFocus, setPasswordFocus] = React.useState(false);
+  const [confirmFocus, setConfirmFocus] = React.useState(false);
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <View style={styles.logoContainer}>
-          <Image
-            source={require("../../assets/logo.png")}
-            style={styles.logo}
-          />
-          <Text style={styles.title}>Bem-vindo de volta!</Text>
+        <View style={{ marginBottom: 32 }}>
+          <Text style={styles.title}>Criar Conta</Text>
           <Text style={styles.subtitle}>
-            Faça login para continuar sua jornada financeira
+            Preencha os dados abaixo para começar sua jornada financeira
           </Text>
         </View>
 
         <View style={styles.formContainer}>
+          <View style={styles.fieldContainer}>
+            <Text style={styles.label}>Nome Completo</Text>
+            <TextInput
+              style={[styles.input, nameFocus && styles.inputFocus]}
+              placeholder="Digite seu nome"
+              placeholderTextColor="#999999"
+              onFocus={() => setNameFocus(true)}
+              onBlur={() => setNameFocus(false)}
+            />
+          </View>
+
           <View style={styles.fieldContainer}>
             <Text style={styles.label}>E-mail</Text>
             <TextInput
               style={[styles.input, emailFocus && styles.inputFocus]}
               placeholder="seu.email@exemplo.com"
               placeholderTextColor="#999999"
+              keyboardType="email-address"
               onFocus={() => setEmailFocus(true)}
               onBlur={() => setEmailFocus(false)}
-              keyboardType="email-address"
             />
           </View>
 
@@ -148,7 +147,7 @@ export default function Login() {
             <Text style={styles.label}>Senha</Text>
             <TextInput
               style={[styles.input, passwordFocus && styles.inputFocus]}
-              placeholder="Sua senha segura"
+              placeholder="Crie uma senha segura"
               placeholderTextColor="#999999"
               secureTextEntry
               onFocus={() => setPasswordFocus(true)}
@@ -156,15 +155,27 @@ export default function Login() {
             />
           </View>
 
+          <View style={styles.fieldContainer}>
+            <Text style={styles.label}>Confirmar Senha</Text>
+            <TextInput
+              style={[styles.input, confirmFocus && styles.inputFocus]}
+              placeholder="Confirme sua senha"
+              placeholderTextColor="#999999"
+              secureTextEntry
+              onFocus={() => setConfirmFocus(true)}
+              onBlur={() => setConfirmFocus(false)}
+            />
+          </View>
+
           <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Entrar</Text>
+            <Text style={styles.buttonText}>Cadastrar</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.footerContainer}>
-          <Text style={styles.footerText}>Não tem conta?</Text>
-          <TouchableOpacity onPress={() => navigation.navigate("Cadastro")}>
-            <Text style={styles.footerLink}>Cadastre-se</Text>
+          <Text style={styles.footerText}>Já tem conta?</Text>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Text style={styles.footerLink}>Voltar ao login</Text>
           </TouchableOpacity>
         </View>
       </View>
