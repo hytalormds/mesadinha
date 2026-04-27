@@ -14,7 +14,7 @@ export default function TelaCadastro() {
         if (!telefone.trim()) {
             alert("Por favor, insira seu telefone.");
             return false;
-        }   
+        }
         if (!cpf.trim()) {
             alert("Por favor, insira seu CPF.");
             return false;
@@ -23,7 +23,7 @@ export default function TelaCadastro() {
             alert("Por favor, insira sua data de nascimento.");
             return false;
         }
-    
+
         if (!email.trim()) {
             alert("Por favor, insira seu e-mail.");
             return false;
@@ -39,6 +39,34 @@ export default function TelaCadastro() {
         }
         return true;
     };
+
+    const formatarCPF = (texto: string) => {
+        const numeros = texto.replace(/\D/g, '');
+
+        return numeros
+            .replace(/(\d{3})(\d)/, '$1.$2')
+            .replace(/(\d{3})(\d)/, '$1.$2')
+            .replace(/(\d{3})(\d{1,2})$/, '$1-$2')
+            .slice(0, 14);
+    };
+    const formatarData = (texto: string) => {
+        const numeros = texto.replace(/\D/g, '');
+
+        return numeros
+            .replace(/(\d{2})(\d)/, '$1/$2')
+            .replace(/(\d{2})(\d)/, '$1/$2')
+            .slice(0, 10);
+    };
+    const formatarTelefone = (texto: string) => {
+        const numeros = texto.replace(/\D/g, '');
+
+        return numeros
+            .replace(/(\d{2})(\d)/, '($1) $2')
+            .replace(/(\d{5})(\d)/, '$1-$2')
+            .slice(0, 15);
+    };
+
+
 
     const navigation = useNavigation<any>();
     const [nome, setNome] = React.useState("");
@@ -71,19 +99,49 @@ export default function TelaCadastro() {
 
                 </View>
                 <View style={styles.containerForm}>
-                    <Text style={styles.subtituloForm}>Preencha os campos abaixo para criar sua conta.</Text>
+                    <Text style={styles.subtituloForm}>
+                        Preencha os campos abaixo para criar sua conta.
+                    </Text>
 
-                    <Text style={styles.label}>Nome Completo</Text>
-                    <TextInput style={styles.input} placeholder="Seu nome" value={nome} onChangeText={setNome} />
+                    <Text
+                        style={styles.label}>
+                        Nome Completo
+                    </Text>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Seu nome"
+                        value={nome}
+                        onChangeText={setNome} />
 
-                    <Text style={styles.label}>Telefone</Text>
-                    <TextInput style={styles.input} placeholder="(00) 00000-0000" keyboardType="phone-pad" value={telefone} onChangeText={setTelefone} />
+                    <Text
+                        style={styles.label}>
+                        Telefone
+                    </Text>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="(00) 00000-0000"
+                        keyboardType="phone-pad"
+                        value={telefone}
+                        onChangeText={(text) =>
+                            setTelefone(formatarTelefone(text))
+                        }
+                    />
 
-                    <Text style={styles.label}>CPF</Text>
-                    <TextInput style={styles.input} placeholder="000.000.000-00" keyboardType="numeric" value={cpf} onChangeText={setCpf} />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="000.000.000-00"
+                        keyboardType="numeric"
+                        value={cpf}
+                        onChangeText={(text) => setCpf(formatarCPF(text))}
+                    />
 
-                    <Text style={styles.label}>Data de Nascimento</Text>
-                    <TextInput style={styles.input} placeholder="DD/MM/AAAA" keyboardType="numeric" value={dataNascimento} onChangeText={setDataNascimento} />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="DD/MM/AAAA"
+                        keyboardType="numeric"
+                        value={dataNascimento}
+                        onChangeText={(text) => setDataNascimento(formatarData(text))}
+                    />
 
                     <Text style={styles.label}>E-mail</Text>
                     <TextInput style={styles.input} placeholder="seu.email@exemplo.com" keyboardType="email-address" value={email} onChangeText={setEmail} />
