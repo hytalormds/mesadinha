@@ -113,6 +113,7 @@ const styles = StyleSheet.create({
 });
 
 export default function Login() {
+  const navigation = useNavigation<any>();
   const [emailFocus, setEmailFocus] = React.useState(false);
   const [passwordFocus, setPasswordFocus] = React.useState(false);
 
@@ -126,7 +127,7 @@ export default function Login() {
           />
           <Text style={styles.title}>Bem-vindo de volta!</Text>
           <Text style={styles.subtitle}>
-            Faça login para continuar sua jornada financeira
+            Faça login para continuar sua jornada financeira.
           </Text>
         </View>
 
@@ -162,7 +163,9 @@ export default function Login() {
 
         <View style={styles.footerContainer}>
           <Text style={styles.footerText}>Não tem conta?</Text>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("TelaCadastro")}
+          >
             <Text style={styles.footerLink}>Cadastre-se</Text>
           </TouchableOpacity>
         </View>
