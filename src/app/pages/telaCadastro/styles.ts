@@ -1,172 +1,123 @@
 import { StyleSheet } from "react-native";
 
-
 export default StyleSheet.create(
     {
+
         container: {
             flex: 1,
             backgroundColor: '#fff',
-            alignItems: 'center',
-            justifyContent: 'flex-start',
         },
-        logo: {
+
+        logoTop: {
             width: 120,
             height: 120,
-            marginBottom: 20,
         },
-        logoTop: {
-            width: 150,
-            height: 150,
-        },
+
         containerLogo: {
-            width: "100%",
-            flex: 2,
-            paddingHorizontal: 20,
-            justifyContent: "center",
-            alignItems: "center",
+            padding: 20,
         },
+
         headerRow: {
             flexDirection: "row",
-            alignItems: "center",
             justifyContent: "space-between",
-            width: "100%",
+            alignItems: "center",
         },
+
         textContainer: {
             flex: 1,
-            paddingRight: 20,
         },
+
         titulo: {
             fontSize: 26,
             fontWeight: "600",
-            textAlign: "center",
-            marginTop: 28,
-            marginBottom: 16,
-            fontFamily: "System",
-            letterSpacing: 0.3,
-            lineHeight: 34,
-            color: "#1a1a1a",
         },
-        subtitulo: {
-            fontSize: 15,
-            textAlign: "center",
-            marginBottom: 32,
-            fontFamily: "System",
-            letterSpacing: 0.2,
-            color: "#666666",
-            lineHeight: 22,
-        },
-        tituloForm: {
-            fontSize: 20,
-            fontWeight: "600",
-            textAlign: "center",
-            marginBottom: 8,
-            fontFamily: "System",
-            letterSpacing: 0.3,
-            lineHeight: 28,
-            color: "#1a1a1a",
-        },
-        subtituloForm: {
-            fontSize: 14,
-            textAlign: "center",
-            marginBottom: 24,
-            fontFamily: "System",
-            letterSpacing: 0.2,
-            color: "#666666",
-            lineHeight: 22,
-        },
-        inputContainer: {
-            width: "100%",
-            marginBottom: 16,
-        },
-        label: {
-            fontSize: 14,
-            fontWeight: "500",
-            fontFamily: "System",
-            letterSpacing: 0.2,
-            color: "#1a1a1a",
-            marginBottom: 6,
-            width: "100%",
-            textAlign: "left",
-            lineHeight: 22,
 
+        subtitulo: {
+            color: "#666",
         },
-        input: {
-            width: "100%",
-            height: 50,
-            borderWidth: 1.5,
-            borderColor: "#e0e0e0",
-            borderRadius: 10,
-            paddingHorizontal: 14,
-            paddingVertical: 10,
-            backgroundColor: "#ffffff",
-            marginBottom: 16,
-        },
-        inputFocus: {
-            borderColor: "#007BFF",
-            backgroundColor: "#f0f7ff",
-        },
-        botaoContainer: {
-            width: "100%",
-            alignItems: "center",
-            marginTop: 16,
-        },
-        botao: {
-            backgroundColor: "#007BFF",
-            borderRadius: 12,
-            paddingVertical: 14,
-            paddingHorizontal: 24,
-            width: "70%",
-            alignItems: "center",
-            justifyContent: "center",
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.08,
-            shadowRadius: 3,
-            elevation: 2,
-        },
-        botaoText: {
-            color: "#ffffff",
-            fontSize: 16,
-            fontWeight: "600",
-            fontFamily: "System",
-            letterSpacing: 0.5,
-        },
-        botaoVoltar: {
-            color: "#FFFFFF",
-            fontSize: 16,
-            fontWeight: "600",
-            fontFamily: "System",
-            letterSpacing: 0.5,
-        },
+
         containerForm: {
-            flex: 1,
-            alignItems: "center",
-            paddingStart: "5%",
-            paddingEnd: "5%",
-            justifyContent: "flex-start",
-            paddingTop: 20,
+            padding: 20,
         },
-        footerContainer: {
+
+        subtituloForm: {
+            marginBottom: 20,
+        },
+
+        label: {
+            marginTop: 10,
+        },
+
+        input: {
+            borderWidth: 1,
+            borderColor: "#ccc",
+            borderRadius: 8,
+            padding: 10,
+            marginBottom: 10,
+        },
+
+        botao: {
+            backgroundColor: "#007bff",
+            padding: 15,
+            borderRadius: 10,
+            alignItems: "center",
+            marginTop: 20,
+        },
+
+        botaoText: {
+            color: "#fff",
+            fontWeight: "bold",
+        },
+
+        // 🔥 TIPO USUÁRIO
+        botaoTipoUsuario: {
             flexDirection: "row",
-            justifyContent: "center",
+            gap: 10,
+            marginTop: 10,
+        },
+
+        botaoTipoUsuarioOption: {
+            flex: 1,
+            padding: 12,
+            borderWidth: 1,
+            borderColor: "#ccc",
+            borderRadius: 8,
             alignItems: "center",
-            marginTop: 16,
         },
-        footerText: {
-            fontSize: 14,
-            fontWeight: "400",
-            fontFamily: "System",
-            letterSpacing: 0.2,
-            color: "#666666",
-            textAlign: "center",
+
+        botaoTipoUsuarioOptionPai: {
+            flex: 1,
+            padding: 12,
+            borderWidth: 1,
+            borderColor: "#007bff",
+            backgroundColor: "#007bff",
+            borderRadius: 8,
+            alignItems: "center",
         },
-        footerLink: {
-            fontSize: 14,
-            fontWeight: "500",
-            fontFamily: "System",
-            letterSpacing: 0.2,
-            color: "#007BFF",
-            textAlign: "center",
-            textDecorationLine: "underline",
+
+        botaoTipoUsuarioOptionFilho: {
+            flex: 1,
+            padding: 12,
+            borderWidth: 1,
+            borderColor: "#007bff",
+            borderRadius: 8,
+            alignItems: "center",
         },
-    });
+
+        botaoOpcaoPaiText: {
+            color: "#fff",
+            fontWeight: "bold",
+        },
+
+        botaoOpcaoFilhoText: {
+            color: "#000",
+            fontWeight: "bold",
+        },
+        botaoFooter: {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            marginTop: 20,
+        },
+
+    }
+);
