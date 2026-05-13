@@ -114,8 +114,32 @@ const styles = StyleSheet.create({
 
 export default function Login() {
   const navigation = useNavigation<any>();
+
   const [emailFocus, setEmailFocus] = React.useState(false);
   const [passwordFocus, setPasswordFocus] = React.useState(false);
+
+  const [email, setEmail] = React.useState("");
+  const [senha, setSenha] = React.useState("");
+
+  const validarFormulario = () => {
+    if (!email.trim()) {
+      alert("Digite seu e-mail");
+      return false;
+    }
+
+    if (!senha.trim()) {
+      alert("Digite sua senha");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleEntrar = () => {
+    if (validarFormulario()) {
+      navigation.navigate("CadastroTarefa");
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -125,7 +149,9 @@ export default function Login() {
             source={require("../../assets/logo.png")}
             style={styles.logo}
           />
+
           <Text style={styles.title}>Bem-vindo de volta!</Text>
+
           <Text style={styles.subtitle}>
             Faça login para continuar sua jornada financeira.
           </Text>
@@ -134,38 +160,44 @@ export default function Login() {
         <View style={styles.formContainer}>
           <View style={styles.fieldContainer}>
             <Text style={styles.label}>E-mail</Text>
+
             <TextInput
               style={[styles.input, emailFocus && styles.inputFocus]}
               placeholder="seu.email@exemplo.com"
               placeholderTextColor="#999999"
+              value={email}
+              onChangeText={setEmail}
               onFocus={() => setEmailFocus(true)}
               onBlur={() => setEmailFocus(false)}
               keyboardType="email-address"
+              autoCapitalize="none"
             />
           </View>
 
           <View style={styles.fieldContainer}>
             <Text style={styles.label}>Senha</Text>
+
             <TextInput
               style={[styles.input, passwordFocus && styles.inputFocus]}
               placeholder="Sua senha segura"
               placeholderTextColor="#999999"
+              value={senha}
+              onChangeText={setSenha}
               secureTextEntry
               onFocus={() => setPasswordFocus(true)}
               onBlur={() => setPasswordFocus(false)}
             />
           </View>
 
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity style={styles.button} onPress={handleEntrar}>
             <Text style={styles.buttonText}>Entrar</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.footerContainer}>
           <Text style={styles.footerText}>Não tem conta?</Text>
-          <TouchableOpacity
-            onPress={() => navigation.navigate("TelaCadastro")}
-          >
+
+          <TouchableOpacity onPress={() => navigation.navigate("TelaCadastro")}>
             <Text style={styles.footerLink}>Cadastre-se</Text>
           </TouchableOpacity>
         </View>
