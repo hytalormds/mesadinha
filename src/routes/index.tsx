@@ -1,7 +1,7 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import BemVindo from "../app/pages/bem-vindo";
 import Login from "../app/pages/login";
-import TelaCadastro from "../app/pages/TelaCadastro";
+import TelaCadastro from "../app/pages/telaCadastro";
 import CadastroTarefa from "../app/pages/CadastroTarefa";
 
 const Stack = createNativeStackNavigator();
