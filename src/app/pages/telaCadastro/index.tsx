@@ -21,22 +21,36 @@ export default function TelaCadastro() {
     const [email, setEmail] = React.useState("");
     const [senha, setSenha] = React.useState("");
     const [confirmarSenha, setConfirmarSenha] = React.useState("");
-    const [tipoUsuario, setTipoUsuario] = React.useState("");
     // Validação simples do formulário
     const validarFormulario = () => {
         if (!nome.trim()) return alert("Digite seu nome"), false;
         if (!email.trim()) return alert("Digite seu e-mail"), false;
         if (!senha.trim()) return alert("Digite sua senha"), false;
         if (senha !== confirmarSenha) return alert("Senhas não coincidem"), false;
-        if (!tipoUsuario) return alert("Selecione o tipo de usuário"), false;
+
         return true;
     };
     // Função para salvar os dados do usuário no AsyncStorage
     const salvarUsuario = async () => {
-        const usuario = { nome, email, senha, tipoUsuario };
-        await AsyncStorage.setItem('@usuario', JSON.stringify(usuario));
+        const codigoVinculo = gerarCodigoVinculo();
+
+        const usuario = {
+            nome,
+            email,
+            senha,
+            tipoUsuario: "Pai",
+            codigoVinculo,
+        };
+
+        await AsyncStorage.setItem("@usuario_pai", JSON.stringify(usuario));
+
+        alert(`Cadastro realizado com sucesso!\nCódigo do filho: ${codigoVinculo}`);
     };
 
+    function gerarCodigoVinculo() {
+        const numero = Math.floor(1000 + Math.random() * 9000);
+        return `PAI-${numero}`;
+    }
     return (
         <SafeAreaView style={{ flex: 1 }}>
             <KeyboardAvoidingView
@@ -82,51 +96,7 @@ export default function TelaCadastro() {
                         <TextInput style={styles.input} secureTextEntry value={confirmarSenha} onChangeText={setConfirmarSenha} />
 
                         {/* TIPO DE USUÁRIO */}
-                        <Text style={styles.label}>Tipo de usuário</Text>
 
-                        <View style={styles.botaoTipoUsuario}>
-
-                            {/* PAI */}
-                            <TouchableOpacity
-                                style={
-                                    tipoUsuario === 'Pai'
-                                        ? styles.botaoTipoUsuarioOptionPai
-                                        : styles.botaoTipoUsuarioOption
-                                }
-                                onPress={() => setTipoUsuario('Pai')}
-                            >
-                                <Text
-                                    style={
-                                        tipoUsuario === 'Pai'
-                                            ? styles.botaoOpcaoPaiText
-                                            : styles.botaoOpcaoFilhoText
-                                    }
-                                >
-                                    Pai
-                                </Text>
-                            </TouchableOpacity>
-
-                            {/* FILHO */}
-                            <TouchableOpacity
-                                style={
-                                    tipoUsuario === 'Filho'
-                                        ? styles.botaoTipoUsuarioOptionPai
-                                        : styles.botaoTipoUsuarioOptionFilho
-                                }
-                                onPress={() => setTipoUsuario('Filho')}
-                            >
-                                <Text
-                                    style={
-                                        tipoUsuario === 'Filho'
-                                            ? styles.botaoOpcaoPaiText
-                                            : styles.botaoOpcaoFilhoText
-                                    }
-                                >
-                                    Filho
-                                </Text>
-                            </TouchableOpacity>
-
-                        </View>
 
                         {/* BOTÕES */}
                         <TouchableOpacity
@@ -134,13 +104,14 @@ export default function TelaCadastro() {
                             onPress={async () => {
                                 if (validarFormulario()) {
                                     await salvarUsuario();
-                                    alert("Cadastrado com sucesso");
                                     navigation.navigate("Login");
                                 }
                             }}
                         >
                             <Text style={styles.botaoText}>Cadastrar</Text>
                         </TouchableOpacity>
+                        <Text style={styles.botaoText}>Cadastrar</Text>
+
                         <TouchableOpacity
                             style={styles.botao}
                             onPress={async () => {
@@ -149,9 +120,7 @@ export default function TelaCadastro() {
                         >
                             <Text style={styles.botaoText}>Voltar</Text>
                         </TouchableOpacity>
-
                     </View>
-
                 </ScrollView>
             </KeyboardAvoidingView>
         </SafeAreaView >

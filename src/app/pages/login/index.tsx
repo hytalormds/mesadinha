@@ -197,8 +197,16 @@ export default function Login() {
         <View style={styles.footerContainer}>
           <Text style={styles.footerText}>Não tem conta?</Text>
 
-          <TouchableOpacity onPress={() => navigation.navigate("TelaCadastro")}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("TelaCadastro")}>
             <Text style={styles.footerLink}>Cadastre-se</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.footerContainer}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("VincularFilho")}>
+            <Text style={styles.footerLink}>Sou filho e tenho um código</Text>
           </TouchableOpacity>
         </View>
       </View>
