@@ -5,20 +5,11 @@ export async function migrate(db: SQLiteDatabase) {
     PRAGMA foreign_keys = ON;
 
     -- =========================
-    -- FAMÍLIA
-    -- =========================
-    CREATE TABLE IF NOT EXISTS familias (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      code TEXT NOT NULL UNIQUE,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-
-    -- =========================
     -- TIPO DE USUÁRIO
     -- =========================
     CREATE TABLE IF NOT EXISTS tipo_usuario (
       id_tipo INTEGER PRIMARY KEY AUTOINCREMENT,
-      descricao TEXT NOT NULL
+      descricao TEXT NOT NULL UNIQUE
     );
 
     -- =========================
@@ -30,14 +21,10 @@ export async function migrate(db: SQLiteDatabase) {
       email TEXT NOT NULL UNIQUE,
       senha TEXT NOT NULL,
       id_tipo INTEGER NOT NULL,
-      family_id INTEGER,
 
       FOREIGN KEY (id_tipo)
-        REFERENCES tipo_usuario(id_tipo),
-
-      FOREIGN KEY (family_id)
-        REFERENCES familias(id)
-        ON DELETE SET NULL
+        REFERENCES tipo_usuario(id_tipo)
+        ON DELETE RESTRICT
     );
 
     -- =========================
@@ -45,7 +32,7 @@ export async function migrate(db: SQLiteDatabase) {
     -- =========================
     CREATE TABLE IF NOT EXISTS carteira (
       id_carteira INTEGER PRIMARY KEY AUTOINCREMENT,
-      pontos FLOAT DEFAULT 0,
+      saldo REAL NOT NULL DEFAULT 0,
       fk_usuario_id INTEGER UNIQUE,
 
       FOREIGN KEY (fk_usuario_id)
@@ -58,7 +45,7 @@ export async function migrate(db: SQLiteDatabase) {
     -- =========================
     CREATE TABLE IF NOT EXISTS status_tarefa (
       id_status INTEGER PRIMARY KEY AUTOINCREMENT,
-      descricao TEXT NOT NULL
+      descricao TEXT NOT NULL UNIQUE
     );
 
     -- =========================
@@ -66,33 +53,30 @@ export async function migrate(db: SQLiteDatabase) {
     -- =========================
     CREATE TABLE IF NOT EXISTS tarefa (
       id_tarefa INTEGER PRIMARY KEY AUTOINCREMENT,
+      valor_recompensa REAL NOT NULL,
+      data_limite TIMESTAMP,
       titulo TEXT NOT NULL,
       descricao TEXT,
-      valor_recompensa FLOAT NOT NULL,
-      data_limite TIMESTAMP,
+      fk_status_tarefa INTEGER NOT NULL,
+      fk_usuario_responsavel INTEGER NOT NULL,
 
-      fk_pai_id INTEGER NOT NULL,
-      fk_filho_id INTEGER,
-      fk_status_id INTEGER,
-
-      FOREIGN KEY (fk_pai_id)
-        REFERENCES usuarios(id_usuario),
-
-      FOREIGN KEY (fk_filho_id)
-        REFERENCES usuarios(id_usuario),
-
-      FOREIGN KEY (fk_status_id)
+      FOREIGN KEY (fk_status_tarefa)
         REFERENCES status_tarefa(id_status)
+        ON DELETE RESTRICT,
+
+      FOREIGN KEY (fk_usuario_responsavel)
+        REFERENCES usuarios(id_usuario)
+        ON DELETE CASCADE
     );
 
     -- =========================
-    -- MOVIMENTAÇÃO DE PONTOS
+    -- MOVIMENTAÇÃO
     -- =========================
-    CREATE TABLE IF NOT EXISTS movimentacao_pontos (
+    CREATE TABLE IF NOT EXISTS movimentacao (
       id_movimentacao INTEGER PRIMARY KEY AUTOINCREMENT,
-      saldo FLOAT NOT NULL,
+      tipo_movimentacao TEXT NOT NULL CHECK (tipo_movimentacao IN ('entrada', 'saida')),
       data TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      descricao TEXT,
+      valor REAL NOT NULL,
 
       fk_carteira_id INTEGER NOT NULL,
       fk_tarefa_id INTEGER,
@@ -105,5 +89,11 @@ export async function migrate(db: SQLiteDatabase) {
         REFERENCES tarefa(id_tarefa)
         ON DELETE SET NULL
     );
+
+    INSERT OR IGNORE INTO status_tarefa (descricao) VALUES
+      ('Concluída'),
+      ('Em Andamento'),
+      ('Em Aberto'),
+      ('Expirado');
   `);
 }
