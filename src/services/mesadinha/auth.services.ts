@@ -1,12 +1,12 @@
-import { FormLoginParams } from "@/screens/Login/LoginForm";
-import { dtMoneyApi } from "@/shared/api/dtmoney";
+import { mesadinhaApi } from "@/shared/api/mesadinha";
+import { AuthLoginRequest } from "@/shared/interfaces/http/auth-login-request";
+import { AuthRegisterRequest } from "@/shared/interfaces/http/auth-register-request";
 import { IAuthenticateResponse } from "@/shared/interfaces/http/authenticate-response";
-import { FormRegisterParams } from "@/screens/Register/RegisterForm/FormRegisterParams";
 
 export const authenticate = async (
-  userData: FormLoginParams,
+  userData: AuthLoginRequest,
 ): Promise<IAuthenticateResponse> => {
-  const { data } = await dtMoneyApi.post<IAuthenticateResponse>(
+  const { data } = await mesadinhaApi.post<IAuthenticateResponse>(
     "/auth/login",
     userData,
   );
@@ -15,9 +15,9 @@ export const authenticate = async (
 };
 
 export const registerUser = async (
-  userData: FormRegisterParams,
+  userData: AuthRegisterRequest,
 ): Promise<IAuthenticateResponse> => {
-  const { data } = await dtMoneyApi.post<IAuthenticateResponse>(
+  const { data } = await mesadinhaApi.post<IAuthenticateResponse>(
     "/auth/register",
     userData,
   );

@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import { Platform } from "react-native";
 import { AppError } from "../helper/appError";
 
@@ -11,12 +11,11 @@ export const mesadinhaApi = axios.create({
   baseURL,
 });
 
-mesadinhaApiApi.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response && error.response.data) {
-      return Promise.reject(new AppError(error.response.data.message));
-    }
-    return Promise.reject(new AppError("Falha na requisição"));
+mesadinhaApi.interceptors.response.use(
+  (response: AxiosResponse) => response,
+  (error: AxiosError<{ message?: string }>) => {
+    const message = error.response?.data?.message ?? "Falha na requisição";
+
+    return Promise.reject(new AppError(message));
   },
 );
