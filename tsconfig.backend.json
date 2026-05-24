@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "lib": ["es5", "es6"],
+    "target": "es5",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "outDir": "./build",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "sourceMap": true,
+    "rootDir": "./src"
+  },
+  "include": [
+    "src/@types/**/*",
+    "src/domain/**/*",
+    "src/infra/**/*",
+    "src/interfaces/**/*",
+    "src/shared/errors/**/*",
+    "src/server.ts",
+    "src/index.ts"
+  ],
+  "exclude": [
+    "src/domain/transaction/**/*",
+    "src/infra/web/controllers/transaction/**/*",
+    "src/infra/web/routes/transaction.routes.ts",
+    "src/infra/web/routes/schemas/transactions/**/*",
+    "src/infra/database/typeorm/dt-money/entities/Transaction.ts",
+    "src/infra/database/typeorm/dt-money/entities/TransactionCategory.ts",
+    "src/infra/database/typeorm/dt-money/entities/TransactionType.ts",
+    "src/infra/database/typeorm/dt-money/repositories/transaction.repository.ts"
+  ]
+}

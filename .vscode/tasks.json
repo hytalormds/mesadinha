@@ -1,0 +1,38 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "backend-typecheck",
+			"type": "shell",
+			"command": "npx",
+			"args": [
+				"tsc",
+				"--noEmit",
+				"-p",
+				"tsconfig.backend.json"
+			],
+			"isBackground": false
+		},
+		{
+			"label": "backend-migration-run",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"api:migration:run"
+			],
+			"isBackground": false
+		},
+		{
+			"label": "cleanup-duplicate-backend",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"if (Test-Path './dt-money-backend') { Remove-Item -Recurse -Force './dt-money-backend' }"
+			],
+			"isBackground": false
+		}
+	]
+}
