@@ -1,0 +1,82 @@
+O back-end é composto por uma:
+
+- API Fastify: https://fastify.dev/docs/latest/
+- TypeScript;
+- TypeORM (ORM - Object-Relational Mapper): Facilita a interação entre aplicações desenvolvidas em JavaScript ou TypeScript e bancos de dados relacionais. 
+Ele permite que os desenvolvedores trabalhem com bancos de dados de forma orientada a objetos, simplificando o processo de manipulação de dados.
+- SQLite;
+
+O ponto de de entrada é o src/server.ts. Ele cria o Fastify, configura o tratamento 
+de erro, schemas, Swagger, CORS, conecta ao banco de dados e registra as rotas. A 
+API sobe em localhost:3001.
+
+O fluxo geral:
+
+- O front chamaria a API via Axios (biblioteca usada para realizar as requisições HTTP de forma simples e eficiente)
+em src/shared/api/mesadinha.ts;
+
+- A requisição entra em uma rota Fastify;
+
+- A rota chama um controller;
+
+- O controller chama um use case;
+
+- O use case aplica a regra de negócio;
+
+- O repositório TypeORM lê/grava no SQLite;
+
+- Os erros são convertidos em respostas HTTP pelo handler global em src/infra/web/config/error-handler.ts
+
+Banco de Dados:
+
+O banco de dados é configurado em SQLite em src/infra/database/typeorm/mesadinha/data-source.ts
+Ele usa as entidades do TypeORM e as migrations. Ao iniciar, src/infra/database/index.ts 
+inicializa a conexão e roda seeders para os tipo usuário e status das tarefas.
+
+As entidades principais são:
+
+- User: Usuários são: responsável ou criança;
+- Familia: Grupo familiar com código de convite;
+- UsuarioFamilia: Vínculo entre User e Familia, com papel responsavel, ou crianca;
+- Tarefa: Taregas com a recompensa, status, responsável, criança e família;
+- Carteira: Responsável por armazenar os "valores" das tarefas;
+- Movimentacao: Responsável pelo fluxo da movimentação da aplicação.
+
+Autenticação:
+
+As rotas de auth estão em: src/infra/web/routes/auth.routes.ts :
+
+- POST /auth/register -> registrar um usuário
+- POST /auth/login -> realiza o login
+
+No ato do cadastro, RegisterUseCase verifica se o e-mail já existe, criptografa a senha
+com bcrypt, cria o usuário, cria uma carteira zerada, cria uma família, vincula o 
+usuário como responsável e devolve um JWT (JSON Web Token). No login, a aplicação 
+busca o usuário por e-mail, compara a senha e gera outro JWT com id, email, papel e familiaId.
+
+Familia:
+
+A rota de entrada por convite é POST /familia/entrar. O caso de uso em join-family-by-code.ts
+recebe um codigoConvite, procura a família e cria automaticamente um usuário criança
+com e-mail/senha internos. Depois vincula essa criança à família com papel crianca e 
+retorna token, usuário e família.
+
+Tarefas:
+
+As rotas das tarefas estão em src/infra/web/routes/tarefa.routes.ts :
+
+- GET /tarefa/status: lista status disponíveis;
+- GET /tarefa: lista tarefas;
+- POST /tarefa: cria a tarefa, somente para o responsável;
+- PUT /tarefa: atualiza a tarefa, só para responsável;
+- DELETE /tarefa/:id : remove a tarefa, só para o responsável.
+
+A autenticação é feita pelo middleware check-authentication.ts .Ele pega o 
+Authorization: Bearer <token>, valida o JWT, busca o usuário no banco e anexa
+request.user com papel e familiaId. Depois, allowRoles("responsavel") bloqueia
+ações que as crianças não podem fazer. A listagem de tarefas fica em tarefa.repository.ts
+. Ela filtra sempre por família. Se o usuário for criança, ele filtra também por
+fkUsuarioCrianca, então a criança só vê as próprias tarefas. Também suporta busca por:
+texto, datas, status, ordenação e paginação.
+
+
