@@ -18,6 +18,7 @@ export class DeleteTarefaController {
     await this.deleteTarefaUseCase.execute({
       idTarefa,
       userId,
+      familiaId: request.user.familiaId,
     });
 
     reply.status(204).send();

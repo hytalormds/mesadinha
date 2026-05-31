@@ -2,11 +2,8 @@ import { FastifySchema } from "fastify";
 import S from "fluent-json-schema";
 
 const body = S.object()
-  .prop("email", S.string().required())
-  .prop("name", S.string().required())
-  .prop("password", S.string().required())
-  .prop("nomeFamilia", S.string())
-  .prop("idTipo", S.number());
+  .prop("codigoConvite", S.string().required())
+  .prop("name", S.string());
 
 const successResponse = S.object()
   .prop("user", S.ref("User#"))
@@ -19,13 +16,13 @@ const successResponse = S.object()
       .prop("codigoConvite", S.string()),
   );
 
-export const registerSchema: FastifySchema = {
-  tags: ["Auth"],
+export const joinFamilySchema: FastifySchema = {
+  tags: ["Familia"],
   body,
   response: {
     200: successResponse,
-    401: {
-      $ref: "Unauthorized#",
+    404: {
+      $ref: "NotFound#",
     },
     422: {
       $ref: "UnprocessableEntity#",

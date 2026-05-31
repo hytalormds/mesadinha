@@ -37,7 +37,9 @@ export const configure = (fastify: FastifyInstance) => {
     .prop("id", S.number())
     .prop("name", S.string())
     .prop("email", S.string())
-    .prop("idTipo", S.number());
+    .prop("idTipo", S.number())
+    .prop("papel", S.string())
+    .prop("familiaId", S.number());
 
   const statusTarefa = S.object()
     .id("StatusTarefa")
@@ -58,6 +60,8 @@ export const configure = (fastify: FastifyInstance) => {
     .prop("descricao", S.oneOf([S.string(), S.null()]))
     .prop("fkStatusTarefa", S.number().required())
     .prop("fkUsuarioResponsavel", S.number().required())
+    .prop("fkUsuarioCrianca", S.number().required())
+    .prop("fkFamiliaId", S.number().required())
     .prop("status", S.oneOf([S.ref("StatusTarefa#"), S.null()]));
 
   const orderDirection = S.string()

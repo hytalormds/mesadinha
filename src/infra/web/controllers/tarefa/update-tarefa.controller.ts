@@ -10,15 +10,19 @@ export class UpdateTarefaController {
   }
 
   execute = async (
-    request: FastifyRequest<{ Body: Omit<UpdateTarefaParams, "userId"> }>,
+    request: FastifyRequest<{
+      Body: Omit<UpdateTarefaParams, "userId" | "familiaId">;
+    }>,
     reply: FastifyReply,
   ) => {
     const body = request.body;
     const userId = request.user.id;
+    const familiaId = request.user.familiaId;
 
     await this.updateTarefaUseCase.execute({
       ...body,
       userId,
+      familiaId,
     });
 
     reply.status(204).send();

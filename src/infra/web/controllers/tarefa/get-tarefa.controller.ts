@@ -37,6 +37,8 @@ export class GetTarefaController {
         id: orderId,
       },
       userId,
+      familiaId: request.user.familiaId,
+      papel: request.user.papel,
       searchText: searchText ?? undefined,
     };
 

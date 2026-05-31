@@ -27,6 +27,8 @@ export class TarefaRepository implements TarefaRepositoryInterface {
         dataLimite: params.dataLimite,
         fkStatusTarefa: params.fkStatusTarefa,
         fkUsuarioResponsavel: params.userId,
+        fkUsuarioCrianca: params.fkUsuarioCrianca,
+        fkFamiliaId: params.familiaId,
       });
 
       return tarefa;
@@ -58,6 +60,8 @@ export class TarefaRepository implements TarefaRepositoryInterface {
       await this.tarefaRepository.save({
         idTarefa: params.idTarefa,
         fkUsuarioResponsavel: params.userId,
+        fkUsuarioCrianca: params.fkUsuarioCrianca,
+        fkFamiliaId: params.familiaId,
         fkStatusTarefa: params.fkStatusTarefa,
         titulo: params.titulo,
         descricao: params.descricao,
@@ -71,6 +75,8 @@ export class TarefaRepository implements TarefaRepositoryInterface {
 
   async getTarefaResumo({
     userId,
+    familiaId,
+    papel,
     filters,
     searchText,
   }: GetTarefasParams): Promise<TarefaResumoResponse> {
@@ -82,7 +88,11 @@ export class TarefaRepository implements TarefaRepositoryInterface {
           "COUNT(tarefa.idTarefa) AS totalTarefas",
           "COALESCE(SUM(tarefa.valorRecompensa), 0) AS totalRecompensas",
         ])
-        .where("tarefa.fkUsuarioResponsavel = :userId", { userId });
+        .where("tarefa.fkFamiliaId = :familiaId", { familiaId });
+
+      if (papel === "crianca") {
+        query.andWhere("tarefa.fkUsuarioCrianca = :userId", { userId });
+      }
 
       if (filters?.from) {
         query.andWhere("tarefa.dataLimite >= :from", { from: filters.from });
@@ -127,6 +137,8 @@ export class TarefaRepository implements TarefaRepositoryInterface {
 
   async getTarefas({
     userId,
+    familiaId,
+    papel,
     pagination,
     filters,
     searchText,
@@ -142,7 +154,11 @@ export class TarefaRepository implements TarefaRepositoryInterface {
       const query = this.tarefaRepository
         .createQueryBuilder("tarefa")
         .leftJoinAndSelect("tarefa.status", "status")
-        .where("tarefa.fkUsuarioResponsavel = :userId", { userId });
+        .where("tarefa.fkFamiliaId = :familiaId", { familiaId });
+
+      if (papel === "crianca") {
+        query.andWhere("tarefa.fkUsuarioCrianca = :userId", { userId });
+      }
 
       if (sort?.id) {
         query.addOrderBy(

@@ -10,15 +10,19 @@ export class CreateTarefaController {
   }
 
   execute = async (
-    request: FastifyRequest<{ Body: Omit<CreateTarefaParams, "userId"> }>,
+    request: FastifyRequest<{
+      Body: Omit<CreateTarefaParams, "userId" | "familiaId">;
+    }>,
     reply: FastifyReply,
   ) => {
     const body = request.body;
     const userId = request.user.id;
+    const familiaId = request.user.familiaId;
 
     const tarefa = await this.createTarefaUseCase.execute({
       ...body,
       userId,
+      familiaId,
     });
 
     reply.status(200).send(tarefa);

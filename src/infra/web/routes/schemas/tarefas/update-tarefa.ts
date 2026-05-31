@@ -7,7 +7,8 @@ const body = S.object()
   .prop("descricao", S.string())
   .prop("valorRecompensa", S.number())
   .prop("dataLimite", S.string().format("date-time"))
-  .prop("fkStatusTarefa", S.number());
+  .prop("fkStatusTarefa", S.number())
+  .prop("fkUsuarioCrianca", S.number());
 
 export const updateTarefaSchema: FastifySchema = {
   tags: ["Tarefa"],

@@ -6,7 +6,8 @@ const body = S.object()
   .prop("descricao", S.string())
   .prop("valorRecompensa", S.number().required())
   .prop("dataLimite", S.string().format("date-time"))
-  .prop("fkStatusTarefa", S.number().required());
+  .prop("fkStatusTarefa", S.number().required())
+  .prop("fkUsuarioCrianca", S.number().required());
 
 const successResponse = S.ref("Tarefa#");
 

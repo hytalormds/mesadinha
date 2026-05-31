@@ -1,4 +1,5 @@
 import { FastifyInstance } from "fastify";
+import { allowRoles } from "../middlewares/allow-roles";
 import { CheckAuthtenticationMiddleware } from "../middlewares/check-authentication";
 import { CreateTarefaController } from "../controllers/tarefa/create-tarefa.controller";
 import { DeleteTarefaController } from "../controllers/tarefa/delete-tarefa.controller";
@@ -39,7 +40,7 @@ export const configure = (fastify: FastifyInstance) => {
     url: "/tarefa",
     method: "post",
     handler: createTarefa.execute,
-    preHandler: [checkAuthenticated.execute],
+    preHandler: [checkAuthenticated.execute, allowRoles("responsavel")],
     schema: createTarefaSchema,
   });
 
@@ -47,7 +48,7 @@ export const configure = (fastify: FastifyInstance) => {
     url: "/tarefa/:id",
     method: "delete",
     handler: deleteTarefa.execute,
-    preHandler: [checkAuthenticated.execute],
+    preHandler: [checkAuthenticated.execute, allowRoles("responsavel")],
     schema: deleteTarefaSchema,
   });
 
@@ -55,7 +56,7 @@ export const configure = (fastify: FastifyInstance) => {
     url: "/tarefa",
     method: "put",
     handler: updateTarefa.execute,
-    preHandler: [checkAuthenticated.execute],
+    preHandler: [checkAuthenticated.execute, allowRoles("responsavel")],
     schema: updateTarefaSchema,
   });
 };

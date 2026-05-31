@@ -9,6 +9,7 @@ import {
 import { StatusTarefa } from "./StatusTarefa";
 import { User } from "./User";
 import { Movimentacao } from "./Movimentacao";
+import { Familia } from "./Familia";
 
 @Entity("tarefa")
 export class Tarefa {
@@ -33,6 +34,12 @@ export class Tarefa {
   @Column({ name: "fk_usuario_responsavel", type: "int", nullable: false })
   fkUsuarioResponsavel: number;
 
+  @Column({ name: "fk_usuario_crianca", type: "int", nullable: false })
+  fkUsuarioCrianca: number;
+
+  @Column({ name: "fk_familia_id", type: "int", nullable: false })
+  fkFamiliaId: number;
+
   @ManyToOne(() => StatusTarefa, (status) => status.tarefas)
   @JoinColumn({ name: "fk_status_tarefa", referencedColumnName: "idStatus" })
   status: StatusTarefa;
@@ -40,6 +47,14 @@ export class Tarefa {
   @ManyToOne(() => User, (user) => user.tarefas)
   @JoinColumn({ name: "fk_usuario_responsavel", referencedColumnName: "id" })
   usuarioResponsavel: User;
+
+  @ManyToOne(() => User)
+  @JoinColumn({ name: "fk_usuario_crianca", referencedColumnName: "id" })
+  usuarioCrianca: User;
+
+  @ManyToOne(() => Familia, (familia) => familia.tarefas)
+  @JoinColumn({ name: "fk_familia_id", referencedColumnName: "idFamilia" })
+  familia: Familia;
 
   @OneToMany(() => Movimentacao, (movimentacao) => movimentacao.tarefa)
   movimentacoes?: Movimentacao[];
