@@ -3,7 +3,7 @@ import BemVindo from "../app/pages/bem-vindo";
 import Login from "../app/pages/login";
 
 import telaCadastro from "../app/pages/telaCadastro";
-import cadastroTarefa from "../app/pages/cadastroTarefa";
+import cadastroTarefa from "../app/pages/CadastroTarefa";
 import vincularFilho from "../app/pages/vincularFIlho";
 const Stack = createNativeStackNavigator();
 

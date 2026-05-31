@@ -15,7 +15,7 @@ import { useNavigation } from "@react-navigation/native";
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
-import styles from "./style";
+import styles from "./styles";
 
 export default function CadastroTarefa() {
   const navigation = useNavigation<any>();
