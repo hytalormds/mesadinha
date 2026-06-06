@@ -24,44 +24,12 @@ export default function CadastroTarefa() {
   const [descricao, setDescricao] = React.useState("");
 
   const [data, setData] = React.useState<Date | null>(null);
-  const [hora, setHora] = React.useState<Date | null>(null);
-
-  const [mostrarCalendario, setMostrarCalendario] = React.useState(false);
-  const [mostrarRelogio, setMostrarRelogio] = React.useState(false);
+  const [valorRecompensa, setValorRecompensa] = React.useState(0);
 
   function formatarData(date: Date | null) {
     if (!date) return "";
 
     return date.toLocaleDateString("pt-BR");
-  }
-
-  function formatarHora(date: Date | null) {
-    if (!date) return "";
-
-    return date.toLocaleTimeString("pt-BR", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  }
-
-  function selecionarData(event: DateTimePickerEvent, selectedDate?: Date) {
-    if (Platform.OS === "android") {
-      setMostrarCalendario(false);
-    }
-
-    if (selectedDate) {
-      setData(selectedDate);
-    }
-  }
-
-  function selecionarHora(event: DateTimePickerEvent, selectedDate?: Date) {
-    if (Platform.OS === "android") {
-      setMostrarRelogio(false);
-    }
-
-    if (selectedDate) {
-      setHora(selectedDate);
-    }
   }
 
   function validarFormulario() {
@@ -76,12 +44,7 @@ export default function CadastroTarefa() {
     }
 
     if (!data) {
-      Alert.alert("Atenção", "Selecione a data da tarefa.");
-      return false;
-    }
-
-    if (!hora) {
-      Alert.alert("Atenção", "Selecione a hora da tarefa.");
+      Alert.alert("Atenção", "Selecione a data limite da tarefa.");
       return false;
     }
 
@@ -96,8 +59,9 @@ export default function CadastroTarefa() {
     const tarefa = {
       titulo,
       descricao,
-      data: formatarData(data),
-      hora: formatarHora(hora),
+      dataLimite: formatarData(data),
+      valorRecompensa,
+
     };
 
     console.log("Tarefa cadastrada:", tarefa);
@@ -107,7 +71,7 @@ export default function CadastroTarefa() {
     setTitulo("");
     setDescricao("");
     setData(null);
-    setHora(null);
+    setValorRecompensa(0);
   }
 
   return (
@@ -115,10 +79,13 @@ export default function CadastroTarefa() {
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >
         <ScrollView
-          contentContainerStyle={{ flexGrow: 1 }}
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}
           keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+          showsVerticalScrollIndicator={false}
         >
           <View style={styles.containerLogo}>
             <View style={styles.headerRow}>
@@ -158,82 +125,36 @@ export default function CadastroTarefa() {
               numberOfLines={5}
               textAlignVertical="top"
             />
+            <Text style={styles.label}>Valor da recompensa</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Digite o valor da recompensa"
+              keyboardType="numeric"
+              value={valorRecompensa ? String(valorRecompensa) : ""}
+              onChangeText={(text) => setValorRecompensa(Number(text))}
+            />
+            <Text style={styles.label}>Data limite da tarefa: </Text>
 
-            <Text style={styles.label}>Data</Text>
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={() => setMostrarCalendario(true)}
-            >
-              <TextInput
-                style={styles.input}
-                placeholder="Selecione a data"
-                value={formatarData(data)}
-                editable={false}
-                pointerEvents="none"
-              />
-            </TouchableOpacity>
-
-            {mostrarCalendario && (
-              <DateTimePicker
-                value={data || new Date()}
-                mode="date"
-                display={Platform.OS === "ios" ? "spinner" : "default"}
-                onChange={selecionarData}
-              />
-            )}
-
-            {Platform.OS === "ios" && mostrarCalendario && (
-              <TouchableOpacity
-                style={styles.botaoConfirmarPicker}
-                onPress={() => setMostrarCalendario(false)}
-              >
-                <Text style={styles.botaoConfirmarPickerText}>
-                  Confirmar Data
-                </Text>
-              </TouchableOpacity>
-            )}
-
+            <TextInput
+              style={styles.input}
+              placeholder="Selecione a data limite"
+              value={formatarData(data)}
+              editable={false}
+              pointerEvents="none"
+            />
             <Text style={styles.label}>Hora</Text>
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={() => setMostrarRelogio(true)}
-            >
-              <TextInput
-                style={styles.input}
-                placeholder="Selecione a hora"
-                value={formatarHora(hora)}
-                editable={false}
-                pointerEvents="none"
-              />
-            </TouchableOpacity>
-
-            {mostrarRelogio && (
-              <DateTimePicker
-                value={hora || new Date()}
-                mode="time"
-                display={Platform.OS === "ios" ? "spinner" : "default"}
-                is24Hour={true}
-                onChange={selecionarHora}
-              />
-            )}
-
-            {Platform.OS === "ios" && mostrarRelogio && (
-              <TouchableOpacity
-                style={styles.botaoConfirmarPicker}
-                onPress={() => setMostrarRelogio(false)}
-              >
-                <Text style={styles.botaoConfirmarPickerText}>
-                  Confirmar Hora
-                </Text>
-              </TouchableOpacity>
-            )}
-
+            <TextInput
+              style={styles.input}
+              placeholder="Selecione a hora"
+              editable={false}
+              pointerEvents="none"
+            />
             <TouchableOpacity style={styles.botao} onPress={salvarTarefa}>
               <Text style={styles.botaoText}>Salvar Tarefa</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </SafeAreaView >
   );
 }
