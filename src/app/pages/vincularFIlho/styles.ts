@@ -38,6 +38,7 @@ export default StyleSheet.create(
 
         containerForm: {
             padding: 20,
+            flex:1
         },
 
         subtituloForm: {
@@ -61,12 +62,14 @@ export default StyleSheet.create(
             padding: 15,
             borderRadius: 10,
             alignItems: "center",
-            marginTop: 20,
+            marginTop: 50,
+           
         },
 
         botaoText: {
             color: "#fff",
             fontWeight: "bold",
+
         },
 
         // 🔥 TIPO USUÁRIO

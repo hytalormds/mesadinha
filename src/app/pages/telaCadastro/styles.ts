@@ -25,6 +25,8 @@ export default StyleSheet.create(
 
         textContainer: {
             flex: 1,
+            alignItems:"center"
+    
         },
 
         titulo: {
@@ -46,6 +48,7 @@ export default StyleSheet.create(
 
         label: {
             marginTop: 10,
+        
         },
 
         input: {
@@ -53,6 +56,7 @@ export default StyleSheet.create(
             borderColor: "#ccc",
             borderRadius: 8,
             padding: 10,
+            marginTop:10,
             marginBottom: 10,
         },
 
@@ -139,6 +143,7 @@ export default StyleSheet.create(
         footerContainer: {
             flex: 1,
             padding: 20,
+            alignItems:"center"
         },
         footerLink: {
             color: "#007bff",

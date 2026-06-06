@@ -159,7 +159,6 @@ export default function CadastroTarefa() {
           </View>
 
           <View style={styles.containerForm}>
-            <Text style={styles.subtituloForm}>Preencha os campos</Text>
 
             <Text style={styles.label}>Título</Text>
             <TextInput

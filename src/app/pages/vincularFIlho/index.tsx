@@ -100,7 +100,7 @@ export default function VincularFilho() {
                     </View>
 
                     <View style={styles.containerForm}>
-                        <Text style={styles.subtituloForm}>Dados do Filho</Text>
+                      
 
                         <Text style={styles.label}>Nome do Filho</Text>
                         <TextInput
@@ -123,12 +123,7 @@ export default function VincularFilho() {
                             <Text style={styles.botaoText}>Vincular Filho</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity
-                            style={styles.botao}
-                            onPress={() => navigation.navigate("Login")}
-                        >
-                            <Text style={styles.botaoText}>Voltar</Text>
-                        </TouchableOpacity>
+                     
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>
