@@ -137,7 +137,7 @@ export default function Login() {
 
   const handleEntrar = () => {
     if (validarFormulario()) {
-      navigation.navigate("CadastroTarefa");
+      navigation.navigate("ListTarefas");
     }
   };
 

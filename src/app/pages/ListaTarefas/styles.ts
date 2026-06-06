@@ -7,12 +7,19 @@ export default StyleSheet.create(
             flex: 1,
             backgroundColor: '#fff',
         },
+        formContainer: {
+            padding: 20,
+        },
 
         logoTop: {
             width: 120,
             height: 120,
         },
 
+        botaoTexto: {
+            color: "#fff",
+            fontWeight: "bold",
+        },
         containerLogo: {
             padding: 20,
         },
@@ -22,6 +29,28 @@ export default StyleSheet.create(
             justifyContent: "space-between",
             alignItems: "center",
         },
+        scrollView: {
+            flexGrow: 1,
+        },
+        header: {
+            padding: 20,
+            borderBottomWidth: 1,
+            borderBottomColor: "#ccc",
+        },
+        title: {
+            fontSize: 26,
+            fontWeight: "600",
+        },
+        tarefaItem: {
+            padding: 15,
+            borderBottomWidth: 1,
+            borderBottomColor: "#ccc",
+        },
+        tarefaText: {
+            fontSize: 16,
+        },
+
+
 
         textContainer: {
             flex: 1,

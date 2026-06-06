@@ -16,7 +16,8 @@
     "android": {
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "softwareKeyboardLayoutMode": "resize"
+      "softwareKeyboardLayoutMode": "resize",
+      "package": "com.luchaoliveira.mesadinha"
     },
     "plugins": [
       "@react-native-community/datetimepicker",

@@ -12,9 +12,6 @@ import {
   Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import DateTimePicker, {
-  DateTimePickerEvent,
-} from "@react-native-community/datetimepicker";
 import styles from "./styles";
 
 export default function CadastroTarefa() {
@@ -22,14 +19,45 @@ export default function CadastroTarefa() {
 
   const [titulo, setTitulo] = React.useState("");
   const [descricao, setDescricao] = React.useState("");
+  const [dataLimite, setDataLimite] = React.useState("");
+  const [valor_recompensa, setvalor_recompensa] = React.useState("");
 
-  const [data, setData] = React.useState<Date | null>(null);
-  const [valorRecompensa, setValorRecompensa] = React.useState(0);
+  function formatarDataDigitada(texto: string) {
+    const numeros = texto.replace(/\D/g, "").slice(0, 8);
 
-  function formatarData(date: Date | null) {
-    if (!date) return "";
+    if (numeros.length <= 2) {
+      return numeros;
+    }
 
-    return date.toLocaleDateString("pt-BR");
+    if (numeros.length <= 4) {
+      return `${numeros.slice(0, 2)}/${numeros.slice(2)}`;
+    }
+
+    return `${numeros.slice(0, 2)}/${numeros.slice(2, 4)}/${numeros.slice(4)}`;
+  }
+
+  function dataValida(dataTexto: string) {
+    const partes = dataTexto.split("/");
+
+    if (partes.length !== 3) {
+      return false;
+    }
+
+    const dia = Number(partes[0]);
+    const mes = Number(partes[1]);
+    const ano = Number(partes[2]);
+
+    if (!dia || !mes || !ano) {
+      return false;
+    }
+
+    const dataTeste = new Date(ano, mes - 1, dia);
+
+    return (
+      dataTeste.getFullYear() === ano &&
+      dataTeste.getMonth() === mes - 1 &&
+      dataTeste.getDate() === dia
+    );
   }
 
   function validarFormulario() {
@@ -43,8 +71,23 @@ export default function CadastroTarefa() {
       return false;
     }
 
-    if (!data) {
-      Alert.alert("Atenção", "Selecione a data limite da tarefa.");
+    if (!valor_recompensa.trim()) {
+      Alert.alert("Atenção", "Digite o valor da recompensa.");
+      return false;
+    }
+
+    if (converterMoedaParaNumero(valor_recompensa) <= 0) {
+      Alert.alert("Atenção", "Digite um valor de recompensa válido.");
+      return false;
+    }
+
+    if (!dataLimite.trim()) {
+      Alert.alert("Atenção", "Digite a data limite da tarefa.");
+      return false;
+    }
+
+    if (!dataValida(dataLimite)) {
+      Alert.alert("Atenção", "Digite uma data válida no formato DD/MM/AAAA.");
       return false;
     }
 
@@ -59,9 +102,8 @@ export default function CadastroTarefa() {
     const tarefa = {
       titulo,
       descricao,
-      dataLimite: formatarData(data),
-      valorRecompensa,
-
+      dataLimite,
+      valor_recompensa: converterMoedaParaNumero(valor_recompensa),
     };
 
     console.log("Tarefa cadastrada:", tarefa);
@@ -70,10 +112,22 @@ export default function CadastroTarefa() {
 
     setTitulo("");
     setDescricao("");
-    setData(null);
-    setValorRecompensa(0);
+    setDataLimite("");
+    setvalor_recompensa("");
   }
+  function formatarvalor_recompensa(texto: string) {
+    const numeros = texto.replace(/\D/g, "");
+    const valor = Number(numeros) / 100;
+    if (!numeros) {
+      return "";
+    }
+    return valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  }
+  function converterMoedaParaNumero(valor: string) {
+    const numeros = valor.replace(/\D/g, "");
 
+    return Number(numeros) / 100;
+  }
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <KeyboardAvoidingView
@@ -125,36 +179,34 @@ export default function CadastroTarefa() {
               numberOfLines={5}
               textAlignVertical="top"
             />
+
             <Text style={styles.label}>Valor da recompensa</Text>
             <TextInput
               style={styles.input}
-              placeholder="Digite o valor da recompensa"
+              placeholder="R$ 0,00"
               keyboardType="numeric"
-              value={valorRecompensa ? String(valorRecompensa) : ""}
-              onChangeText={(text) => setValorRecompensa(Number(text))}
+              value={valor_recompensa}
+              onChangeText={(text) => setvalor_recompensa(formatarvalor_recompensa(text))}
             />
-            <Text style={styles.label}>Data limite da tarefa: </Text>
 
+            <Text style={styles.label}>Data limite da tarefa:</Text>
             <TextInput
               style={styles.input}
-              placeholder="Selecione a data limite"
-              value={formatarData(data)}
-              editable={false}
-              pointerEvents="none"
+              placeholder="DD/MM/AAAA"
+              value={dataLimite}
+              onChangeText={(text) =>
+                setDataLimite(formatarDataDigitada(text))
+              }
+              keyboardType="numeric"
+              maxLength={10}
             />
-            <Text style={styles.label}>Hora</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Selecione a hora"
-              editable={false}
-              pointerEvents="none"
-            />
+
             <TouchableOpacity style={styles.botao} onPress={salvarTarefa}>
               <Text style={styles.botaoText}>Salvar Tarefa</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView >
+    </SafeAreaView>
   );
 }
