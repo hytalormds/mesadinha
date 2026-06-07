@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+﻿import { StyleSheet } from "react-native";
 
 export default StyleSheet.create(
     {
@@ -7,6 +7,19 @@ export default StyleSheet.create(
         container: {
             flex: 1,
             backgroundColor: '#fff',
+        },
+
+        safeArea: {
+            flex: 1,
+        },
+
+        keyboardAvoiding: {
+            flex: 1,
+        },
+
+        scrollContent: {
+            flexGrow: 1,
+            paddingBottom: 40,
         },
 
         logoTop: {

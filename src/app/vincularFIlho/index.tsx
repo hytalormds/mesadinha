@@ -1,9 +1,8 @@
-import React from "react";
+﻿import React from "react";
 import {
     Text,
     View,
     TextInput,
-    TouchableOpacity,
     Alert,
     Image,
     ScrollView,
@@ -14,6 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import styles from "./styles";
+import { Button } from "../../componentes/Button";
 
 export default function VincularFilho() {
     const navigation = useNavigation<any>();
@@ -76,12 +76,12 @@ export default function VincularFilho() {
     }
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
+        <SafeAreaView style={styles.safeArea}>
             <KeyboardAvoidingView
-                style={{ flex: 1 }}
+                style={styles.keyboardAvoiding}
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
             >
-                <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                <ScrollView contentContainerStyle={styles.scrollContent}>
                     <View style={styles.containerLogo}>
                         <View style={styles.headerRow}>
                             <View style={styles.textContainer}>
@@ -119,9 +119,11 @@ export default function VincularFilho() {
                             autoCapitalize="characters"
                         />
 
-                        <TouchableOpacity style={styles.botao} onPress={vincularFilho}>
-                            <Text style={styles.botaoText}>Vincular Filho</Text>
-                        </TouchableOpacity>
+                        <Button
+                            title="Vincular Filho"
+                            style={styles.botao}
+                            onPress={vincularFilho}
+                        />
 
                      
                     </View>
@@ -130,3 +132,6 @@ export default function VincularFilho() {
         </SafeAreaView>
     );
 }
+
+
+

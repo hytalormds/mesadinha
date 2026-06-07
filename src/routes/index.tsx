@@ -1,11 +1,11 @@
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import BemVindo from "../app/pages/bem-vindo";
-import Login from "../app/pages/login";
+﻿import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import BemVindo from "../app/bem-vindo";
+import Login from "../app/login";
 
-import telaCadastro from "../app/pages/telaCadastro";
-import cadastroTarefa from "../app/pages/CadastroTarefa";
-import vincularFilho from "../app/pages/vincularFIlho";
-import ListTarefas from "../app/pages/ListaTarefas";
+import telaCadastro from "../app/telaCadastro";
+import cadastroTarefa from "../app/CadastroTarefa";
+import vincularFilho from "../app/vincularFIlho";
+import ListTarefas from "../app/ListaTarefas";
 const Stack = createNativeStackNavigator();
 
 export default function Routes() {
@@ -27,3 +27,4 @@ export default function Routes() {
     </Stack.Navigator>
   );
 }
+

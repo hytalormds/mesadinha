@@ -1,9 +1,10 @@
-import React from "react";
-import { Text, View, TouchableOpacity, ScrollView } from "react-native";
+﻿import React from "react";
+import { Text, View, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import styles from "./styles";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { TextInput } from "react-native";
+import { Button } from "../../componentes/Button";
 
 export default function TelaCadastro() {
   const validarFormulario = () => {
@@ -38,8 +39,8 @@ export default function TelaCadastro() {
   >("Pai");
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.containerLogo}>
           <View style={styles.headerRow}>
             <View style={styles.textContainer}>
@@ -97,37 +98,39 @@ export default function TelaCadastro() {
           <Text style={styles.label}>Tipo de Usuário:</Text>
           <View style={styles.tipoUsuarioContainer}>
             {["Pai", "Filho", "Ambos"].map((tipo) => (
-              <TouchableOpacity
+              <Button
                 key={tipo}
+                title={tipo}
                 style={[
                   styles.tipoUsuario,
                   tipoUsuario === tipo && styles.tipoUsuarioButtonSelected,
                 ]}
                 onPress={() => setTipoUsuario(tipo as "Pai" | "Filho")}
-              >
-                <Text>{tipo}</Text>
-              </TouchableOpacity>
+              />
             ))}
           </View>
 
-          <TouchableOpacity
+          <Button
+            title="Cadastrar"
             style={styles.botao}
             onPress={() => {
               if (validarFormulario()) {
                 navigation.navigate("Login");
               }
             }}
-          >
-            <Text style={styles.botaoText}>Cadastrar</Text>
-          </TouchableOpacity>
+          />
           <View style={styles.footerContainer}>
             <Text style={styles.footerText}>Já tem conta?</Text>
-            <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-              <Text style={styles.footerLink}>Faça login</Text>
-            </TouchableOpacity>
+            <Button
+              title="Faça login"
+              onPress={() => navigation.navigate("Login")}
+            />
           </View>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
+
+
+

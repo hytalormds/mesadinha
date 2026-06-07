@@ -1,10 +1,9 @@
-import React from "react";
+﻿import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Text,
   View,
   Image,
-  TouchableOpacity,
   TextInput,
   ScrollView,
   KeyboardAvoidingView,
@@ -13,6 +12,7 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import styles from "./styles";
+import { Button } from "../../componentes/Button";
 
 export default function CadastroTarefa() {
   const navigation = useNavigation<any>();
@@ -129,14 +129,14 @@ export default function CadastroTarefa() {
     return Number(numeros) / 100;
   }
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
+        style={styles.keyboardAvoiding}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >
         <ScrollView
-          contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}
+          contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
           showsVerticalScrollIndicator={false}
@@ -200,12 +200,16 @@ export default function CadastroTarefa() {
               maxLength={10}
             />
 
-            <TouchableOpacity style={styles.botao} onPress={salvarTarefa}>
-              <Text style={styles.botaoText}>Salvar Tarefa</Text>
-            </TouchableOpacity>
+            <Button
+              title="Salvar Tarefa"
+              style={styles.botao}
+              onPress={salvarTarefa}
+            />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
+
+

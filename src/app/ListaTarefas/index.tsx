@@ -1,4 +1,4 @@
-import { Platform, Text, TouchableOpacity, View } from "react-native";
+﻿import { Platform, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import styles from "./styles";
 import { Image } from "react-native";
@@ -6,20 +6,20 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { KeyboardAvoidingView } from "react-native";
 import React from "react";
 import { MaterialIcons } from "@expo/vector-icons";
-import { Button } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { Button } from "../../componentes/Button";
 
 export default function ListaTarefas() {
     const navigation = useNavigation();
     return (
-        <SafeAreaView style={{ flex: 1 }}>
+        <SafeAreaView style={styles.safeArea}>
             <KeyboardAvoidingView
-                style={{ flex: 1 }}
+                style={styles.keyboardAvoiding}
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
                 keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
             >
                 <ScrollView
-                    contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}
+                    contentContainerStyle={styles.scrollContent}
                     keyboardShouldPersistTaps="handled"
                     keyboardDismissMode="on-drag"
                     showsVerticalScrollIndicator={false}
@@ -62,13 +62,13 @@ export default function ListaTarefas() {
                         </View>
 
                     </View>
-                    <View style={{ height: 20 }} />
+                    <View style={styles.spacer} />
                     <View style={styles.footerContainer}>
-                        <TouchableOpacity style={styles.botao}
+                        <Button
+                            title="Adicionar Nova Tarefa"
+                            style={styles.botao}
                             onPress={() => navigation.navigate("CadastroTarefa" as never)}
-                        >
-                            <Text style={styles.botaoTexto}>Adicionar Nova Tarefa</Text>
-                        </TouchableOpacity>
+                        />
                     </View>
 
                 </ScrollView>
@@ -76,3 +76,5 @@ export default function ListaTarefas() {
         </SafeAreaView>
     );
 }
+
+

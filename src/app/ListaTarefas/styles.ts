@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+﻿import { StyleSheet } from "react-native";
 
 export default StyleSheet.create(
     {
@@ -7,12 +7,32 @@ export default StyleSheet.create(
             flex: 1,
             backgroundColor: '#fff',
         },
+        safeArea: {
+            flex: 1,
+        },
+        keyboardAvoiding: {
+            flex: 1,
+        },
+        scrollContent: {
+            flexGrow: 1,
+            paddingBottom: 40,
+        },
+        spacer: {
+            height: 20,
+        },
+        formContainer: {
+            padding: 20,
+        },
 
         logoTop: {
             width: 120,
             height: 120,
         },
 
+        botaoTexto: {
+            color: "#fff",
+            fontWeight: "bold",
+        },
         containerLogo: {
             padding: 20,
         },
@@ -22,11 +42,31 @@ export default StyleSheet.create(
             justifyContent: "space-between",
             alignItems: "center",
         },
+        scrollView: {
+            flexGrow: 1,
+        },
+        header: {
+            padding: 20,
+            borderBottomWidth: 1,
+            borderBottomColor: "#ccc",
+        },
+        title: {
+            fontSize: 26,
+            fontWeight: "600",
+        },
+        tarefaItem: {
+            padding: 15,
+            borderBottomWidth: 1,
+            borderBottomColor: "#ccc",
+        },
+        tarefaText: {
+            fontSize: 16,
+        },
+
+
 
         textContainer: {
             flex: 1,
-            alignItems:"center"
-    
         },
 
         titulo: {
@@ -48,7 +88,6 @@ export default StyleSheet.create(
 
         label: {
             marginTop: 10,
-        
         },
 
         input: {
@@ -56,7 +95,6 @@ export default StyleSheet.create(
             borderColor: "#ccc",
             borderRadius: 8,
             padding: 10,
-            marginTop:10,
             marginBottom: 10,
         },
 
@@ -73,7 +111,7 @@ export default StyleSheet.create(
             fontWeight: "bold",
         },
 
-        // 🔥 TIPO USUÁRIO
+        // Tipo usuario
         botaoTipoUsuario: {
             flexDirection: "row",
             gap: 10,
@@ -143,7 +181,6 @@ export default StyleSheet.create(
         footerContainer: {
             flex: 1,
             padding: 20,
-            alignItems:"center"
         },
         footerLink: {
             color: "#007bff",
@@ -155,3 +192,4 @@ export default StyleSheet.create(
 
     }
 );
+

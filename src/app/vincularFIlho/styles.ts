@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+﻿import { StyleSheet } from "react-native";
 
 export default StyleSheet.create(
     {
@@ -7,8 +7,17 @@ export default StyleSheet.create(
             flex: 1,
             backgroundColor: '#fff',
         },
-        formContainer: {
-            padding: 20,
+
+        safeArea: {
+            flex: 1,
+        },
+
+        keyboardAvoiding: {
+            flex: 1,
+        },
+
+        scrollContent: {
+            flexGrow: 1,
         },
 
         logoTop: {
@@ -16,10 +25,6 @@ export default StyleSheet.create(
             height: 120,
         },
 
-        botaoTexto: {
-            color: "#fff",
-            fontWeight: "bold",
-        },
         containerLogo: {
             padding: 20,
         },
@@ -29,28 +34,6 @@ export default StyleSheet.create(
             justifyContent: "space-between",
             alignItems: "center",
         },
-        scrollView: {
-            flexGrow: 1,
-        },
-        header: {
-            padding: 20,
-            borderBottomWidth: 1,
-            borderBottomColor: "#ccc",
-        },
-        title: {
-            fontSize: 26,
-            fontWeight: "600",
-        },
-        tarefaItem: {
-            padding: 15,
-            borderBottomWidth: 1,
-            borderBottomColor: "#ccc",
-        },
-        tarefaText: {
-            fontSize: 16,
-        },
-
-
 
         textContainer: {
             flex: 1,
@@ -67,6 +50,7 @@ export default StyleSheet.create(
 
         containerForm: {
             padding: 20,
+            flex:1
         },
 
         subtituloForm: {
@@ -90,27 +74,24 @@ export default StyleSheet.create(
             padding: 15,
             borderRadius: 10,
             alignItems: "center",
-            marginTop: 20,
+            marginTop: 50,
+           
         },
 
         botaoText: {
             color: "#fff",
             fontWeight: "bold",
+
         },
 
-        // 🔥 TIPO USUÁRIO
+        // Tipo usuario
         botaoTipoUsuario: {
             flexDirection: "row",
             gap: 10,
             marginTop: 10,
         },
-        tipoUsuarioContainer: {
-            flexDirection: "row",
-            gap: 10,
-            marginTop: 10,
-        },
-        tipoUsuario
-            : {
+
+        botaoTipoUsuarioOption: {
             flex: 1,
             padding: 12,
             borderWidth: 1,
@@ -119,19 +100,6 @@ export default StyleSheet.create(
             alignItems: "center",
         },
 
-        tipoUsuarioButton: {
-            flex: 1,
-            padding: 12,
-            borderWidth: 1,
-            borderColor: "#ccc",
-            borderRadius: 8,
-            alignItems: "center",
-        },
-        tipoUsuarioButtonSelected
-            : {
-            backgroundColor: "#007bff",
-            borderColor: "#007bff",
-        },
         botaoTipoUsuarioOptionPai: {
             flex: 1,
             padding: 12,
@@ -165,17 +133,7 @@ export default StyleSheet.create(
             justifyContent: "space-between",
             marginTop: 20,
         },
-        footerContainer: {
-            flex: 1,
-            padding: 20,
-        },
-        footerLink: {
-            color: "#007bff",
-        },
-        footerText: {
-            color: "#666",
-        },
-
 
     }
 );
+
