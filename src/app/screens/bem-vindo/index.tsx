@@ -2,7 +2,7 @@ import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text, View, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { Button } from "../../componentes/Button";
+import { Button } from "../../../componentes/Button";
 import styles from "./styles";
 
 export default function BemVindo() {
@@ -17,7 +17,7 @@ export default function BemVindo() {
       <View style={styles.container}>
         <View style={styles.containerLogo}>
           <Image
-            source={require("../../assets/logo.png")}
+            source={require("src/assets/logo.png")}
             style={styles.logo}
             resizeMode="contain"
           />

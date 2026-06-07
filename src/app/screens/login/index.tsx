@@ -2,7 +2,7 @@ import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text, View, Image, TextInput } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { Button } from "../../componentes/Button";
+import { Button } from "../../../componentes/Button";
 import styles from "./styles";
 
 export default function Login() {
@@ -30,7 +30,7 @@ export default function Login() {
 
   const handleEntrar = () => {
     if (validarFormulario()) {
-      navigation.navigate("ListTarefas");
+      navigation.navigate("ListaTarefas");
     }
   };
 
@@ -39,7 +39,7 @@ export default function Login() {
       <View style={styles.content}>
         <View style={styles.logoContainer}>
           <Image
-            source={require("../../assets/logo.png")}
+            source={require("src/assets/logo.png")}
             style={styles.logo}
           />
 

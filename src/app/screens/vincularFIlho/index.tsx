@@ -13,7 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import styles from "./styles";
-import { Button } from "../../componentes/Button";
+import { Button } from "../../../componentes/Button";
 
 export default function VincularFilho() {
     const navigation = useNavigation<any>();
@@ -93,7 +93,7 @@ export default function VincularFilho() {
                             </View>
 
                             <Image
-                                source={require("../../assets/logo.png")}
+                                source={require("src/assets/logo.png")}
                                 style={styles.logoTop}
                             />
                         </View>
