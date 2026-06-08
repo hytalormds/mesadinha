@@ -1,11 +1,11 @@
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import BemVindo from "../app/pages/bem-vindo";
-import Login from "../app/pages/login";
+﻿import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import BemVindo from "../app/screens/bem-vindo";
+import Login from "../app/screens/login";
 
-import telaCadastro from "../app/pages/telaCadastro";
-import cadastroTarefa from "../app/pages/CadastroTarefa";
-import vincularFilho from "../app/pages/vincularFIlho";
-import ListTarefas from "../app/pages/ListaTarefas";
+import telaCadastro from "../app/screens/telaCadastro";
+import cadastroTarefa from "../app/screens/CadastroTarefa";
+import vincularFilho from "../app/screens/vincularFIlho";
+import ListaTarefas from "../app/screens/ListaTarefas";
 const Stack = createNativeStackNavigator();
 
 export default function Routes() {
@@ -23,7 +23,8 @@ export default function Routes() {
       <Stack.Screen name="TelaCadastro" component={telaCadastro} />
       <Stack.Screen name="CadastroTarefa" component={cadastroTarefa} />
       <Stack.Screen name="VincularFilho" component={vincularFilho} />
-      <Stack.Screen name="ListTarefas" component={ListTarefas} />
+      <Stack.Screen name="ListaTarefas" component={ListaTarefas} />
     </Stack.Navigator>
   );
 }
+

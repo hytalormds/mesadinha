@@ -1,22 +1,32 @@
-import React from "react";
+﻿import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Text,
   View,
   Image,
-  TouchableOpacity,
   TextInput,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
   Alert,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import styles from "./styles";
+import { Button } from "../../../componentes/Button";
 
+type Tarefa = {
+  id: string;
+  titulo: string;
+  descricao?: string;
+  dataLimite?: string;
+  valor_recompensa?: number;
+  concluida?: boolean;
+};
 export default function CadastroTarefa() {
   const navigation = useNavigation<any>();
+  const route = useRoute<any>();
 
+  const tarefaEditando = route.params?.tarefaEditando as Tarefa | undefined;
   const [titulo, setTitulo] = React.useState("");
   const [descricao, setDescricao] = React.useState("");
   const [dataLimite, setDataLimite] = React.useState("");
@@ -60,6 +70,49 @@ export default function CadastroTarefa() {
     );
   }
 
+  function formatarvalor_recompensa(texto: string) {
+    const numeros = texto.replace(/\D/g, "");
+
+    if (!numeros) {
+      return "";
+    }
+
+    const valor = Number(numeros) / 100;
+
+    return valor.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    });
+  }
+
+  function converterMoedaParaNumero(valor: string) {
+    const numeros = valor.replace(/\D/g, "");
+
+    return Number(numeros) / 100;
+  }
+  React.useEffect(() => {
+    if (tarefaEditando) {
+      setTitulo(tarefaEditando.titulo);
+      setDescricao(tarefaEditando.descricao ?? "");
+      setDataLimite(tarefaEditando.dataLimite ?? "");
+      setvalor_recompensa(
+        tarefaEditando.valor_recompensa
+          ? formatarNumeroParaMoeda(tarefaEditando.valor_recompensa)
+          : ""
+      );
+    } else {
+      setTitulo("");
+      setDescricao("");
+      setDataLimite("");
+      setvalor_recompensa("");
+    }
+  }, [tarefaEditando]);
+  function formatarNumeroParaMoeda(valor: number) {
+    return valor.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    });
+  }
   function validarFormulario() {
     if (!titulo.trim()) {
       Alert.alert("Atenção", "Digite o título da tarefa.");
@@ -99,44 +152,29 @@ export default function CadastroTarefa() {
       return;
     }
 
-    const tarefa = {
+    const tarefaSalva = {
+      id: tarefaEditando?.id ?? String(Date.now()),
       titulo,
       descricao,
       dataLimite,
       valor_recompensa: converterMoedaParaNumero(valor_recompensa),
+      concluida: tarefaEditando?.concluida ?? false,
     };
 
-    console.log("Tarefa cadastrada:", tarefa);
-
-    Alert.alert("Sucesso", "Tarefa cadastrada com sucesso!");
-
-    setTitulo("");
-    setDescricao("");
-    setDataLimite("");
-    setvalor_recompensa("");
+    navigation.navigate("ListaTarefas", {
+      tarefaSalva,
+    });
   }
-  function formatarvalor_recompensa(texto: string) {
-    const numeros = texto.replace(/\D/g, "");
-    const valor = Number(numeros) / 100;
-    if (!numeros) {
-      return "";
-    }
-    return valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-  }
-  function converterMoedaParaNumero(valor: string) {
-    const numeros = valor.replace(/\D/g, "");
 
-    return Number(numeros) / 100;
-  }
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
+        style={styles.keyboardAvoiding}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >
         <ScrollView
-          contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}
+          contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
           showsVerticalScrollIndicator={false}
@@ -144,22 +182,24 @@ export default function CadastroTarefa() {
           <View style={styles.containerLogo}>
             <View style={styles.headerRow}>
               <View style={styles.textContainer}>
-                <Text style={styles.titulo}>Cadastro de Tarefa</Text>
-
+                <Text style={styles.titulo}>
+                  {tarefaEditando ? "Editar Tarefa" : "Cadastrar Tarefa"}
+                </Text>
                 <Text style={styles.subtitulo}>
-                  Cadastre a sua tarefa para organizar seu dia
+                  {tarefaEditando
+                    ? "Edite a sua tarefa para organizar seu dia"
+                    : "Cadastre a sua tarefa para organizar seu dia"}
                 </Text>
               </View>
 
               <Image
-                source={require("../../assets/logo.png")}
+                source={require("src/assets/logo.png")}
                 style={styles.logoTop}
               />
             </View>
           </View>
 
           <View style={styles.containerForm}>
-
             <Text style={styles.label}>Título</Text>
             <TextInput
               style={styles.input}
@@ -185,7 +225,9 @@ export default function CadastroTarefa() {
               placeholder="R$ 0,00"
               keyboardType="numeric"
               value={valor_recompensa}
-              onChangeText={(text) => setvalor_recompensa(formatarvalor_recompensa(text))}
+              onChangeText={(text) =>
+                setvalor_recompensa(formatarvalor_recompensa(text))
+              }
             />
 
             <Text style={styles.label}>Data limite da tarefa:</Text>
@@ -193,16 +235,16 @@ export default function CadastroTarefa() {
               style={styles.input}
               placeholder="DD/MM/AAAA"
               value={dataLimite}
-              onChangeText={(text) =>
-                setDataLimite(formatarDataDigitada(text))
-              }
+              onChangeText={(text) => setDataLimite(formatarDataDigitada(text))}
               keyboardType="numeric"
               maxLength={10}
             />
 
-            <TouchableOpacity style={styles.botao} onPress={salvarTarefa}>
-              <Text style={styles.botaoText}>Salvar Tarefa</Text>
-            </TouchableOpacity>
+            <Button
+              title={tarefaEditando ? "Salvar Alterações" : "Salvar Tarefa"}
+              style={styles.botao}
+              onPress={salvarTarefa}
+            />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

@@ -1,16 +1,37 @@
-import React from "react";
-import { Text, View, TouchableOpacity, ScrollView } from "react-native";
+﻿import React from "react";
+import {
+  Text,
+  View,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import styles from "./styles";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { TextInput } from "react-native";
+
+import styles from "./styles";
+import { Button } from "../../../componentes/Button";
+
+type TipoUsuario = "Pai" | "Filho" | "Ambos";
 
 export default function TelaCadastro() {
+  const navigation = useNavigation<any>();
+
+  const [nome, setNome] = React.useState("");
+  const [telefone, setTelefone] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [senha, setSenha] = React.useState("");
+  const [confirmarSenha, setConfirmarSenha] = React.useState("");
+  const [tipoUsuario, setTipoUsuario] = React.useState<TipoUsuario>("Pai");
+
+  const tiposUsuario: TipoUsuario[] = ["Pai", "Filho", "Ambos"];
+
   const validarFormulario = () => {
     if (!nome.trim()) {
       alert("Por favor, insira seu nome completo.");
       return false;
     }
+
     if (!email.trim()) {
       alert("Por favor, insira seu e-mail.");
       return false;
@@ -20,36 +41,30 @@ export default function TelaCadastro() {
       alert("Por favor, insira uma senha.");
       return false;
     }
+
     if (senha !== confirmarSenha) {
       alert("As senhas não coincidem.");
       return false;
     }
+
     return true;
   };
 
-  const navigation = useNavigation<any>();
-  const [nome, setNome] = React.useState("");
-  const [telefone, setTelefone] = React.useState("");
-  const [email, setEmail] = React.useState("");
-  const [senha, setSenha] = React.useState("");
-  const [confirmarSenha, setConfirmarSenha] = React.useState("");
-  const [tipoUsuario, setTipoUsuario] = React.useState<
-    "Pai" | "Filho" | "Ambos"
-  >("Pai");
-
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.containerLogo}>
           <View style={styles.headerRow}>
             <View style={styles.textContainer}>
               <Text style={styles.titulo}>Cadastre-se!</Text>
+
               <Text style={styles.subtitulo}>
                 Crie sua conta para começar a usar o app.
               </Text>
             </View>
           </View>
         </View>
+
         <View style={styles.containerForm}>
           <Text style={styles.label}>Nome Completo:</Text>
           <TextInput
@@ -63,6 +78,7 @@ export default function TelaCadastro() {
           <TextInput
             style={styles.input}
             placeholder="Seu telefone"
+            keyboardType="phone-pad"
             value={telefone}
             onChangeText={setTelefone}
           />
@@ -72,6 +88,7 @@ export default function TelaCadastro() {
             style={styles.input}
             placeholder="seu.email@exemplo.com"
             keyboardType="email-address"
+            autoCapitalize="none"
             value={email}
             onChangeText={setEmail}
           />
@@ -95,36 +112,50 @@ export default function TelaCadastro() {
           />
 
           <Text style={styles.label}>Tipo de Usuário:</Text>
+
           <View style={styles.tipoUsuarioContainer}>
-            {["Pai", "Filho", "Ambos"].map((tipo) => (
-              <TouchableOpacity
-                key={tipo}
-                style={[
-                  styles.tipoUsuario,
-                  tipoUsuario === tipo && styles.tipoUsuarioButtonSelected,
-                ]}
-                onPress={() => setTipoUsuario(tipo as "Pai" | "Filho")}
-              >
-                <Text>{tipo}</Text>
-              </TouchableOpacity>
-            ))}
+            {tiposUsuario.map((tipo) => {
+              const selecionado = tipoUsuario === tipo;
+
+              return (
+                <TouchableOpacity
+                  key={tipo}
+                  style={[
+                    styles.tipoUsuario,
+                    selecionado && styles.tipoUsuarioButtonSelected,
+                  ]}
+                  onPress={() => setTipoUsuario(tipo)}
+                >
+                  <Text
+                    style={[
+                      styles.tipoUsuarioText,
+                      selecionado && styles.tipoUsuarioTextSelected,
+                    ]}
+                  >
+                    {tipo}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
 
-          <TouchableOpacity
+          <Button
+            title="Cadastrar"
             style={styles.botao}
             onPress={() => {
               if (validarFormulario()) {
                 navigation.navigate("Login");
               }
             }}
-          >
-            <Text style={styles.botaoText}>Cadastrar</Text>
-          </TouchableOpacity>
+          />
+
           <View style={styles.footerContainer}>
             <Text style={styles.footerText}>Já tem conta?</Text>
-            <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-              <Text style={styles.footerLink}>Faça login</Text>
-            </TouchableOpacity>
+
+            <Button
+              title="Faça login"
+              onPress={() => navigation.navigate("Login")}
+            />
           </View>
         </View>
       </ScrollView>
