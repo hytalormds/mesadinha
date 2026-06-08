@@ -54,6 +54,7 @@ export default StyleSheet.create({
 
   label: {
     marginTop: 10,
+    
   },
 
   input: {

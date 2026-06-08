@@ -7,6 +7,7 @@ import {
     KeyboardAvoidingView,
     ScrollView,
     TouchableOpacity,
+    Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -24,27 +25,8 @@ type Tarefa = {
     valor_recompensa?: number;
     concluida?: boolean;
 };
+
 const STORAGE_KEY = "@mesadinha:tarefas";
-
-const TAREFAS_INICIAIS: Tarefa[] = [
-    {
-        id: "1",
-        titulo: "Arrumar o quarto",
-        descricao: "Organizar cama, roupas e objetos pessoais.",
-        dataLimite: "10/10/2026",
-        valor_recompensa: 5,
-        concluida: true,
-    },
-    {
-        id: "2",
-        titulo: "Fazer lição de casa",
-        descricao: "Realizar as atividades escolares.",
-        dataLimite: "10/10/2026",
-        valor_recompensa: 5,
-        concluida: false,
-    },
-];
-
 
 export default function ListaTarefas() {
     const route = useRoute<any>();
@@ -52,10 +34,49 @@ export default function ListaTarefas() {
 
     const [tarefas, setTarefas] = React.useState<Tarefa[]>([]);
     const [carregouTarefas, setCarregouTarefas] = React.useState(false);
+
     React.useEffect(() => {
         async function carregarTarefas() {
             try {
                 const tarefasSalvas = await AsyncStorage.getItem(STORAGE_KEY);
+
+                if (tarefasSalvas) {
+                    setTarefas(JSON.parse(tarefasSalvas));
+                } else {
+                    setTarefas([]);
+                }
+            } catch (error) {
+                console.log("Erro ao carregar tarefas:", error);
+                setTarefas([]);
+            } finally {
+                setCarregouTarefas(true);
+            }
+        }
+
+        carregarTarefas();
+    }, []);
+
+    React.useEffect(() => {
+        async function salvarTarefas() {
+            if (!carregouTarefas) {
+                return;
+            }
+
+            try {
+                await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(tarefas));
+            } catch (error) {
+                console.log("Erro ao salvar tarefas:", error);
+            }
+        }
+
+        salvarTarefas();
+    }, [tarefas, carregouTarefas]);
+
+    React.useEffect(() => {
+        if (!carregouTarefas) {
+            return;
+        }
+
         const tarefaSalva = route.params?.tarefaSalva as Tarefa | undefined;
 
         if (!tarefaSalva) {
@@ -79,18 +100,40 @@ export default function ListaTarefas() {
         navigation.setParams({
             tarefaSalva: undefined,
         });
-    }, [route.params?.tarefaSalva]);
+    }, [route.params?.tarefaSalva, carregouTarefas]);
 
     function alternarConclusaoTarefa(id: string) {
         setTarefas((tarefasAtuais) =>
             tarefasAtuais.map((tarefa) =>
                 tarefa.id === id
                     ? {
-                        ...tarefa,
-                        concluida: !tarefa.concluida,
-                    }
+                          ...tarefa,
+                          concluida: !tarefa.concluida,
+                      }
                     : tarefa
             )
+        );
+    }
+
+    function apagarTarefa(id: string) {
+        Alert.alert(
+            "Excluir tarefa",
+            "Deseja realmente excluir esta tarefa?",
+            [
+                {
+                    text: "Cancelar",
+                    style: "cancel",
+                },
+                {
+                    text: "Excluir",
+                    style: "destructive",
+                    onPress: () => {
+                        setTarefas((tarefasAtuais) =>
+                            tarefasAtuais.filter((tarefa) => tarefa.id !== id)
+                        );
+                    },
+                },
+            ]
         );
     }
 
@@ -130,52 +173,96 @@ export default function ListaTarefas() {
                         </Text>
 
                         <View style={styles.formContainer}>
-                            {tarefas.map((tarefa, index) => (
-                                <View
-                                    key={tarefa.id}
-                                    style={{
-                                        flexDirection: "row",
-                                        alignItems: "center",
-                                        justifyContent: "space-between",
-                                    }}
+                            {tarefas.length === 0 ? (
+                                <Text
+                                    style={[
+                                        styles.label,
+                                        {
+                                            marginTop: 20,
+                                            color: "#777",
+                                            textAlign: "center",
+                                        },
+                                    ]}
                                 >
-                                    <TouchableOpacity
-                                        style={{ flex: 1 }}
-                                        onPress={() =>
-                                            navigation.navigate("CadastroTarefa", {
-                                                tarefaEditando: tarefa,
-                                            })
-                                        }
+                                    Não há tarefa cadastrada.
+                                </Text>
+                            ) : (
+                                tarefas.map((tarefa, index) => (
+                                    <View
+                                        key={tarefa.id}
+                                        style={{
+                                            flexDirection: "row",
+                                            alignItems: "center",
+                                            justifyContent: "space-between",
+                                        }}
                                     >
-                                        <Text
-                                            style={[
-                                                styles.label,
-                                                tarefa.concluida && {
-                                                    textDecorationLine: "line-through",
-                                                    color: "#777",
-                                                },
-                                            ]}
-                                        >
-                                            Tarefa {index + 1}: {tarefa.titulo}
-                                        </Text>
-                                    </TouchableOpacity>
-
-                                    <TouchableOpacity
-                                        onPress={() => alternarConclusaoTarefa(tarefa.id)}
-                                    >
-                                        <MaterialIcons
-                                            name={
-                                                tarefa.concluida
-                                                    ? "check-circle"
-                                                    : "radio-button-unchecked"
+                                        <TouchableOpacity
+                                            style={{ flex: 1 }}
+                                            onPress={() =>
+                                                navigation.navigate("CadastroTarefa", {
+                                                    tarefaEditando: tarefa,
+                                                })
                                             }
-                                            size={22}
-                                            color={tarefa.concluida ? "#007bff" : "#999"}
-                                            style={{ marginLeft: 8, marginTop: 10 }}
-                                        />
-                                    </TouchableOpacity>
-                                </View>
-                            ))}
+                                        >
+                                            <Text
+                                                style={[
+                                                    styles.label,
+                                                    tarefa.concluida && {
+                                                        textDecorationLine: "line-through",
+                                                        color: "#777",
+                                                    },
+                                                ]}
+                                            >
+                                                Tarefa {index + 1}: {tarefa.titulo}
+                                            </Text>
+                                        </TouchableOpacity>
+
+                                        <View
+                                            style={{
+                                                flexDirection: "row",
+                                                alignItems: "center",
+                                                marginTop: 10,
+                                            }}
+                                        >
+                                            <TouchableOpacity
+                                                onPress={() =>
+                                                    alternarConclusaoTarefa(tarefa.id)
+                                                }
+                                            >
+                                                <MaterialIcons
+                                                    name={
+                                                        tarefa.concluida
+                                                            ? "check-circle"
+                                                            : "radio-button-unchecked"
+                                                    }
+                                                    size={22}
+                                                    color={
+                                                        tarefa.concluida
+                                                            ? "#007bff"
+                                                            : "#999"
+                                                    }
+                                                    style={{
+                                                        marginLeft: 8,
+                                                    }}
+                                                />
+                                            </TouchableOpacity>
+
+                                            <TouchableOpacity
+                                                onPress={() => apagarTarefa(tarefa.id)}
+                                            >
+                                                <MaterialIcons
+                                                    name="delete-outline"
+                                                    size={24}
+                                                    color="#dc3545"
+                                                    style={{
+                                                        marginLeft: 14,
+                                                    }}
+                                                />
+                                            </TouchableOpacity>
+                                        </View>
+                                    </View>
+                                ))
+                            )}
                         </View>
                     </View>
 

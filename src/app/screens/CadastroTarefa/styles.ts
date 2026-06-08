@@ -105,7 +105,7 @@ export default StyleSheet.create(
 
         botaoConfirmarPickerText: {
             color: "#fff",
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: "bold",
         },
     }

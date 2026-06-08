@@ -205,6 +205,9 @@ export default function CadastroTarefa() {
               style={styles.input}
               placeholder="Digite o título da tarefa"
               value={titulo}
+              keyboardType="default"
+              autoCorrect={true}
+              autoCapitalize="sentences"
               onChangeText={setTitulo}
             />
 
@@ -213,6 +216,8 @@ export default function CadastroTarefa() {
               style={[styles.input, styles.inputDescricao]}
               placeholder="Digite a descrição da tarefa"
               value={descricao}
+              keyboardType="default"
+              autoCorrect={true}
               onChangeText={setDescricao}
               multiline
               numberOfLines={5}
