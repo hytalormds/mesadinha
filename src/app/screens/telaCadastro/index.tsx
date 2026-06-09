@@ -5,17 +5,21 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import styles from "./styles";
-import { Button } from "../../../componentes/Button";
+import { Button } from "@/componentes/Button";
+import type { RootStackParamList } from "@/types/navigation";
 
 type TipoUsuario = "Pai" | "Filho" | "Ambos";
 
 export default function TelaCadastro() {
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const [nome, setNome] = React.useState("");
   const [telefone, setTelefone] = React.useState("");
@@ -52,113 +56,113 @@ export default function TelaCadastro() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.containerLogo}>
-          <View style={styles.headerRow}>
-            <View style={styles.textContainer}>
-              <Text style={styles.titulo}>Cadastre-se!</Text>
+      <KeyboardAvoidingView
+        style={styles.keyboardAvoiding}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.containerForm}>
+            <Text style={styles.label}>Nome Completo:</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Seu nome"
+              value={nome}
+              onChangeText={setNome}
+            />
 
-              <Text style={styles.subtitulo}>
-                Crie sua conta para começar a usar o app.
-              </Text>
-            </View>
-          </View>
-        </View>
+            <Text style={styles.label}>Telefone:</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Seu telefone"
+              keyboardType="phone-pad"
+              value={telefone}
+              onChangeText={setTelefone}
+            />
 
-        <View style={styles.containerForm}>
-          <Text style={styles.label}>Nome Completo:</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Seu nome"
-            value={nome}
-            onChangeText={setNome}
-          />
+            <Text style={styles.label}>E-mail:</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="seu.email@exemplo.com"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              value={email}
+              onChangeText={setEmail}
+            />
 
-          <Text style={styles.label}>Telefone:</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Seu telefone"
-            keyboardType="phone-pad"
-            value={telefone}
-            onChangeText={setTelefone}
-          />
+            <Text style={styles.label}>Senha:</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Sua senha"
+              secureTextEntry
+              value={senha}
+              onChangeText={setSenha}
+            />
 
-          <Text style={styles.label}>E-mail:</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="seu.email@exemplo.com"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            value={email}
-            onChangeText={setEmail}
-          />
+            <Text style={styles.label}>Confirmar Senha:</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Repita sua senha"
+              secureTextEntry
+              value={confirmarSenha}
+              onChangeText={setConfirmarSenha}
+            />
 
-          <Text style={styles.label}>Senha:</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Sua senha"
-            secureTextEntry
-            value={senha}
-            onChangeText={setSenha}
-          />
+            <Text style={styles.label}>Tipo de Usuário:</Text>
 
-          <Text style={styles.label}>Confirmar Senha:</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Repita sua senha"
-            secureTextEntry
-            value={confirmarSenha}
-            onChangeText={setConfirmarSenha}
-          />
+            <View style={styles.tipoUsuarioContainer}>
+              {tiposUsuario.map((tipo) => {
+                const selecionado = tipoUsuario === tipo;
 
-          <Text style={styles.label}>Tipo de Usuário:</Text>
-
-          <View style={styles.tipoUsuarioContainer}>
-            {tiposUsuario.map((tipo) => {
-              const selecionado = tipoUsuario === tipo;
-
-              return (
-                <TouchableOpacity
-                  key={tipo}
-                  style={[
-                    styles.tipoUsuario,
-                    selecionado && styles.tipoUsuarioButtonSelected,
-                  ]}
-                  onPress={() => setTipoUsuario(tipo)}
-                >
-                  <Text
+                return (
+                  <TouchableOpacity
+                    key={tipo}
                     style={[
-                      styles.tipoUsuarioText,
-                      selecionado && styles.tipoUsuarioTextSelected,
+                      styles.tipoUsuario,
+                      selecionado && styles.tipoUsuarioButtonSelected,
                     ]}
+                    onPress={() => setTipoUsuario(tipo)}
                   >
-                    {tipo}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-
-          <Button
-            title="Cadastrar"
-            style={styles.botao}
-            onPress={() => {
-              if (validarFormulario()) {
-                navigation.navigate("Login");
-              }
-            }}
-          />
-
-          <View style={styles.footerContainer}>
-            <Text style={styles.footerText}>Já tem conta?</Text>
+                    <Text
+                      style={[
+                        styles.tipoUsuarioText,
+                        selecionado && styles.tipoUsuarioTextSelected,
+                      ]}
+                    >
+                      {tipo}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
 
             <Button
-              title="Faça login"
-              onPress={() => navigation.navigate("Login")}
+              title="Cadastrar"
+              style={styles.botao}
+              onPress={() => {
+                if (validarFormulario()) {
+                  navigation.navigate("Login");
+                }
+              }}
             />
+
+            <View style={styles.footerContainer}>
+              <Text style={styles.footerText}>Já tem conta?</Text>
+
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={() => navigation.navigate("Login")}
+              >
+                <Text style={styles.footerLink}>Faça login</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

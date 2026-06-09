@@ -3,35 +3,30 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import {
     Text,
     View,
-    Image,
     TextInput,
     ScrollView,
     KeyboardAvoidingView,
     Platform,
     Alert,
-    TouchableOpacity,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import type { RouteProp } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import styles from "./styles";
-import { Button } from "../../../componentes/Button";
+import { Button } from "@/componentes/Button";
+import type { RootStackParamList } from "@/types/navigation";
 
-type Tarefa = {
-    id: string;
-    titulo: string;
-    descricao?: string;
-    dataLimite?: string;
-    valor_recompensa?: number;
-    concluida?: boolean;
-};
 const LIMITE_DESCRICAO = 250;
 
 export default function CadastroTarefa() {
-    const navigation = useNavigation<any>();
-    const route = useRoute<any>();
+    const navigation =
+        useNavigation<
+            NativeStackNavigationProp<RootStackParamList, "CadastroTarefa">
+        >();
+    const route = useRoute<RouteProp<RootStackParamList, "CadastroTarefa">>();
 
-    const tarefaEditando = route.params?.tarefaEditando as Tarefa | undefined;
+    const tarefaEditando = route.params?.tarefaEditando;
 
     const [titulo, setTitulo] = React.useState("");
     const [descricao, setDescricao] = React.useState("");
@@ -55,15 +50,6 @@ export default function CadastroTarefa() {
             setvalor_recompensa("");
         }
     }, [tarefaEditando]);
-
-    function voltarTela() {
-        if (navigation.canGoBack()) {
-            navigation.goBack();
-            return;
-        }
-
-        navigation.navigate("ListaTarefas");
-    }
 
     function formatarDataDigitada(texto: string) {
         const numeros = texto.replace(/\D/g, "").slice(0, 8);
@@ -203,42 +189,6 @@ export default function CadastroTarefa() {
                     keyboardDismissMode="on-drag"
                     showsVerticalScrollIndicator={false}
                 >
-                    <View style={styles.containerLogo}>
-                        <View style={styles.headerTop}>
-                            <TouchableOpacity
-                                style={styles.botaoVoltar}
-                                onPress={voltarTela}
-                            >
-                                <MaterialIcons
-                                    name="arrow-back"
-                                    size={26}
-                                    color="#333"
-                                />
-                            </TouchableOpacity>
-                        </View>
-
-                        <View style={styles.headerRow}>
-                            <View style={styles.textContainer}>
-                                <Text style={styles.titulo}>
-                                    {tarefaEditando
-                                        ? "Editar Tarefa"
-                                        : "Cadastrar Tarefa"}
-                                </Text>
-
-                                <Text style={styles.subtitulo}>
-                                    {tarefaEditando
-                                        ? "Edite a sua tarefa para organizar seu dia"
-                                        : "Cadastre a sua tarefa para organizar seu dia"}
-                                </Text>
-                            </View>
-
-                            <Image
-                                source={require("src/assets/logo.png")}
-                                style={styles.logoTop}
-                            />
-                        </View>
-                    </View>
-
                     <View style={styles.containerForm}>
                         <Text style={styles.label}>Título</Text>
 

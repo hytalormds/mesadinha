@@ -3,7 +3,6 @@ import {
     Platform,
     Text,
     View,
-    Image,
     KeyboardAvoidingView,
     ScrollView,
     TouchableOpacity,
@@ -13,24 +12,23 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import type { RouteProp } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import styles from "./styles";
-import { Button } from "../../../componentes/Button";
-
-type Tarefa = {
-    id: string;
-    titulo: string;
-    descricao?: string;
-    dataLimite?: string;
-    valor_recompensa?: number;
-    concluida?: boolean;
-};
+import { Button } from "@/componentes/Button";
+import { ButtonIcon } from "@/componentes/ButtonIcon";
+import { Title } from "@/componentes/Title";
+import type { RootStackParamList, Tarefa } from "@/types/navigation";
 
 const STORAGE_KEY = "@mesadinha:tarefas";
 
 export default function ListaTarefas() {
-    const route = useRoute<any>();
-    const navigation = useNavigation<any>();
+    const route = useRoute<RouteProp<RootStackParamList, "ListaTarefas">>();
+    const navigation =
+        useNavigation<
+            NativeStackNavigationProp<RootStackParamList, "ListaTarefas">
+        >();
 
     const [tarefas, setTarefas] = React.useState<Tarefa[]>([]);
     const [carregouTarefas, setCarregouTarefas] = React.useState(false);
@@ -77,7 +75,7 @@ export default function ListaTarefas() {
             return;
         }
 
-        const tarefaSalva = route.params?.tarefaSalva as Tarefa | undefined;
+        const tarefaSalva = route.params?.tarefaSalva;
 
         if (!tarefaSalva) {
             return;
@@ -185,7 +183,19 @@ export default function ListaTarefas() {
                     showsVerticalScrollIndicator={false}
                 >
                     <View style={styles.containerLogo}>
-                        <View style={styles.headerTop}>
+                        <View style={styles.headerRow}>
+                            <View style={styles.textContainer}>
+                                <Title style={styles.titulo}>
+                                    Lista de Tarefas
+                                </Title>
+
+                                <Text style={styles.subtitulo}>
+                                    {tarefas.length === 1
+                                        ? "1 tarefa cadastrada"
+                                        : `${tarefas.length} tarefas cadastradas`}
+                                </Text>
+                            </View>
+
                             <TouchableOpacity
                                 style={styles.botaoSair}
                                 onPress={confirmarSair}
@@ -201,30 +211,9 @@ export default function ListaTarefas() {
                                 </Text>
                             </TouchableOpacity>
                         </View>
-
-                        <View style={styles.headerRow}>
-                            <View style={styles.textContainer}>
-                                <Text style={styles.titulo}>
-                                    Lista de Tarefas
-                                </Text>
-
-                                <Text style={styles.subtitulo}>
-                                    Aqui estão todas as suas tarefas cadastradas.
-                                </Text>
-                            </View>
-
-                            <Image
-                                source={require("src/assets/logo.png")}
-                                style={styles.logoTop}
-                            />
-                        </View>
                     </View>
 
                     <View style={styles.containerForm}>
-                        <Text style={styles.subtituloForm}>
-                            Toque em uma tarefa para ver os detalhes ou editá-la.
-                        </Text>
-
                         {tarefas.length === 0 ? (
                             <View style={styles.cardVazio}>
                                 <MaterialIcons
@@ -235,6 +224,10 @@ export default function ListaTarefas() {
 
                                 <Text style={styles.textoVazio}>
                                     Não há tarefa cadastrada.
+                                </Text>
+
+                                <Text style={styles.textoVazioDescricao}>
+                                    Toque em adicionar para criar sua primeira tarefa.
                                 </Text>
                             </View>
                         ) : (
@@ -251,7 +244,7 @@ export default function ListaTarefas() {
                                         activeOpacity={0.8}
                                         style={styles.cardConteudo}
                                         onPress={() =>
-                                            navigation.navigate(
+                                            navigation.push(
                                                 "CadastroTarefa",
                                                 {
                                                     tarefaEditando: tarefa,
@@ -318,41 +311,35 @@ export default function ListaTarefas() {
                                     </TouchableOpacity>
 
                                     <View style={styles.cardAcoes}>
-                                        <TouchableOpacity
+                                        <ButtonIcon
+                                            name={
+                                                tarefa.concluida
+                                                    ? "check-circle"
+                                                    : "radio-button-unchecked"
+                                            }
+                                            size={26}
+                                            color={
+                                                tarefa.concluida
+                                                    ? "#007bff"
+                                                    : "#999"
+                                            }
                                             style={styles.botaoAcao}
                                             onPress={() =>
                                                 alternarConclusaoTarefa(
                                                     tarefa.id
                                                 )
                                             }
-                                        >
-                                            <MaterialIcons
-                                                name={
-                                                    tarefa.concluida
-                                                        ? "check-circle"
-                                                        : "radio-button-unchecked"
-                                                }
-                                                size={26}
-                                                color={
-                                                    tarefa.concluida
-                                                        ? "#007bff"
-                                                        : "#999"
-                                                }
-                                            />
-                                        </TouchableOpacity>
+                                        />
 
-                                        <TouchableOpacity
+                                        <ButtonIcon
+                                            name="delete-outline"
+                                            size={28}
+                                            color="#dc3545"
                                             style={styles.botaoAcao}
                                             onPress={() =>
                                                 apagarTarefa(tarefa.id)
                                             }
-                                        >
-                                            <MaterialIcons
-                                                name="delete-outline"
-                                                size={28}
-                                                color="#dc3545"
-                                            />
-                                        </TouchableOpacity>
+                                        />
                                     </View>
                                 </View>
                             ))
@@ -364,7 +351,7 @@ export default function ListaTarefas() {
                     <Button
                         title="Adicionar Nova Tarefa"
                         style={styles.botao}
-                        onPress={() => navigation.navigate("CadastroTarefa")}
+                        onPress={() => navigation.push("CadastroTarefa")}
                     />
                 </View>
             </KeyboardAvoidingView>

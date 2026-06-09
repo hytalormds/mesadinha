@@ -7,6 +7,14 @@ export default StyleSheet.create({
     padding: 16,
   },
 
+  keyboardAvoiding: {
+    flex: 1,
+  },
+
+  scrollContent: {
+    flexGrow: 1,
+  },
+
   content: {
     flex: 1,
     justifyContent: "center",
@@ -97,5 +105,11 @@ export default StyleSheet.create({
   footerText: {
     fontSize: 13,
     color: "#666666",
+  },
+
+  footerLink: {
+    fontSize: 13,
+    color: "#007BFF",
+    fontWeight: "700",
   },
 });
