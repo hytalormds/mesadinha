@@ -36,6 +36,17 @@ export default StyleSheet.create({
         alignItems: "center",
         backgroundColor: "#f2f2f2",
     },
+    contadorCaracteres: {
+        marginTop: 4,
+        fontSize: 12,
+        color: "#777",
+        textAlign: "right",
+    },
+
+    contadorCaracteresLimite: {
+        color: "#dc3545",
+        fontWeight: "700",
+    },
 
     headerRow: {
         flexDirection: "row",

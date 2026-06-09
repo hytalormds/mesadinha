@@ -25,6 +25,7 @@ type Tarefa = {
     valor_recompensa?: number;
     concluida?: boolean;
 };
+const LIMITE_DESCRICAO = 250;
 
 export default function CadastroTarefa() {
     const navigation = useNavigation<any>();
@@ -255,7 +256,7 @@ export default function CadastroTarefa() {
 
                         <TextInput
                             style={[styles.input, styles.inputDescricao]}
-                            placeholder="Digite a descrição da tarefa"
+                            placeholder={`Digite a descrição da tarefa. Máximo de ${LIMITE_DESCRICAO} caracteres.`}
                             value={descricao}
                             keyboardType="default"
                             autoCorrect={true}
@@ -263,7 +264,17 @@ export default function CadastroTarefa() {
                             multiline
                             numberOfLines={5}
                             textAlignVertical="top"
+                            maxLength={LIMITE_DESCRICAO}
                         />
+
+                        <Text
+                            style={[
+                                styles.contadorCaracteres,
+                                descricao.length >= LIMITE_DESCRICAO && styles.contadorCaracteresLimite,
+                            ]}
+                        >
+                            {descricao.length}/{LIMITE_DESCRICAO} caracteres
+                        </Text>
 
                         <Text style={styles.label}>Valor da recompensa</Text>
 
