@@ -1,112 +1,117 @@
 ﻿import { StyleSheet } from "react-native";
 
-export default StyleSheet.create(
-    {
+export default StyleSheet.create({
+    safeArea: {
+        flex: 1,
+        backgroundColor: "#fff",
+    },
 
+    keyboardAvoiding: {
+        flex: 1,
+    },
 
-        container: {
-            flex: 1,
-            backgroundColor: '#fff',
-        },
+    scrollContent: {
+        flexGrow: 1,
+        paddingBottom: 40,
+    },
 
-        safeArea: {
-            flex: 1,
-        },
+    containerLogo: {
+        paddingHorizontal: 20,
+        paddingTop: 12,
+        paddingBottom: 10,
+    },
 
-        keyboardAvoiding: {
-            flex: 1,
-        },
+    headerTop: {
+        flexDirection: "row",
+        justifyContent: "flex-end",
+        alignItems: "center",
+        marginBottom: 12,
+    },
 
-        scrollContent: {
-            flexGrow: 1,
-            paddingBottom: 40,
-        },
+    botaoVoltar: {
+        width: 42,
+        height: 42,
+        borderRadius: 21,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#f2f2f2",
+    },
+    contadorCaracteres: {
+        marginTop: 4,
+        fontSize: 12,
+        color: "#777",
+        textAlign: "right",
+    },
 
-        logoTop: {
-            width: 120,
-            height: 120,
-        },
+    contadorCaracteresLimite: {
+        color: "#dc3545",
+        fontWeight: "700",
+    },
 
-        containerLogo: {
-            padding: 20,
-        },
+    headerRow: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+    },
 
-        headerRow: {
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-        },
-        textContainer: {
-            flex: 1,
-        },
+    textContainer: {
+        flex: 1,
+        paddingRight: 12,
+    },
 
+    titulo: {
+        fontSize: 26,
+        fontWeight: "700",
+        color: "#222",
+    },
 
-        titulo: {
-            fontSize: 26,
-            fontWeight: "600",
-        },
+    subtitulo: {
+        marginTop: 4,
+        fontSize: 14,
+        color: "#666",
+    },
 
-        subtitulo: {
-            color: "#666",
-        },
+    logoTop: {
+        width: 100,
+        height: 100,
+        resizeMode: "contain",
+    },
 
-        containerForm: {
-            padding: 20,
-        },
+    containerForm: {
+        padding: 20,
+    },
 
-        subtituloForm: {
-            marginBottom: 20,
-        },
+    label: {
+        marginTop: 12,
+        marginBottom: 6,
+        fontSize: 14,
+        fontWeight: "600",
+        color: "#333",
+    },
 
-        label: {
-            marginTop: 10,
-        },
+    input: {
+        width: "100%",
+        height: 48,
+        borderWidth: 1,
+        borderColor: "#ddd",
+        borderRadius: 8,
+        paddingHorizontal: 12,
+        backgroundColor: "#fff",
+    },
 
-        input: {
-            width: "100%",
-            height: 48,
-            borderWidth: 1,
-            borderColor: "#ddd",
-            borderRadius: 8,
-            paddingHorizontal: 12,
-            backgroundColor: "#fff",
-        },
+    inputDescricao: {
+        height: 140,
+        paddingTop: 12,
+        textAlignVertical: "top",
+    },
 
-        botao: {
-            width: "100%",
-            height: 48,
-            backgroundColor: "#007BFF",
-            borderRadius: 8,
-            justifyContent: "center",
-            alignItems: "center",
-            marginTop: 20,
-        },
-
-        botaoText: {
-            color: "#fff",
-            fontSize: 16,
-            fontWeight: "bold",
-        },
-
-        inputDescricao: {
-            height: 140,
-            paddingTop: 12,
-            textAlignVertical: "top",
-        },
-        botaoConfirmarPicker: {
-            height: 42,
-            backgroundColor: "#007BFF",
-            borderRadius: 8,
-            justifyContent: "center",
-            alignItems: "center",
-            marginTop: 8,
-            marginBottom: 8,
-        },
-
-        botaoConfirmarPickerText: {
-            color: "#fff",
-            fontSize: 14,
-            fontWeight: "bold",
-        },
-    }
-);
+    botao: {
+        width: "100%",
+        height: 48,
+        backgroundColor: "#007BFF",
+        borderRadius: 8,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 24,
+    },
+});

@@ -37,7 +37,7 @@ export default StyleSheet.create({
   },
 
   subtitulo: {
-    fontSize: 15,
+    fontSize: 16,
     textAlign: "center",
     marginBottom: 32,
     fontFamily: "System",
