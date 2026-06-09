@@ -2,7 +2,6 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { MaterialIcons } from "@expo/vector-icons";
 
-import BemVindo from "@/app/screens/bem-vindo";
 import Login from "@/app/screens/login";
 import TelaCadastro from "@/app/screens/telaCadastro";
 import CadastroTarefa from "@/app/screens/CadastroTarefa";
@@ -17,7 +16,7 @@ export default function Routes() {
   return (
     <Stack.Navigator
       id={undefined}
-      initialRouteName="BemVindo"
+      initialRouteName="Login"
       screenOptions={{
         headerShown: true,
         headerTintColor: "#007BFF",
@@ -25,11 +24,6 @@ export default function Routes() {
         headerBackTitle: "Voltar",
       }}
     >
-      <Stack.Screen
-        name="BemVindo"
-        component={BemVindo}
-        options={{ headerShown: false }}
-      />
       <Stack.Screen
         name="Login"
         component={Login}

@@ -8,7 +8,6 @@ export type Tarefa = {
 };
 
 export type RootStackParamList = {
-  BemVindo: undefined;
   Login: undefined;
   TelaCadastro: undefined;
   CadastroTarefa: { tarefaEditando?: Tarefa } | undefined;
