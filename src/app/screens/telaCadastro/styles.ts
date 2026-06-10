@@ -11,45 +11,18 @@ export default StyleSheet.create({
     backgroundColor: "#fff",
   },
 
+  keyboardAvoiding: {
+    flex: 1,
+  },
+
   scrollContent: {
     flexGrow: 1,
-  },
-
-  logoTop: {
-    width: 120,
-    height: 120,
-  },
-
-  containerLogo: {
-    padding: 20,
-  },
-
-  headerRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-
-  textContainer: {
-    flex: 1,
-    alignItems: "center",
-  },
-
-  titulo: {
-    fontSize: 26,
-    fontWeight: "600",
-  },
-
-  subtitulo: {
-    color: "#666",
+    paddingBottom: 40,
   },
 
   containerForm: {
     padding: 20,
-  },
-
-  subtituloForm: {
-    marginBottom: 20,
+    paddingTop: 12,
   },
 
   label: {
@@ -129,9 +102,11 @@ export default StyleSheet.create({
 
   footerLink: {
     color: "#007bff",
+    fontWeight: "700",
   },
 
   footerText: {
+    marginBottom: 6,
     color: "#666",
   },
 });

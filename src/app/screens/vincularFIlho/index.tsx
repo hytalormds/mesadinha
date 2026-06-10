@@ -4,19 +4,20 @@ import {
     View,
     TextInput,
     Alert,
-    Image,
     ScrollView,
     KeyboardAvoidingView,
     Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import styles from "./styles";
-import { Button } from "../../../componentes/Button";
+import { Button } from "@/componentes/Button";
+import type { RootStackParamList } from "@/types/navigation";
 
 export default function VincularFilho() {
-    const navigation = useNavigation<any>();
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
     const [nomeFilho, setNomeFilho] = React.useState("");
     const [codigoVinculo, setCodigoVinculo] = React.useState("");
@@ -80,27 +81,18 @@ export default function VincularFilho() {
             <KeyboardAvoidingView
                 style={styles.keyboardAvoiding}
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
+                keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
             >
-                <ScrollView contentContainerStyle={styles.scrollContent}>
-                    <View style={styles.containerLogo}>
-                        <View style={styles.headerRow}>
-                            <View style={styles.textContainer}>
-                                <Text style={styles.titulo}>Vincular Filho</Text>
-
-                                <Text style={styles.subtitulo}>
-                                    Informe o código recebido pelo responsável
-                                </Text>
-                            </View>
-
-                            <Image
-                                source={require("src/assets/logo.png")}
-                                style={styles.logoTop}
-                            />
-                        </View>
-                    </View>
-
+                <ScrollView
+                    contentContainerStyle={styles.scrollContent}
+                    keyboardShouldPersistTaps="handled"
+                    keyboardDismissMode="on-drag"
+                    showsVerticalScrollIndicator={false}
+                >
                     <View style={styles.containerForm}>
-                      
+                        <Text style={styles.infoText}>
+                            Informe o código recebido pelo responsável.
+                        </Text>
 
                         <Text style={styles.label}>Nome do Filho</Text>
                         <TextInput
@@ -124,8 +116,6 @@ export default function VincularFilho() {
                             style={styles.botao}
                             onPress={vincularFilho}
                         />
-
-                     
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>

@@ -12,26 +12,19 @@ export default StyleSheet.create({
 
     scrollContent: {
         flexGrow: 1,
-        paddingBottom: 20,
+        paddingBottom: 12,
     },
 
     containerLogo: {
         paddingHorizontal: 20,
-        paddingTop: 12,
-        paddingBottom: 10,
-    },
-
-    headerTop: {
-        flexDirection: "row",
-        justifyContent: "flex-end",
-        alignItems: "center",
-        marginBottom: 12,
+        paddingTop: 18,
+        paddingBottom: 8,
     },
 
     botaoSair: {
-        height: 42,
-        paddingHorizontal: 14,
-        borderRadius: 21,
+        height: 38,
+        paddingHorizontal: 12,
+        borderRadius: 19,
         flexDirection: "row",
         justifyContent: "center",
         alignItems: "center",
@@ -42,7 +35,7 @@ export default StyleSheet.create({
 
     botaoSairTexto: {
         marginLeft: 6,
-        fontSize: 14,
+        fontSize: 13,
         fontWeight: "700",
         color: "#dc3545",
     },
@@ -55,7 +48,7 @@ export default StyleSheet.create({
 
     textContainer: {
         flex: 1,
-        paddingRight: 12,
+        paddingRight: 16,
     },
 
     titulo: {
@@ -70,30 +63,18 @@ export default StyleSheet.create({
         color: "#666",
     },
 
-    logoTop: {
-        width: 100,
-        height: 100,
-        resizeMode: "contain",
-    },
-
     containerForm: {
         paddingHorizontal: 20,
-        paddingTop: 10,
+        paddingTop: 8,
         paddingBottom: 20,
-    },
-
-    subtituloForm: {
-        marginBottom: 16,
-        fontSize: 14,
-        color: "#666",
     },
 
     cardVazio: {
         minHeight: 180,
-        borderRadius: 14,
+        borderRadius: 12,
         borderWidth: 1,
-        borderColor: "#e5e5e5",
-        backgroundColor: "#fafafa",
+        borderColor: "#e8edf3",
+        backgroundColor: "#f8fbff",
         justifyContent: "center",
         alignItems: "center",
         padding: 20,
@@ -106,21 +87,28 @@ export default StyleSheet.create({
         textAlign: "center",
     },
 
+    textoVazioDescricao: {
+        marginTop: 6,
+        fontSize: 13,
+        color: "#888",
+        textAlign: "center",
+    },
+
     cardTarefa: {
         backgroundColor: "#fff",
-        borderRadius: 14,
+        borderRadius: 12,
         padding: 16,
-        marginBottom: 14,
+        marginBottom: 12,
         borderWidth: 1,
-        borderColor: "#e5e5e5",
+        borderColor: "#e8edf3",
         shadowColor: "#000",
         shadowOffset: {
             width: 0,
-            height: 2,
+            height: 1,
         },
-        shadowOpacity: 0.08,
-        shadowRadius: 4,
-        elevation: 3,
+        shadowOpacity: 0.05,
+        shadowRadius: 3,
+        elevation: 2,
     },
 
     cardTarefaConcluida: {
@@ -157,7 +145,7 @@ export default StyleSheet.create({
     },
 
     cardValor: {
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: "700",
         color: "#007bff",
     },
@@ -193,13 +181,19 @@ export default StyleSheet.create({
         justifyContent: "flex-end",
         alignItems: "center",
         borderTopWidth: 1,
-        borderTopColor: "#eee",
+        borderTopColor: "#f0f0f0",
         marginTop: 14,
         paddingTop: 10,
     },
 
     botaoAcao: {
-        marginLeft: 18,
+        marginLeft: 14,
+        width: 38,
+        height: 38,
+        borderRadius: 19,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#f8f9fa",
     },
 
     textoConcluido: {

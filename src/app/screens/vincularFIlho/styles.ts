@@ -1,139 +1,53 @@
-﻿import { StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 
-export default StyleSheet.create(
-    {
+export default StyleSheet.create({
+    safeArea: {
+        flex: 1,
+        backgroundColor: "#fff",
+    },
 
-        container: {
-            flex: 1,
-            backgroundColor: '#fff',
-        },
+    keyboardAvoiding: {
+        flex: 1,
+    },
 
-        safeArea: {
-            flex: 1,
-        },
+    scrollContent: {
+        flexGrow: 1,
+        paddingBottom: 40,
+    },
 
-        keyboardAvoiding: {
-            flex: 1,
-        },
+    containerForm: {
+        padding: 20,
+        paddingTop: 12,
+    },
 
-        scrollContent: {
-            flexGrow: 1,
-        },
+    infoText: {
+        marginBottom: 18,
+        fontSize: 14,
+        color: "#666",
+        lineHeight: 20,
+    },
 
-        logoTop: {
-            width: 120,
-            height: 120,
-        },
+    label: {
+        marginTop: 10,
+        marginBottom: 6,
+        fontSize: 14,
+        fontWeight: "600",
+        color: "#333",
+    },
 
-        containerLogo: {
-            padding: 20,
-        },
+    input: {
+        height: 48,
+        borderWidth: 1,
+        borderColor: "#ccc",
+        borderRadius: 8,
+        paddingHorizontal: 12,
+        marginBottom: 10,
+        backgroundColor: "#fff",
+    },
 
-        headerRow: {
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-        },
-
-        textContainer: {
-            flex: 1,
-        },
-
-        titulo: {
-            fontSize: 26,
-            fontWeight: "600",
-        },
-
-        subtitulo: {
-            color: "#666",
-        },
-
-        containerForm: {
-            padding: 20,
-            flex:1
-        },
-
-        subtituloForm: {
-            marginBottom: 20,
-        },
-
-        label: {
-            marginTop: 10,
-        },
-
-        input: {
-            borderWidth: 1,
-            borderColor: "#ccc",
-            borderRadius: 8,
-            padding: 10,
-            marginBottom: 10,
-        },
-
-        botao: {
-            backgroundColor: "#007bff",
-            padding: 15,
-            borderRadius: 10,
-            alignItems: "center",
-            marginTop: 50,
-           
-        },
-
-        botaoText: {
-            color: "#fff",
-            fontWeight: "bold",
-
-        },
-
-        // Tipo usuario
-        botaoTipoUsuario: {
-            flexDirection: "row",
-            gap: 10,
-            marginTop: 10,
-        },
-
-        botaoTipoUsuarioOption: {
-            flex: 1,
-            padding: 12,
-            borderWidth: 1,
-            borderColor: "#ccc",
-            borderRadius: 8,
-            alignItems: "center",
-        },
-
-        botaoTipoUsuarioOptionPai: {
-            flex: 1,
-            padding: 12,
-            borderWidth: 1,
-            borderColor: "#007bff",
-            backgroundColor: "#007bff",
-            borderRadius: 8,
-            alignItems: "center",
-        },
-
-        botaoTipoUsuarioOptionFilho: {
-            flex: 1,
-            padding: 12,
-            borderWidth: 1,
-            borderColor: "#007bff",
-            borderRadius: 8,
-            alignItems: "center",
-        },
-
-        botaoOpcaoPaiText: {
-            color: "#fff",
-            fontWeight: "bold",
-        },
-
-        botaoOpcaoFilhoText: {
-            color: "#000",
-            fontWeight: "bold",
-        },
-        botaoFooter: {
-            flexDirection: "row",
-            justifyContent: "space-between",
-            marginTop: 20,
-        },
-
-    }
-);
-
+    botao: {
+        width: "100%",
+        height: 48,
+        marginTop: 24,
+    },
+});
