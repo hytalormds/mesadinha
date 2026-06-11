@@ -3,9 +3,9 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { MaterialIcons } from "@expo/vector-icons";
 
 import Login from "@/app/screens/login";
-import TelaCadastro from "@/app/screens/telaCadastro";
+import TelaCadastro from "@/app/screens/CadastroUsuario";
 import CadastroTarefa from "@/app/screens/CadastroTarefa";
-import VincularFilho from "@/app/screens/vincularFIlho";
+import VincularFilho from "@/app/screens/VincularFIlho";
 import ListaTarefas from "@/app/screens/ListaTarefas";
 import type { RootStackParamList } from "@/types/navigation";
 import styles from "./styles";

@@ -65,4 +65,36 @@ export default StyleSheet.create({
         alignItems: "center",
         marginTop: 24,
     },
+    cardValorStatusContainer: {
+    alignItems: "flex-end",
+    gap: 6,
+},
+
+statusBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 20,
+},
+
+statusTexto: {
+    color: "#ffffff",
+    fontSize: 11,
+    fontWeight: "700",
+},
+
+statusConcluida: {
+    backgroundColor: "#28a745",
+},
+
+statusEmAndamento: {
+    backgroundColor: "#007BFF",
+},
+
+statusEmAberto: {
+    backgroundColor: "#ffc107",
+},
+
+statusExpirado: {
+    backgroundColor: "#dc3545",
+},
 });

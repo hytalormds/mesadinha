@@ -169,6 +169,7 @@ export default function CadastroTarefa() {
             dataLimite,
             valor_recompensa: converterMoedaParaNumero(valor_recompensa),
             concluida: tarefaEditando?.concluida ?? false,
+            status: tarefaEditando?.status ?? "Em Aberto",
         };
 
         navigation.popTo("ListaTarefas", {

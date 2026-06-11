@@ -1,3 +1,9 @@
+export type StatusTarefa =
+    | "Concluída"
+    | "Em Andamento"
+    | "Em Aberto"
+    | "Expirado";
+
 export type Tarefa = {
   id: string;
   titulo: string;
@@ -5,6 +11,7 @@ export type Tarefa = {
   dataLimite?: string;
   valor_recompensa?: number;
   concluida?: boolean;
+  status?: StatusTarefa;
 };
 
 export type RootStackParamList = {
