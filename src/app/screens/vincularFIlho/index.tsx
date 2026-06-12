@@ -33,6 +33,7 @@ export default function VincularFilho() {
     const [filhos, setFilhos] = React.useState<Usuario[]>([]);
     const [carregouFilhos, setCarregouFilhos] = React.useState(false);
     const [usuarioLogado, setUsuarioLogado] = React.useState<Usuario | null>(null);
+    const [senha, setSenha] = React.useState("");
     React.useEffect(() => {
         async function carregarFilhos() {
             try {
@@ -129,6 +130,16 @@ export default function VincularFilho() {
             return false;
         }
 
+        if (!email.trim()) {
+            Alert.alert("Atenção", "Digite o e-mail do filho.");
+            return false;
+        }
+
+        if (!senha.trim()) {
+            Alert.alert("Atenção", "Digite a senha do filho.");
+            return false;
+        }
+
         return true;
     }
 
@@ -140,7 +151,8 @@ export default function VincularFilho() {
         const novoFilho: Usuario = {
             id_usuario: String(Date.now()),
             nome: nome.trim(),
-            email: email.trim() || undefined,
+            email: email.trim().toLowerCase(),
+            senha: senha.trim(),
             id_tipo: 2,
         };
 
@@ -148,6 +160,7 @@ export default function VincularFilho() {
 
         setNome("");
         setEmail("");
+        setSenha("");
 
         Alert.alert("Sucesso", "Filho cadastrado com sucesso.");
     }
@@ -214,7 +227,15 @@ export default function VincularFilho() {
                         onChangeText={setNome}
                         autoCapitalize="words"
                     />
+                    <Text style={styles.label}>Senha</Text>
 
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Digite uma senha para o filho"
+                        value={senha}
+                        onChangeText={setSenha}
+                        secureTextEntry
+                    />
                     <Text style={styles.label}>E-mail</Text>
 
                     <TextInput

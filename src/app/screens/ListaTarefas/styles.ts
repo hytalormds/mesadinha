@@ -21,48 +21,6 @@ export default StyleSheet.create({
         paddingBottom: 8,
     },
 
-    botaoSair: {
-        height: 38,
-        paddingHorizontal: 12,
-        borderRadius: 19,
-        flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "#fff5f5",
-        borderWidth: 1,
-        borderColor: "#ffd6d6",
-    },
-
-    botaoSairTexto: {
-        marginLeft: 6,
-        fontSize: 13,
-        fontWeight: "700",
-        color: "#dc3545",
-    },
-
-    headerRow: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-    },
-
-    textContainer: {
-        flex: 1,
-        paddingRight: 16,
-    },
-
-    titulo: {
-        fontSize: 26,
-        fontWeight: "700",
-        color: "#222",
-    },
-
-    subtitulo: {
-        marginTop: 4,
-        fontSize: 14,
-        color: "#666",
-    },
-
     containerForm: {
         paddingHorizontal: 20,
         paddingTop: 8,
@@ -118,17 +76,6 @@ export default StyleSheet.create({
 
     cardConteudo: {
         width: "100%",
-    },
-
-    cardHeader: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "flex-start",
-    },
-
-    cardTituloContainer: {
-        flex: 1,
-        paddingRight: 12,
     },
 
     cardNumero: {
@@ -280,31 +227,134 @@ export default StyleSheet.create({
     statusEmAberto: {
         backgroundColor: "#ffc107",
     },
-    cardValorStatusContainer
-        : {
+
+    statusAguardandoAprovacao: {
+        backgroundColor: "#6f42c1",
+    },
+
+    statusRecusada: {
+        backgroundColor: "#6c757d",
+    },
+
+    headerContainer: {
+        width: "100%",
+        marginBottom: 16,
+    },
+
+    headerRow: {
+        width: "100%",
+    },
+
+    textContainer: {
+        width: "100%",
+        marginBottom: 12,
+    },
+
+    headerActions: {
+        width: "100%",
         flexDirection: "row",
         alignItems: "center",
-        marginTop: 8,
+        gap: 8,
+        flexWrap: "wrap",
     },
+
+    titulo: {
+        fontSize: 34,
+        fontWeight: "800",
+        color: "#1a1a1a",
+    },
+
+    subtitulo: {
+        fontSize: 16,
+        color: "#666666",
+        marginTop: 4,
+    },
+
+    usuarioLogadoTexto: {
+        fontSize: 14,
+        color: "#666666",
+        marginTop: 4,
+    },
+
     botaoFilhos: {
         flexDirection: "row",
         alignItems: "center",
         gap: 4,
-        paddingHorizontal: 10,
-        paddingVertical: 8,
-        borderRadius: 8,
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+        borderRadius: 12,
         backgroundColor: "#eaf3ff",
-        marginRight: 8,
     },
+
     botaoFilhosTexto: {
         color: "#007BFF",
         fontSize: 13,
         fontWeight: "700",
     },
-    usuarioLogadoTexto: {
-        fontSize: 12,
-        color: "#666666",
-        marginTop: 4,
+
+    botaoCofrinho: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 4,
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+        borderRadius: 12,
+        backgroundColor: "#eaf3ff",
     },
 
+    botaoCofrinhoTexto: {
+        color: "#007BFF",
+        fontSize: 13,
+        fontWeight: "700",
+    },
+
+    botaoSair: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 4,
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+        borderRadius: 20,
+        backgroundColor: "#fff5f5",
+        borderWidth: 1,
+        borderColor: "#ffd6d6",
+    },
+
+    botaoSairTexto: {
+        color: "#dc3545",
+        fontSize: 13,
+        fontWeight: "700",
+    },
+    botaoFamilia: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 4,
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+        borderRadius: 12,
+        backgroundColor: "#eaf3ff",
+    },
+
+    botaoFamiliaTexto: {
+        color: "#007BFF",
+        fontSize: 13,
+        fontWeight: "700",
+    },
+
+    cardHeader: {
+    width: "100%",
+    gap: 10,
+},
+
+cardTituloContainer: {
+    width: "100%",
+},
+
+cardValorStatusContainer: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 4,
+},
 });

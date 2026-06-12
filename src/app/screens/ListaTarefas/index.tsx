@@ -24,10 +24,14 @@ import type {
     Tarefa,
     StatusTarefa,
     Usuario,
+    Carteira,
+    Movimentacao,
 } from "@/types/navigation";
 
 const STORAGE_KEY = "@mesadinha:tarefas";
 const USUARIO_LOGADO_STORAGE_KEY = "@mesadinha:usuario_logado";
+const CARTEIRAS_STORAGE_KEY = "@mesadinha:carteiras";
+const MOVIMENTACOES_STORAGE_KEY = "@mesadinha:movimentacoes";
 
 type FiltroStatus = StatusTarefa | "Todas";
 
@@ -41,11 +45,13 @@ export default function ListaTarefas() {
 
     const [tarefas, setTarefas] = React.useState<Tarefa[]>([]);
     const [carregouTarefas, setCarregouTarefas] = React.useState(false);
-    const [filtroStatus, setFiltroStatus] =
-        React.useState<FiltroStatus>("Todas");
-    const [usuarioLogado, setUsuarioLogado] =
-        React.useState<Usuario | null>(null);
+    const [filtroStatus, setFiltroStatus] = React.useState<FiltroStatus>("Todas");
+    const [usuarioLogado, setUsuarioLogado] = React.useState<Usuario | null>(null);
+    const [carteiras, setCarteiras] = React.useState<Carteira[]>([]);
+    const [carregouCarteiras, setCarregouCarteiras] = React.useState(false);
 
+    const [movimentacoes, setMovimentacoes] = React.useState<Movimentacao[]>([]);
+    const [carregouMovimentacoes, setCarregouMovimentacoes] = React.useState(false);
     React.useEffect(() => {
         async function carregarUsuarioLogado() {
             try {
@@ -114,7 +120,86 @@ export default function ListaTarefas() {
 
         salvarTarefas();
     }, [tarefas, carregouTarefas]);
+    React.useEffect(() => {
+        async function salvarCarteiras() {
+            if (!carregouCarteiras) {
+                return;
+            }
 
+            try {
+                await AsyncStorage.setItem(
+                    CARTEIRAS_STORAGE_KEY,
+                    JSON.stringify(carteiras)
+                );
+            } catch (error) {
+                console.log("Erro ao salvar carteiras:", error);
+            }
+        }
+
+        salvarCarteiras();
+    }, [carteiras, carregouCarteiras]);
+    React.useEffect(() => {
+        async function carregarMovimentacoes() {
+            try {
+                const movimentacoesSalvas = await AsyncStorage.getItem(
+                    MOVIMENTACOES_STORAGE_KEY
+                );
+
+                if (movimentacoesSalvas) {
+                    setMovimentacoes(JSON.parse(movimentacoesSalvas));
+                } else {
+                    setMovimentacoes([]);
+                }
+            } catch (error) {
+                console.log("Erro ao carregar movimentações:", error);
+                setMovimentacoes([]);
+            } finally {
+                setCarregouMovimentacoes(true);
+            }
+        }
+
+        carregarMovimentacoes();
+    }, []);
+    React.useEffect(() => {
+        async function carregarCarteiras() {
+            try {
+                const carteirasSalvas = await AsyncStorage.getItem(
+                    CARTEIRAS_STORAGE_KEY
+                );
+
+                if (carteirasSalvas) {
+                    setCarteiras(JSON.parse(carteirasSalvas));
+                } else {
+                    setCarteiras([]);
+                }
+            } catch (error) {
+                console.log("Erro ao carregar carteiras:", error);
+                setCarteiras([]);
+            } finally {
+                setCarregouCarteiras(true);
+            }
+        }
+
+        carregarCarteiras();
+    }, []);
+    React.useEffect(() => {
+        async function salvarMovimentacoes() {
+            if (!carregouMovimentacoes) {
+                return;
+            }
+
+            try {
+                await AsyncStorage.setItem(
+                    MOVIMENTACOES_STORAGE_KEY,
+                    JSON.stringify(movimentacoes)
+                );
+            } catch (error) {
+                console.log("Erro ao salvar movimentações:", error);
+            }
+        }
+
+        salvarMovimentacoes();
+    }, [movimentacoes, carregouMovimentacoes]);
     React.useEffect(() => {
         if (!carregouTarefas) {
             return;
@@ -210,6 +295,14 @@ export default function ListaTarefas() {
             return "Concluída";
         }
 
+        if (
+            tarefa.status === "Aguardando Aprovação" ||
+            tarefa.status === "Recusada" ||
+            tarefa.status === "Expirado"
+        ) {
+            return tarefa.status;
+        }
+
         const dataLimiteConvertida = converterDataBRParaDate(
             tarefa.dataLimite
         );
@@ -241,6 +334,12 @@ export default function ListaTarefas() {
 
             case "Expirado":
                 return styles.statusExpirado;
+
+            case "Aguardando Aprovação":
+                return styles.statusAguardandoAprovacao;
+
+            case "Recusada":
+                return styles.statusRecusada;
 
             default:
                 return styles.statusEmAberto;
@@ -289,24 +388,16 @@ export default function ListaTarefas() {
         "Todas",
         "Em Aberto",
         "Em Andamento",
+        "Aguardando Aprovação",
         "Concluída",
+        "Recusada",
         "Expirado",
     ];
 
     const usuarioEhPai = usuarioLogado?.id_tipo === 1;
     const usuarioEhFilho = usuarioLogado?.id_tipo === 2;
 
-    const tarefasPermitidas = tarefas.filter((tarefa) => {
-        if (!usuarioLogado) {
-            return false;
-        }
-
-        if (usuarioLogado.id_tipo === 1) {
-            return true;
-        }
-
-        return tarefa.fk_usuario_responsavel === usuarioLogado.id_usuario;
-    });
+    const tarefasPermitidas = tarefas;
 
     const tarefasFiltradas = tarefasPermitidas.filter((tarefa) => {
         const statusAtual = obterStatusTarefa(tarefa);
@@ -329,7 +420,93 @@ export default function ListaTarefas() {
             </SafeAreaView>
         );
     }
+    function aceitarTarefa(tarefaSelecionada: Tarefa) {
+        const criancaId = String(
+            tarefaSelecionada.fk_usuario_crianca ??
+            tarefaSelecionada.fk_usuario_responsavel ??
+            ""
+        );
 
+        const valorRecompensa = tarefaSelecionada.valor_recompensa ?? 0;
+
+        if (!criancaId) {
+            Alert.alert("Atenção", "Criança da tarefa não encontrada.");
+            return;
+        }
+
+        if (valorRecompensa <= 0) {
+            Alert.alert("Atenção", "Valor da recompensa inválido.");
+            return;
+        }
+
+        if (tarefaSelecionada.recompensa_creditada) {
+            alterarStatusTarefa(tarefaSelecionada.id, "Concluída");
+            return;
+        }
+
+        let carteiraDaCrianca: Carteira | null = null;
+
+        setCarteiras((carteirasAtuais) => {
+            const carteiraExistente = carteirasAtuais.find(
+                (carteira) => String(carteira.fk_usuario_id) === criancaId
+            );
+
+            if (carteiraExistente) {
+                carteiraDaCrianca = {
+                    ...carteiraExistente,
+                    saldo: carteiraExistente.saldo + valorRecompensa,
+                };
+
+                return carteirasAtuais.map((carteira) =>
+                    String(carteira.fk_usuario_id) === criancaId
+                        ? carteiraDaCrianca as Carteira
+                        : carteira
+                );
+            }
+
+            carteiraDaCrianca = {
+                id_carteira: String(Date.now()),
+                saldo: valorRecompensa,
+                fk_usuario_id: criancaId,
+            };
+
+            return [...carteirasAtuais, carteiraDaCrianca];
+        });
+
+        const idCarteira = carteiraDaCrianca?.id_carteira ?? String(Date.now());
+
+        const novaMovimentacao: Movimentacao = {
+            id_movimentacao: String(Date.now()),
+            tipo_movimentacao: "entrada",
+            data: new Date().toISOString(),
+            valor: valorRecompensa,
+            fk_tarefa_id: tarefaSelecionada.id,
+            fk_carteira_id: idCarteira,
+        };
+
+        setMovimentacoes((movimentacoesAtuais) => [
+            novaMovimentacao,
+            ...movimentacoesAtuais,
+        ]);
+
+        setTarefas((tarefasAtuais) =>
+            tarefasAtuais.map((tarefa) =>
+                tarefa.id === tarefaSelecionada.id
+                    ? {
+                        ...tarefa,
+                        status: "Concluída",
+                        concluida: true,
+                        recompensa_creditada: true,
+                    }
+                    : tarefa
+            )
+        );
+
+        Alert.alert(
+            "Tarefa aceita",
+            "A recompensa foi adicionada ao cofrinho da criança."
+        );
+    }
     return (
         <SafeAreaView style={styles.safeArea}>
             <KeyboardAvoidingView
@@ -344,7 +521,7 @@ export default function ListaTarefas() {
                     showsVerticalScrollIndicator={false}
                 >
                     <View style={styles.containerLogo}>
-                        <View style={styles.headerRow}>
+                        <View style={styles.headerContainer}>
                             <View style={styles.textContainer}>
                                 <Title style={styles.titulo}>
                                     Lista de Tarefas
@@ -366,39 +543,67 @@ export default function ListaTarefas() {
                                 </Text>
                             </View>
 
-                            {usuarioEhPai && (
+                            <View style={styles.headerActions}>
+                                {usuarioEhPai && (
+                                    <TouchableOpacity
+                                        style={styles.botaoFilhos}
+                                        onPress={() => navigation.push("VincularFilho")}
+                                    >
+                                        <MaterialIcons
+                                            name="person-add"
+                                            size={20}
+                                            color="#007BFF"
+                                        />
+
+                                        <Text style={styles.botaoFilhosTexto}>
+                                            Filhos
+                                        </Text>
+                                    </TouchableOpacity>
+                                )}
+
                                 <TouchableOpacity
-                                    style={styles.botaoFilhos}
-                                    onPress={() =>
-                                        navigation.push("VincularFilho")
-                                    }
+                                    style={styles.botaoCofrinho}
+                                    onPress={() => navigation.push("Cofrinho")}
                                 >
                                     <MaterialIcons
-                                        name="person-add"
+                                        name="savings"
                                         size={20}
                                         color="#007BFF"
                                     />
 
-                                    <Text style={styles.botaoFilhosTexto}>
-                                        Filhos
+                                    <Text style={styles.botaoCofrinhoTexto}>
+                                        Cofrinho
                                     </Text>
                                 </TouchableOpacity>
-                            )}
+                                <TouchableOpacity
+                                    style={styles.botaoFamilia}
+                                    onPress={() => navigation.push("Familia")}
+                                >
+                                    <MaterialIcons
+                                        name="groups"
+                                        size={20}
+                                        color="#007BFF"
+                                    />
 
-                            <TouchableOpacity
-                                style={styles.botaoSair}
-                                onPress={confirmarSair}
-                            >
-                                <MaterialIcons
-                                    name="logout"
-                                    size={20}
-                                    color="#dc3545"
-                                />
+                                    <Text style={styles.botaoFamiliaTexto}>
+                                        Família
+                                    </Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={styles.botaoSair}
+                                    onPress={confirmarSair}
+                                >
+                                    <MaterialIcons
+                                        name="logout"
+                                        size={20}
+                                        color="#dc3545"
+                                    />
 
-                                <Text style={styles.botaoSairTexto}>
-                                    Sair
-                                </Text>
-                            </TouchableOpacity>
+                                    <Text style={styles.botaoSairTexto}>
+                                        Sair
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
 
                         <View style={styles.containerForm}>
@@ -463,6 +668,31 @@ export default function ListaTarefas() {
                                     const statusAtual =
                                         obterStatusTarefa(tarefa);
 
+                                    const usuarioLogadoId = String(usuarioLogado.id_usuario);
+
+                                    const idsPossiveisDaCrianca = [
+                                        tarefa.fk_usuario_crianca,
+                                        tarefa.fk_usuario_responsavel,
+                                    ]
+                                        .filter(Boolean)
+                                        .map((id) => String(id));
+
+                                    const nomeCriancaDaTarefa = String(
+                                        tarefa.nome_usuario_crianca ??
+                                        tarefa.nome_usuario_responsavel ??
+                                        ""
+                                    )
+                                        .trim()
+                                        .toLowerCase();
+
+                                    const nomeUsuarioLogado = String(usuarioLogado.nome)
+                                        .trim()
+                                        .toLowerCase();
+
+                                    const tarefaEhDoFilhoLogado =
+                                        usuarioEhFilho &&
+                                        (idsPossiveisDaCrianca.includes(usuarioLogadoId) ||
+                                            nomeCriancaDaTarefa === nomeUsuarioLogado);
                                     return (
                                         <View
                                             key={tarefa.id}
@@ -490,16 +720,11 @@ export default function ListaTarefas() {
                                                 }}
                                             >
                                                 <View style={styles.cardHeader}>
-                                                    <View
-                                                        style={
-                                                            styles.cardTituloContainer
-                                                        }
-                                                    >
+                                                    <View style={styles.cardTituloContainer}>
                                                         <Text
                                                             style={[
                                                                 styles.cardNumero,
-                                                                statusAtual ===
-                                                                "Concluída" &&
+                                                                statusAtual === "Concluída" &&
                                                                 styles.textoConcluido,
                                                             ]}
                                                         >
@@ -507,10 +732,10 @@ export default function ListaTarefas() {
                                                         </Text>
 
                                                         <Text
+                                                            numberOfLines={2}
                                                             style={[
                                                                 styles.cardTitulo,
-                                                                statusAtual ===
-                                                                "Concluída" &&
+                                                                statusAtual === "Concluída" &&
                                                                 styles.textoConcluido,
                                                             ]}
                                                         >
@@ -518,60 +743,23 @@ export default function ListaTarefas() {
                                                         </Text>
                                                     </View>
 
-                                                    <View
-                                                        style={
-                                                            styles.cardValorStatusContainer
-                                                        }
-                                                    >
-                                                        <Text
-                                                            style={
-                                                                styles.cardValor
-                                                            }
-                                                        >
-                                                            {formatarValor(
-                                                                tarefa.valor_recompensa
-                                                            )}
+                                                    <View style={styles.cardValorStatusContainer}>
+                                                        <Text style={styles.cardValor}>
+                                                            {formatarValor(tarefa.valor_recompensa)}
                                                         </Text>
 
                                                         <View
                                                             style={[
                                                                 styles.statusBadge,
-                                                                getStatusStyle(
-                                                                    statusAtual
-                                                                ),
+                                                                getStatusStyle(statusAtual),
                                                             ]}
                                                         >
-                                                            <Text
-                                                                style={
-                                                                    styles.statusTexto
-                                                                }
-                                                            >
+                                                            <Text style={styles.statusTexto}>
                                                                 {statusAtual}
                                                             </Text>
                                                         </View>
                                                     </View>
                                                 </View>
-
-                                                <View
-                                                    style={styles.cardInfoRow}
-                                                >
-                                                    <MaterialIcons
-                                                        name="event"
-                                                        size={18}
-                                                        color="#666"
-                                                    />
-
-                                                    <Text
-                                                        style={
-                                                            styles.cardInfoTexto
-                                                        }
-                                                    >
-                                                        Data limite:{" "}
-                                                        {tarefa.dataLimite ||
-                                                            "Não informada"}
-                                                    </Text>
-                                                </View>
-
                                                 <View
                                                     style={styles.cardInfoRow}
                                                 >
@@ -588,7 +776,28 @@ export default function ListaTarefas() {
                                                     >
                                                         Responsável:{" "}
                                                         {tarefa.nome_usuario_responsavel ||
-                                                            "Não vinculado"}
+                                                            "Não informado"}
+                                                    </Text>
+                                                </View>
+
+                                                <View
+                                                    style={styles.cardInfoRow}
+                                                >
+                                                    <MaterialIcons
+                                                        name="child-care"
+                                                        size={18}
+                                                        color="#666"
+                                                    />
+
+                                                    <Text
+                                                        style={
+                                                            styles.cardInfoTexto
+                                                        }
+                                                    >
+                                                        Criança:{" "}
+                                                        {tarefa.nome_usuario_crianca ||
+                                                            tarefa.nome_usuario_responsavel ||
+                                                            "Não vinculada"}
                                                     </Text>
                                                 </View>
 
@@ -611,6 +820,76 @@ export default function ListaTarefas() {
                                             {usuarioEhPai && (
                                                 <View style={styles.cardAcoes}>
                                                     {statusAtual ===
+                                                        "Aguardando Aprovação" && (
+                                                            <>
+                                                                <ButtonIcon
+                                                                    name="check-circle"
+                                                                    size={28}
+                                                                    color="#095414"
+                                                                    style={
+                                                                        styles.botaoAcao
+                                                                    }
+                                                                    onPress={() =>
+                                                                        aceitarTarefa(
+                                                                            tarefa
+                                                                        )
+                                                                    }
+                                                                />
+
+                                                                <ButtonIcon
+                                                                    name="cancel"
+                                                                    size={28}
+                                                                    color="#dc3545"
+                                                                    style={
+                                                                        styles.botaoAcao
+                                                                    }
+                                                                    onPress={() =>
+                                                                        alterarStatusTarefa(
+                                                                            tarefa.id,
+                                                                            "Recusada"
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </>
+                                                        )}
+
+                                                    <ButtonIcon
+                                                        name="edit"
+                                                        size={28}
+                                                        color="#007BFF"
+                                                        style={
+                                                            styles.botaoAcao
+                                                        }
+                                                        onPress={() =>
+                                                            navigation.push(
+                                                                "CadastroTarefa",
+                                                                {
+                                                                    tarefaEditando:
+                                                                        tarefa,
+                                                                }
+                                                            )
+                                                        }
+                                                    />
+
+                                                    <ButtonIcon
+                                                        name="delete-outline"
+                                                        size={28}
+                                                        color="#dc3545"
+                                                        style={
+                                                            styles.botaoAcao
+                                                        }
+                                                        onPress={() =>
+                                                            apagarTarefa(
+                                                                tarefa.id
+                                                            )
+                                                        }
+                                                    />
+                                                </View>
+                                            )}
+
+                                            {tarefaEhDoFilhoLogado && (
+                                                <View style={styles.cardAcoes}>
+                                                    {statusAtual ===
                                                         "Em Aberto" && (
                                                             <ButtonIcon
                                                                 name="play-arrow"
@@ -628,8 +907,10 @@ export default function ListaTarefas() {
                                                             />
                                                         )}
 
-                                                    {statusAtual ===
-                                                        "Em Andamento" && (
+                                                    {(statusAtual ===
+                                                        "Em Andamento" ||
+                                                        statusAtual ===
+                                                        "Recusada") && (
                                                             <ButtonIcon
                                                                 name="check-circle"
                                                                 size={28}
@@ -640,64 +921,11 @@ export default function ListaTarefas() {
                                                                 onPress={() =>
                                                                     alterarStatusTarefa(
                                                                         tarefa.id,
-                                                                        "Concluída"
+                                                                        "Aguardando Aprovação"
                                                                     )
                                                                 }
                                                             />
                                                         )}
-
-                                                    {statusAtual ===
-                                                        "Concluída" && (
-                                                            <ButtonIcon
-                                                                name="refresh"
-                                                                size={28}
-                                                                color="#6c757d"
-                                                                style={
-                                                                    styles.botaoAcao
-                                                                }
-                                                                onPress={() =>
-                                                                    alterarStatusTarefa(
-                                                                        tarefa.id,
-                                                                        "Em Aberto"
-                                                                    )
-                                                                }
-                                                            />
-                                                        )}
-
-                                                    {statusAtual ===
-                                                        "Expirado" && (
-                                                            <ButtonIcon
-                                                                name="edit"
-                                                                size={28}
-                                                                color="#dc3545"
-                                                                style={
-                                                                    styles.botaoAcao
-                                                                }
-                                                                onPress={() =>
-                                                                    navigation.push(
-                                                                        "CadastroTarefa",
-                                                                        {
-                                                                            tarefaEditando:
-                                                                                tarefa,
-                                                                        }
-                                                                    )
-                                                                }
-                                                            />
-                                                        )}
-
-                                                    <ButtonIcon
-                                                        name="delete-outline"
-                                                        size={28}
-                                                        color="#dc3545"
-                                                        style={
-                                                            styles.botaoAcao
-                                                        }
-                                                        onPress={() =>
-                                                            apagarTarefa(
-                                                                tarefa.id
-                                                            )
-                                                        }
-                                                    />
                                                 </View>
                                             )}
                                         </View>

@@ -128,10 +128,10 @@ export default function Login() {
                 style={styles.logo}
               />
 
-              <Title style={styles.title}>Bem-vindo de volta!</Title>
+              <Title style={styles.title}>Bem-vindo!</Title>
 
               <Text style={styles.subtitle}>
-                Faça login para continuar sua jornada financeira.
+                Faça login para visualizar e controlar as tarefas e mesada do(s) seu(s) filho(s).
               </Text>
             </View>
 

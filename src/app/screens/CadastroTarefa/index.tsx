@@ -82,7 +82,9 @@ export default function CadastroTarefa() {
             setDescricao(tarefaEditando.descricao ?? "");
             setDataLimite(tarefaEditando.dataLimite ?? "");
             setUsuarioResponsavelId(
-                tarefaEditando.fk_usuario_responsavel ?? ""
+                tarefaEditando.fk_usuario_crianca ??
+                tarefaEditando.fk_usuario_responsavel ??
+                ""
             );
 
             setvalor_recompensa(
@@ -258,17 +260,31 @@ export default function CadastroTarefa() {
             return;
         }
 
-        const usuarioResponsavel = filhosCadastrados.find(
+        if (!usuarioLogado) {
+            Alert.alert("Atenção", "Usuário logado não encontrado.");
+            return;
+        }
+
+        if (usuarioLogado.id_tipo !== 1) {
+            Alert.alert(
+                "Acesso negado",
+                "Somente o responsável pode salvar tarefas."
+            );
+            return;
+        }
+
+        const criancaSelecionada = filhosCadastrados.find(
             (usuario) => usuario.id_usuario === usuarioResponsavelId
         );
 
-        if (!usuarioResponsavel) {
+        if (!criancaSelecionada) {
             Alert.alert("Atenção", "Filho responsável não encontrado.");
             return;
         }
 
         const tarefaSalva: Tarefa = {
             id: tarefaEditando?.id ?? String(Date.now()),
+            id_tarefa: tarefaEditando?.id_tarefa,
             titulo,
             descricao,
             dataLimite,
@@ -276,26 +292,18 @@ export default function CadastroTarefa() {
             concluida: tarefaEditando?.concluida ?? false,
             status: tarefaEditando?.status ?? "Em Aberto",
 
-            fk_usuario_responsavel: usuarioResponsavel.id_usuario,
-            nome_usuario_responsavel: usuarioResponsavel.nome,
+            fk_usuario_responsavel: usuarioLogado.id_usuario,
+            nome_usuario_responsavel: usuarioLogado.nome,
+
+            fk_usuario_crianca: criancaSelecionada.id_usuario,
+            nome_usuario_crianca: criancaSelecionada.nome,
+
+            fk_familia_id: tarefaEditando?.fk_familia_id,
         };
 
         navigation.popTo("ListaTarefas", {
             tarefaSalva,
         });
-    }
-    if (!usuarioLogado) {
-        return (
-            <SafeAreaView style={styles.safeArea}>
-                <View style={styles.containerForm}>
-                    <Text style={styles.label}>Carregando usuário...</Text>
-                </View>
-            </SafeAreaView>
-        );
-    }
-
-    if (usuarioLogado.id_tipo !== 1) {
-        return null;
     }
     return (
         <SafeAreaView style={styles.safeArea}>

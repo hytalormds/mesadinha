@@ -2,14 +2,15 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { MaterialIcons } from "@expo/vector-icons";
 
-import Login from "@/app/screens/login";
+import Login from "@/app/screens/Login";
 import TelaCadastro from "@/app/screens/CadastroUsuario";
 import CadastroTarefa from "@/app/screens/CadastroTarefa";
 import VincularFilho from "@/app/screens/VincularFilho";
 import ListaTarefas from "@/app/screens/ListaTarefas";
-
+import Cofrinho from "@/app/screens/Cofrinho";
 import type { RootStackParamList } from "@/types/navigation";
 import styles from "./styles";
+import Familia from "@/app/screens/Familia";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -75,6 +76,17 @@ export default function Routes() {
             <Stack.Screen
                 name="ListaTarefas"
                 component={ListaTarefas}
+                options={{ headerShown: false }}
+            />
+
+            <Stack.Screen
+                name="Cofrinho"
+                component={Cofrinho}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="Familia"
+                component={Familia}
                 options={{ headerShown: false }}
             />
         </Stack.Navigator>
