@@ -296,10 +296,15 @@ export default StyleSheet.create({
         backgroundColor: "#eaf3ff",
         marginRight: 8,
     },
-
     botaoFilhosTexto: {
         color: "#007BFF",
         fontSize: 13,
         fontWeight: "700",
     },
+    usuarioLogadoTexto: {
+        fontSize: 12,
+        color: "#666666",
+        marginTop: 4,
+    },
+
 });

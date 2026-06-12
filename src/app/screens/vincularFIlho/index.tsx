@@ -15,10 +15,12 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
+
 import type { RootStackParamList, Usuario } from "@/types/navigation";
 import styles from "./styles";
 
 const USUARIOS_STORAGE_KEY = "@mesadinha:usuarios";
+const USUARIO_LOGADO_STORAGE_KEY = "@mesadinha:usuario_logado";
 
 export default function VincularFilho() {
     const navigation =
@@ -30,7 +32,7 @@ export default function VincularFilho() {
     const [email, setEmail] = React.useState("");
     const [filhos, setFilhos] = React.useState<Usuario[]>([]);
     const [carregouFilhos, setCarregouFilhos] = React.useState(false);
-
+    const [usuarioLogado, setUsuarioLogado] = React.useState<Usuario | null>(null);
     React.useEffect(() => {
         async function carregarFilhos() {
             try {
@@ -78,7 +80,49 @@ export default function VincularFilho() {
 
         salvarFilhos();
     }, [filhos, carregouFilhos]);
+    React.useEffect(() => {
+        async function carregarUsuarioLogado() {
+            try {
+                const usuarioSalvo = await AsyncStorage.getItem(
+                    USUARIO_LOGADO_STORAGE_KEY
+                );
 
+                if (usuarioSalvo) {
+                    const usuario: Usuario = JSON.parse(usuarioSalvo);
+
+                    setUsuarioLogado(usuario);
+
+                    if (usuario.id_tipo !== 1) {
+                        Alert.alert(
+                            "Acesso negado",
+                            "Somente o responsável pode cadastrar filhos."
+                        );
+
+                        navigation.reset({
+                            index: 0,
+                            routes: [{ name: "ListaTarefas" }],
+                        });
+                    }
+
+                    return;
+                }
+
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: "Login" }],
+                });
+            } catch (error) {
+                console.log("Erro ao carregar usuário logado:", error);
+
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: "Login" }],
+                });
+            }
+        }
+
+        carregarUsuarioLogado();
+    }, []);
     function validarFormulario() {
         if (!nome.trim()) {
             Alert.alert("Atenção", "Digite o nome do filho.");
@@ -131,7 +175,21 @@ export default function VincularFilho() {
             ]
         );
     }
+    if (!usuarioLogado) {
+        return (
+            <SafeAreaView style={styles.safeArea}>
+                <View style={styles.cardVazio}>
+                    <Text style={styles.textoVazio}>
+                        Carregando usuário...
+                    </Text>
+                </View>
+            </SafeAreaView>
+        );
+    }
 
+    if (usuarioLogado.id_tipo !== 1) {
+        return null;
+    }
     return (
         <SafeAreaView style={styles.safeArea}>
             <KeyboardAvoidingView

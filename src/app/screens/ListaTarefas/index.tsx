@@ -23,12 +23,17 @@ import type {
     RootStackParamList,
     Tarefa,
     StatusTarefa,
+    Usuario,
 } from "@/types/navigation";
 
 const STORAGE_KEY = "@mesadinha:tarefas";
+const USUARIO_LOGADO_STORAGE_KEY = "@mesadinha:usuario_logado";
+
 type FiltroStatus = StatusTarefa | "Todas";
+
 export default function ListaTarefas() {
     const route = useRoute<RouteProp<RootStackParamList, "ListaTarefas">>();
+
     const navigation =
         useNavigation<
             NativeStackNavigationProp<RootStackParamList, "ListaTarefas">
@@ -38,6 +43,38 @@ export default function ListaTarefas() {
     const [carregouTarefas, setCarregouTarefas] = React.useState(false);
     const [filtroStatus, setFiltroStatus] =
         React.useState<FiltroStatus>("Todas");
+    const [usuarioLogado, setUsuarioLogado] =
+        React.useState<Usuario | null>(null);
+
+    React.useEffect(() => {
+        async function carregarUsuarioLogado() {
+            try {
+                const usuarioSalvo = await AsyncStorage.getItem(
+                    USUARIO_LOGADO_STORAGE_KEY
+                );
+
+                if (usuarioSalvo) {
+                    setUsuarioLogado(JSON.parse(usuarioSalvo));
+                    return;
+                }
+
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: "Login" }],
+                });
+            } catch (error) {
+                console.log("Erro ao carregar usuário logado:", error);
+
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: "Login" }],
+                });
+            }
+        }
+
+        carregarUsuarioLogado();
+    }, []);
+
     React.useEffect(() => {
         async function carregarTarefas() {
             try {
@@ -117,7 +154,9 @@ export default function ListaTarefas() {
             {
                 text: "Sair",
                 style: "destructive",
-                onPress: () => {
+                onPress: async () => {
+                    await AsyncStorage.removeItem(USUARIO_LOGADO_STORAGE_KEY);
+
                     navigation.reset({
                         index: 0,
                         routes: [{ name: "Login" }],
@@ -245,6 +284,7 @@ export default function ListaTarefas() {
             ]
         );
     }
+
     const filtrosStatus: FiltroStatus[] = [
         "Todas",
         "Em Aberto",
@@ -253,7 +293,22 @@ export default function ListaTarefas() {
         "Expirado",
     ];
 
-    const tarefasFiltradas = tarefas.filter((tarefa) => {
+    const usuarioEhPai = usuarioLogado?.id_tipo === 1;
+    const usuarioEhFilho = usuarioLogado?.id_tipo === 2;
+
+    const tarefasPermitidas = tarefas.filter((tarefa) => {
+        if (!usuarioLogado) {
+            return false;
+        }
+
+        if (usuarioLogado.id_tipo === 1) {
+            return true;
+        }
+
+        return tarefa.fk_usuario_responsavel === usuarioLogado.id_usuario;
+    });
+
+    const tarefasFiltradas = tarefasPermitidas.filter((tarefa) => {
         const statusAtual = obterStatusTarefa(tarefa);
 
         if (filtroStatus === "Todas") {
@@ -262,6 +317,19 @@ export default function ListaTarefas() {
 
         return statusAtual === filtroStatus;
     });
+
+    if (!usuarioLogado) {
+        return (
+            <SafeAreaView style={styles.safeArea}>
+                <View style={styles.cardVazio}>
+                    <Text style={styles.textoVazio}>
+                        Carregando usuário...
+                    </Text>
+                </View>
+            </SafeAreaView>
+        );
+    }
+
     return (
         <SafeAreaView style={styles.safeArea}>
             <KeyboardAvoidingView
@@ -283,25 +351,40 @@ export default function ListaTarefas() {
                                 </Title>
 
                                 <Text style={styles.subtitulo}>
-                                    {tarefas.length === 1
-                                        ? "1 tarefa cadastrada"
-                                        : `${tarefas.length} tarefas cadastradas`}
+                                    {tarefasPermitidas.length === 1
+                                        ? "1 tarefa disponível"
+                                        : `${tarefasPermitidas.length} tarefas disponíveis`}
+                                </Text>
+
+                                <Text style={styles.usuarioLogadoTexto}>
+                                    Perfil atual: {usuarioLogado.nome}{" "}
+                                    {usuarioEhPai
+                                        ? "(Pai)"
+                                        : usuarioEhFilho
+                                            ? "(Filho)"
+                                            : ""}
                                 </Text>
                             </View>
-                            <TouchableOpacity
-                                style={styles.botaoFilhos}
-                                onPress={() => navigation.push("VincularFilho")}
-                            >
-                                <MaterialIcons
-                                    name="person-add"
-                                    size={20}
-                                    color="#007BFF"
-                                />
 
-                                <Text style={styles.botaoFilhosTexto}>
-                                    Filhos
-                                </Text>
-                            </TouchableOpacity>
+                            {usuarioEhPai && (
+                                <TouchableOpacity
+                                    style={styles.botaoFilhos}
+                                    onPress={() =>
+                                        navigation.push("VincularFilho")
+                                    }
+                                >
+                                    <MaterialIcons
+                                        name="person-add"
+                                        size={20}
+                                        color="#007BFF"
+                                    />
+
+                                    <Text style={styles.botaoFilhosTexto}>
+                                        Filhos
+                                    </Text>
+                                </TouchableOpacity>
+                            )}
+
                             <TouchableOpacity
                                 style={styles.botaoSair}
                                 onPress={confirmarSair}
@@ -312,278 +395,328 @@ export default function ListaTarefas() {
                                     color="#dc3545"
                                 />
 
-                                <Text style={styles.botaoSairTexto}>Sair</Text>
+                                <Text style={styles.botaoSairTexto}>
+                                    Sair
+                                </Text>
                             </TouchableOpacity>
                         </View>
-                    </View>
 
-                    <View style={styles.containerForm}>
-                        <View style={styles.filtrosContainer}>
-                            <ScrollView
-                                horizontal
-                                showsHorizontalScrollIndicator={false}
-                                contentContainerStyle={styles.filtrosScroll}
-                            >
-                                {filtrosStatus.map((status) => (
-                                    <TouchableOpacity
-                                        key={status}
-                                        style={[
-                                            styles.filtroBotao,
-                                            filtroStatus === status && styles.filtroBotaoAtivo,
-                                        ]}
-                                        onPress={() => setFiltroStatus(status)}
-                                    >
-                                        <Text
-                                            style={[
-                                                styles.filtroTexto,
-                                                filtroStatus === status && styles.filtroTextoAtivo,
-                                            ]}
-                                        >
-                                            {status}
-                                        </Text>
-                                    </TouchableOpacity>
-                                ))}
-                            </ScrollView>
-                        </View>
-                        {tarefasFiltradas.length === 0 ? (
-                            <View style={styles.cardVazio}>
-                                <MaterialIcons
-                                    name="assignment"
-                                    size={42}
-                                    color="#999"
-                                />
-
-                                <Text style={styles.textoVazio}>
-                                    {tarefas.length === 0
-                                        ? "Não há tarefa cadastrada."
-                                        : `Não há tarefa com status ${filtroStatus}.`}
-                                </Text>
-
-                                <Text style={styles.textoVazioDescricao}>
-                                    {tarefas.length === 0
-                                        ? 'Clique no botão "Adicionar Nova Tarefa" para criar sua primeira tarefa.'
-                                        : "Altere o filtro acima para visualizar outras tarefas."}
-                                </Text>
-                            </View>
-                        ) : (
-                            tarefasFiltradas.map((tarefa, index) => {
-                                const statusAtual =
-                                    obterStatusTarefa(tarefa);
-
-                                return (
-                                    <View
-                                        key={tarefa.id}
-                                        style={[
-                                            styles.cardTarefa,
-                                            statusAtual === "Concluída" &&
-                                            styles.cardTarefaConcluida,
-                                        ]}
-                                    >
+                        <View style={styles.containerForm}>
+                            <View style={styles.filtrosContainer}>
+                                <ScrollView
+                                    horizontal
+                                    showsHorizontalScrollIndicator={false}
+                                    contentContainerStyle={styles.filtrosScroll}
+                                >
+                                    {filtrosStatus.map((status) => (
                                         <TouchableOpacity
-                                            activeOpacity={0.8}
-                                            style={styles.cardConteudo}
+                                            key={status}
+                                            style={[
+                                                styles.filtroBotao,
+                                                filtroStatus === status &&
+                                                styles.filtroBotaoAtivo,
+                                            ]}
                                             onPress={() =>
-                                                navigation.push(
-                                                    "CadastroTarefa",
-                                                    {
-                                                        tarefaEditando: tarefa,
-                                                    }
-                                                )
+                                                setFiltroStatus(status)
                                             }
                                         >
-                                            <View style={styles.cardHeader}>
-                                                <View
-                                                    style={
-                                                        styles.cardTituloContainer
-                                                    }
-                                                >
-                                                    <Text
-                                                        style={[
-                                                            styles.cardNumero,
-                                                            statusAtual ===
-                                                            "Concluída" &&
-                                                            styles.textoConcluido,
-                                                        ]}
-                                                    >
-                                                        Tarefa {index + 1}
-                                                    </Text>
+                                            <Text
+                                                style={[
+                                                    styles.filtroTexto,
+                                                    filtroStatus === status &&
+                                                    styles.filtroTextoAtivo,
+                                                ]}
+                                            >
+                                                {status}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    ))}
+                                </ScrollView>
+                            </View>
 
-                                                    <Text
-                                                        style={[
-                                                            styles.cardTitulo,
-                                                            statusAtual ===
-                                                            "Concluída" &&
-                                                            styles.textoConcluido,
-                                                        ]}
-                                                    >
-                                                        {tarefa.titulo}
-                                                    </Text>
-                                                </View>
+                            {tarefasFiltradas.length === 0 ? (
+                                <View style={styles.cardVazio}>
+                                    <MaterialIcons
+                                        name="assignment"
+                                        size={42}
+                                        color="#999"
+                                    />
 
-                                                <View
-                                                    style={
-                                                        styles.cardValorStatusContainer
+                                    <Text style={styles.textoVazio}>
+                                        {tarefasPermitidas.length === 0
+                                            ? usuarioEhPai
+                                                ? "Não há tarefa cadastrada."
+                                                : "Você ainda não possui tarefas vinculadas."
+                                            : `Não há tarefa com status ${filtroStatus}.`}
+                                    </Text>
+
+                                    <Text style={styles.textoVazioDescricao}>
+                                        {tarefasPermitidas.length === 0
+                                            ? usuarioEhPai
+                                                ? 'Clique no botão "Adicionar Nova Tarefa" para criar sua primeira tarefa.'
+                                                : "Aguarde o responsável cadastrar uma tarefa para você."
+                                            : "Altere o filtro acima para visualizar outras tarefas."}
+                                    </Text>
+                                </View>
+                            ) : (
+                                tarefasFiltradas.map((tarefa, index) => {
+                                    const statusAtual =
+                                        obterStatusTarefa(tarefa);
+
+                                    return (
+                                        <View
+                                            key={tarefa.id}
+                                            style={[
+                                                styles.cardTarefa,
+                                                statusAtual === "Concluída" &&
+                                                styles.cardTarefaConcluida,
+                                            ]}
+                                        >
+                                            <TouchableOpacity
+                                                activeOpacity={0.8}
+                                                style={styles.cardConteudo}
+                                                onPress={() => {
+                                                    if (!usuarioEhPai) {
+                                                        return;
                                                     }
-                                                >
-                                                    <Text
-                                                        style={styles.cardValor}
+
+                                                    navigation.push(
+                                                        "CadastroTarefa",
+                                                        {
+                                                            tarefaEditando:
+                                                                tarefa,
+                                                        }
+                                                    );
+                                                }}
+                                            >
+                                                <View style={styles.cardHeader}>
+                                                    <View
+                                                        style={
+                                                            styles.cardTituloContainer
+                                                        }
                                                     >
-                                                        {formatarValor(
-                                                            tarefa.valor_recompensa
-                                                        )}
-                                                    </Text>
+                                                        <Text
+                                                            style={[
+                                                                styles.cardNumero,
+                                                                statusAtual ===
+                                                                "Concluída" &&
+                                                                styles.textoConcluido,
+                                                            ]}
+                                                        >
+                                                            Tarefa {index + 1}
+                                                        </Text>
+
+                                                        <Text
+                                                            style={[
+                                                                styles.cardTitulo,
+                                                                statusAtual ===
+                                                                "Concluída" &&
+                                                                styles.textoConcluido,
+                                                            ]}
+                                                        >
+                                                            {tarefa.titulo}
+                                                        </Text>
+                                                    </View>
 
                                                     <View
-                                                        style={[
-                                                            styles.statusBadge,
-                                                            getStatusStyle(
-                                                                statusAtual
-                                                            ),
-                                                        ]}
+                                                        style={
+                                                            styles.cardValorStatusContainer
+                                                        }
                                                     >
                                                         <Text
                                                             style={
-                                                                styles.statusTexto
+                                                                styles.cardValor
                                                             }
                                                         >
-                                                            {statusAtual}
+                                                            {formatarValor(
+                                                                tarefa.valor_recompensa
+                                                            )}
                                                         </Text>
+
+                                                        <View
+                                                            style={[
+                                                                styles.statusBadge,
+                                                                getStatusStyle(
+                                                                    statusAtual
+                                                                ),
+                                                            ]}
+                                                        >
+                                                            <Text
+                                                                style={
+                                                                    styles.statusTexto
+                                                                }
+                                                            >
+                                                                {statusAtual}
+                                                            </Text>
+                                                        </View>
                                                     </View>
                                                 </View>
-                                            </View>
 
-                                            <View style={styles.cardInfoRow}>
-                                                <MaterialIcons
-                                                    name="event"
-                                                    size={18}
-                                                    color="#666"
-                                                />
+                                                <View
+                                                    style={styles.cardInfoRow}
+                                                >
+                                                    <MaterialIcons
+                                                        name="event"
+                                                        size={18}
+                                                        color="#666"
+                                                    />
+
+                                                    <Text
+                                                        style={
+                                                            styles.cardInfoTexto
+                                                        }
+                                                    >
+                                                        Data limite:{" "}
+                                                        {tarefa.dataLimite ||
+                                                            "Não informada"}
+                                                    </Text>
+                                                </View>
+
+                                                <View
+                                                    style={styles.cardInfoRow}
+                                                >
+                                                    <MaterialIcons
+                                                        name="person"
+                                                        size={18}
+                                                        color="#666"
+                                                    />
+
+                                                    <Text
+                                                        style={
+                                                            styles.cardInfoTexto
+                                                        }
+                                                    >
+                                                        Responsável:{" "}
+                                                        {tarefa.nome_usuario_responsavel ||
+                                                            "Não vinculado"}
+                                                    </Text>
+                                                </View>
 
                                                 <Text
                                                     style={
-                                                        styles.cardInfoTexto
+                                                        styles.cardDescricaoTitulo
                                                     }
                                                 >
-                                                    Data limite:{" "}
-                                                    {tarefa.dataLimite ||
-                                                        "Não informada"}
+                                                    Descrição
                                                 </Text>
-                                            </View>
-                                            <View style={styles.cardInfoRow}>
-                                                <MaterialIcons
-                                                    name="person"
-                                                    size={18}
-                                                    color="#666"
-                                                />
 
-                                                <Text style={styles.cardInfoTexto}>
-                                                    Responsável:{" "}
-                                                    {tarefa.nome_usuario_responsavel || "Não vinculado"}
+                                                <Text
+                                                    style={styles.cardDescricao}
+                                                >
+                                                    {tarefa.descricao ||
+                                                        "Sem descrição informada."}
                                                 </Text>
-                                            </View>
-                                            <Text
-                                                style={
-                                                    styles.cardDescricaoTitulo
-                                                }
-                                            >
-                                                Descrição
-                                            </Text>
+                                            </TouchableOpacity>
 
-                                            <Text style={styles.cardDescricao}>
-                                                {tarefa.descricao ||
-                                                    "Sem descrição informada."}
-                                            </Text>
-                                        </TouchableOpacity>
+                                            {usuarioEhPai && (
+                                                <View style={styles.cardAcoes}>
+                                                    {statusAtual ===
+                                                        "Em Aberto" && (
+                                                            <ButtonIcon
+                                                                name="play-arrow"
+                                                                size={28}
+                                                                color="#007BFF"
+                                                                style={
+                                                                    styles.botaoAcao
+                                                                }
+                                                                onPress={() =>
+                                                                    alterarStatusTarefa(
+                                                                        tarefa.id,
+                                                                        "Em Andamento"
+                                                                    )
+                                                                }
+                                                            />
+                                                        )}
 
-                                        <View style={styles.cardAcoes}>
-                                            {statusAtual === "Em Aberto" && (
-                                                <ButtonIcon
-                                                    name="play-arrow"
-                                                    size={28}
-                                                    color="#007BFF"
-                                                    style={styles.botaoAcao}
-                                                    onPress={() =>
-                                                        alterarStatusTarefa(
-                                                            tarefa.id,
-                                                            "Em Andamento"
-                                                        )
-                                                    }
-                                                />
-                                            )}
+                                                    {statusAtual ===
+                                                        "Em Andamento" && (
+                                                            <ButtonIcon
+                                                                name="check-circle"
+                                                                size={28}
+                                                                color="#095414"
+                                                                style={
+                                                                    styles.botaoAcao
+                                                                }
+                                                                onPress={() =>
+                                                                    alterarStatusTarefa(
+                                                                        tarefa.id,
+                                                                        "Concluída"
+                                                                    )
+                                                                }
+                                                            />
+                                                        )}
 
-                                            {statusAtual ===
-                                                "Em Andamento" && (
+                                                    {statusAtual ===
+                                                        "Concluída" && (
+                                                            <ButtonIcon
+                                                                name="refresh"
+                                                                size={28}
+                                                                color="#6c757d"
+                                                                style={
+                                                                    styles.botaoAcao
+                                                                }
+                                                                onPress={() =>
+                                                                    alterarStatusTarefa(
+                                                                        tarefa.id,
+                                                                        "Em Aberto"
+                                                                    )
+                                                                }
+                                                            />
+                                                        )}
+
+                                                    {statusAtual ===
+                                                        "Expirado" && (
+                                                            <ButtonIcon
+                                                                name="edit"
+                                                                size={28}
+                                                                color="#dc3545"
+                                                                style={
+                                                                    styles.botaoAcao
+                                                                }
+                                                                onPress={() =>
+                                                                    navigation.push(
+                                                                        "CadastroTarefa",
+                                                                        {
+                                                                            tarefaEditando:
+                                                                                tarefa,
+                                                                        }
+                                                                    )
+                                                                }
+                                                            />
+                                                        )}
+
                                                     <ButtonIcon
-                                                        name="check-circle"
+                                                        name="delete-outline"
                                                         size={28}
-                                                        color="#095414"
-                                                        style={styles.botaoAcao}
+                                                        color="#dc3545"
+                                                        style={
+                                                            styles.botaoAcao
+                                                        }
                                                         onPress={() =>
-                                                            alterarStatusTarefa(
-                                                                tarefa.id,
-                                                                "Concluída"
+                                                            apagarTarefa(
+                                                                tarefa.id
                                                             )
                                                         }
                                                     />
-                                                )}
-
-                                            {statusAtual === "Concluída" && (
-                                                <ButtonIcon
-                                                    name="refresh"
-                                                    size={28}
-                                                    color="#6c757d"
-                                                    style={styles.botaoAcao}
-                                                    onPress={() =>
-                                                        alterarStatusTarefa(
-                                                            tarefa.id,
-                                                            "Em Aberto"
-                                                        )
-                                                    }
-                                                />
+                                                </View>
                                             )}
-
-                                            {statusAtual === "Expirado" && (
-                                                <ButtonIcon
-                                                    name="edit"
-                                                    size={28}
-                                                    color="#dc3545"
-                                                    style={styles.botaoAcao}
-                                                    onPress={() =>
-                                                        navigation.push(
-                                                            "CadastroTarefa",
-                                                            {
-                                                                tarefaEditando:
-                                                                    tarefa,
-                                                            }
-                                                        )
-                                                    }
-                                                />
-                                            )}
-
-                                            <ButtonIcon
-                                                name="delete-outline"
-                                                size={28}
-                                                color="#dc3545"
-                                                style={styles.botaoAcao}
-                                                onPress={() =>
-                                                    apagarTarefa(tarefa.id)
-                                                }
-                                            />
                                         </View>
-                                    </View>
-                                );
-                            })
-                        )}
+                                    );
+                                })
+                            )}
+                        </View>
                     </View>
                 </ScrollView>
 
-                <View style={styles.footerContainer}>
-                    <Button
-                        title="Adicionar Nova Tarefa"
-                        style={styles.botao}
-                        onPress={() => navigation.push("CadastroTarefa")}
-                    />
-                </View>
+                {usuarioEhPai && (
+                    <View style={styles.footerContainer}>
+                        <Button
+                            title="Adicionar Nova Tarefa"
+                            style={styles.botao}
+                            onPress={() => navigation.push("CadastroTarefa")}
+                        />
+                    </View>
+                )}
             </KeyboardAvoidingView>
         </SafeAreaView>
     );

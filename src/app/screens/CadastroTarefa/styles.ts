@@ -97,7 +97,7 @@ export default StyleSheet.create({
     statusExpirado: {
         backgroundColor: "#dc3545",
     },
-   
+
     filhosContainer: {
         width: "100%",
         flexDirection: "row",
@@ -128,6 +128,35 @@ export default StyleSheet.create({
 
     filhoNomeSelecionado: {
         color: "#007BFF",
+        fontWeight: "700",
+    },
+    semFilhosContainer: {
+        width: "100%",
+        backgroundColor: "#ffffff",
+        borderRadius: 10,
+        padding: 16,
+        marginBottom: 16,
+        borderWidth: 1,
+        borderColor: "#e0e0e0",
+    },
+
+    semFilhosTexto: {
+        fontSize: 14,
+        color: "#666666",
+        marginBottom: 12,
+    },
+
+    botaoCadastrarFilho: {
+        backgroundColor: "#007BFF",
+        borderRadius: 8,
+        paddingVertical: 10,
+        paddingHorizontal: 14,
+        alignItems: "center",
+    },
+
+    botaoCadastrarFilhoTexto: {
+        color: "#ffffff",
+        fontSize: 14,
         fontWeight: "700",
     },
 });

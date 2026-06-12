@@ -3,12 +3,14 @@ export type StatusTarefa =
     | "Em Andamento"
     | "Em Aberto"
     | "Expirado";
+export type TipoUsuario = 1 | 2; // 1 Para Pai/Responsável, 2 para filho
 
 export type Usuario = {
     id_usuario: string;
     nome: string;
     email?: string;
-    id_tipo: number;
+    senha?: string;
+    id_tipo: TipoUsuario;
 };
 
 export type Tarefa = {

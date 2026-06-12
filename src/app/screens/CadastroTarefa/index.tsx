@@ -30,6 +30,7 @@ import type {
 
 const LIMITE_DESCRICAO = 250;
 const USUARIOS_STORAGE_KEY = "@mesadinha:usuarios";
+const USUARIO_LOGADO_STORAGE_KEY = "@mesadinha:usuario_logado";
 
 export default function CadastroTarefa() {
     const navigation =
@@ -47,7 +48,7 @@ export default function CadastroTarefa() {
     const [valor_recompensa, setvalor_recompensa] = React.useState("");
     const [usuarioResponsavelId, setUsuarioResponsavelId] = React.useState("");
     const [filhosCadastrados, setFilhosCadastrados] = React.useState<Usuario[]>([]);
-
+    const [usuarioLogado, setUsuarioLogado] = React.useState<Usuario | null>(null);
     async function carregarFilhos() {
         try {
             const usuariosSalvos = await AsyncStorage.getItem(
@@ -98,6 +99,49 @@ export default function CadastroTarefa() {
         }
     }, [tarefaEditando]);
 
+    React.useEffect(() => {
+        async function carregarUsuarioLogado() {
+            try {
+                const usuarioSalvo = await AsyncStorage.getItem(
+                    USUARIO_LOGADO_STORAGE_KEY
+                );
+
+                if (usuarioSalvo) {
+                    const usuario: Usuario = JSON.parse(usuarioSalvo);
+
+                    setUsuarioLogado(usuario);
+
+                    if (usuario.id_tipo !== 1) {
+                        Alert.alert(
+                            "Acesso negado",
+                            "Somente o responsável pode cadastrar ou editar tarefas."
+                        );
+
+                        navigation.reset({
+                            index: 0,
+                            routes: [{ name: "ListaTarefas" }],
+                        });
+                    }
+
+                    return;
+                }
+
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: "Login" }],
+                });
+            } catch (error) {
+                console.log("Erro ao carregar usuário logado:", error);
+
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: "Login" }],
+                });
+            }
+        }
+
+        carregarUsuarioLogado();
+    }, []);
     function formatarDataDigitada(texto: string) {
         const numeros = texto.replace(/\D/g, "").slice(0, 8);
 
@@ -214,7 +258,7 @@ export default function CadastroTarefa() {
             return;
         }
 
-        const usuarioResponsavel = FILHOS_CADASTRADOS.find(
+        const usuarioResponsavel = filhosCadastrados.find(
             (usuario) => usuario.id_usuario === usuarioResponsavelId
         );
 
@@ -240,7 +284,19 @@ export default function CadastroTarefa() {
             tarefaSalva,
         });
     }
+    if (!usuarioLogado) {
+        return (
+            <SafeAreaView style={styles.safeArea}>
+                <View style={styles.containerForm}>
+                    <Text style={styles.label}>Carregando usuário...</Text>
+                </View>
+            </SafeAreaView>
+        );
+    }
 
+    if (usuarioLogado.id_tipo !== 1) {
+        return null;
+    }
     return (
         <SafeAreaView style={styles.safeArea}>
             <KeyboardAvoidingView
@@ -257,39 +313,53 @@ export default function CadastroTarefa() {
                     <View style={styles.containerForm}>
                         <Text style={styles.label}>Filho responsável</Text>
 
-                        <View style={styles.filhosContainer}>
-                            {FILHOS_CADASTRADOS.map((usuario) => {
-                                const selecionado =
-                                    usuarioResponsavelId === usuario.id_usuario;
+                        {filhosCadastrados.length === 0 ? (
+                            <View style={styles.semFilhosContainer}>
+                                <Text style={styles.semFilhosTexto}>
+                                    Nenhum filho cadastrado.
+                                </Text>
 
-                                return (
-                                    <TouchableOpacity
-                                        key={usuario.id_usuario}
-                                        style={[
-                                            styles.filhoCard,
-                                            selecionado &&
-                                            styles.filhoCardSelecionado,
-                                        ]}
-                                        onPress={() =>
-                                            setUsuarioResponsavelId(
-                                                usuario.id_usuario
-                                            )
-                                        }
-                                    >
-                                        <Text
+                                <TouchableOpacity
+                                    style={styles.botaoCadastrarFilho}
+                                    onPress={() => navigation.push("VincularFilho")}
+                                >
+                                    <Text style={styles.botaoCadastrarFilhoTexto}>
+                                        Cadastrar Filho
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        ) : (
+                            <View style={styles.filhosContainer}>
+                                {filhosCadastrados.map((usuario) => {
+                                    const selecionado =
+                                        usuarioResponsavelId === usuario.id_usuario;
+
+                                    return (
+                                        <TouchableOpacity
+                                            key={usuario.id_usuario}
                                             style={[
-                                                styles.filhoNome,
+                                                styles.filhoCard,
                                                 selecionado &&
-                                                styles.filhoNomeSelecionado,
+                                                styles.filhoCardSelecionado,
                                             ]}
+                                            onPress={() =>
+                                                setUsuarioResponsavelId(usuario.id_usuario)
+                                            }
                                         >
-                                            {usuario.nome}
-                                        </Text>
-                                    </TouchableOpacity>
-                                );
-                            })}
-                        </View>
-
+                                            <Text
+                                                style={[
+                                                    styles.filhoNome,
+                                                    selecionado &&
+                                                    styles.filhoNomeSelecionado,
+                                                ]}
+                                            >
+                                                {usuario.nome}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    );
+                                })}
+                            </View>
+                        )}
                         <Text style={styles.label}>Título</Text>
 
                         <TextInput

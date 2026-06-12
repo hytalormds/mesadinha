@@ -9,16 +9,41 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
 import { Button } from "@/componentes/Button";
 import { Title } from "@/componentes/Title";
 import styles from "./styles";
-import type { RootStackParamList } from "@/types/navigation";
+import type { RootStackParamList, Usuario } from "@/types/navigation";
+
+const USUARIOS_STORAGE_KEY = "@mesadinha:usuarios";
+const USUARIO_LOGADO_STORAGE_KEY = "@mesadinha:usuario_logado";
+
+const USUARIO_PAI_TESTE: Usuario = {
+  id_usuario: "1",
+  nome: "Responsável",
+  email: "pai@mesadinha.com",
+  senha: "123456",
+  id_tipo: 1,
+};
+
+const USUARIO_FILHO_TESTE: Usuario = {
+    id_usuario: "2",
+    nome: "Samuel",
+    email: "samuel@mesadinha.com",
+    senha: "123456",
+    id_tipo: 2,
+};
+
+
 
 export default function Login() {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const [emailFocus, setEmailFocus] = React.useState(false);
   const [passwordFocus, setPasswordFocus] = React.useState(false);
@@ -26,28 +51,63 @@ export default function Login() {
   const [email, setEmail] = React.useState("");
   const [senha, setSenha] = React.useState("");
 
-  const validarFormulario = () => {
+  function validarFormulario() {
     if (!email.trim()) {
-      alert("Digite seu e-mail");
+      Alert.alert("Atenção", "Digite seu e-mail.");
       return false;
     }
 
     if (!senha.trim()) {
-      alert("Digite sua senha");
+      Alert.alert("Atenção", "Digite sua senha.");
       return false;
     }
 
     return true;
-  };
+  }
 
-  const handleEntrar = () => {
-    if (validarFormulario()) {
+  async function handleEntrar() {
+    if (!validarFormulario()) {
+      return;
+    }
+
+    try {
+      const usuariosSalvos = await AsyncStorage.getItem(USUARIOS_STORAGE_KEY);
+
+      const usuariosCadastrados: Usuario[] = usuariosSalvos
+        ? JSON.parse(usuariosSalvos)
+        : [];
+
+      const usuariosDisponiveis: Usuario[] = [
+        USUARIO_PAI_TESTE,
+        USUARIO_FILHO_TESTE,
+        ...usuariosCadastrados,
+      ];
+
+      const usuarioEncontrado = usuariosDisponiveis.find(
+        (usuario) =>
+          usuario.email.toLowerCase() === email.trim().toLowerCase() &&
+          usuario.senha === senha
+      );
+
+      if (!usuarioEncontrado) {
+        Alert.alert("Atenção", "E-mail ou senha inválidos.");
+        return;
+      }
+
+      await AsyncStorage.setItem(
+        USUARIO_LOGADO_STORAGE_KEY,
+        JSON.stringify(usuarioEncontrado)
+      );
+
       navigation.reset({
         index: 0,
         routes: [{ name: "ListaTarefas" }],
       });
+    } catch (error) {
+      console.log("Erro ao fazer login:", error);
+      Alert.alert("Erro", "Não foi possível realizar o login.");
     }
-  };
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -122,15 +182,6 @@ export default function Login() {
                 onPress={() => navigation.navigate("TelaCadastro")}
               >
                 <Text style={styles.footerLink}>Cadastre-se</Text>
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.footerContainer}>
-              <TouchableOpacity
-                activeOpacity={0.7}
-                onPress={() => navigation.navigate("VincularFilho")}
-              >
-                <Text style={styles.footerLink}>Sou filho e tenho um código</Text>
               </TouchableOpacity>
             </View>
           </View>
