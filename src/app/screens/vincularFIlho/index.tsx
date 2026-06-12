@@ -1,79 +1,135 @@
 ﻿import React from "react";
 import {
-    Text,
-    View,
-    TextInput,
     Alert,
-    ScrollView,
     KeyboardAvoidingView,
     Platform,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import type { RootStackParamList, Usuario } from "@/types/navigation";
 import styles from "./styles";
-import { Button } from "@/componentes/Button";
-import type { RootStackParamList } from "@/types/navigation";
+
+const USUARIOS_STORAGE_KEY = "@mesadinha:usuarios";
 
 export default function VincularFilho() {
-    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const navigation =
+        useNavigation<
+            NativeStackNavigationProp<RootStackParamList, "VincularFilho">
+        >();
 
-    const [nomeFilho, setNomeFilho] = React.useState("");
-    const [codigoVinculo, setCodigoVinculo] = React.useState("");
+    const [nome, setNome] = React.useState("");
+    const [email, setEmail] = React.useState("");
+    const [filhos, setFilhos] = React.useState<Usuario[]>([]);
+    const [carregouFilhos, setCarregouFilhos] = React.useState(false);
 
-    async function vincularFilho() {
-        console.log("Botão Vincular Filho pressionado");
+    React.useEffect(() => {
+        async function carregarFilhos() {
+            try {
+                const usuariosSalvos = await AsyncStorage.getItem(
+                    USUARIOS_STORAGE_KEY
+                );
 
-        if (!nomeFilho.trim()) {
+                if (usuariosSalvos) {
+                    const usuarios: Usuario[] = JSON.parse(usuariosSalvos);
+
+                    const filhosCadastrados = usuarios.filter(
+                        (usuario) => usuario.id_tipo === 2
+                    );
+
+                    setFilhos(filhosCadastrados);
+                } else {
+                    setFilhos([]);
+                }
+            } catch (error) {
+                console.log("Erro ao carregar filhos:", error);
+                setFilhos([]);
+            } finally {
+                setCarregouFilhos(true);
+            }
+        }
+
+        carregarFilhos();
+    }, []);
+
+    React.useEffect(() => {
+        async function salvarFilhos() {
+            if (!carregouFilhos) {
+                return;
+            }
+
+            try {
+                await AsyncStorage.setItem(
+                    USUARIOS_STORAGE_KEY,
+                    JSON.stringify(filhos)
+                );
+            } catch (error) {
+                console.log("Erro ao salvar filhos:", error);
+            }
+        }
+
+        salvarFilhos();
+    }, [filhos, carregouFilhos]);
+
+    function validarFormulario() {
+        if (!nome.trim()) {
             Alert.alert("Atenção", "Digite o nome do filho.");
+            return false;
+        }
+
+        return true;
+    }
+
+    function cadastrarFilho() {
+        if (!validarFormulario()) {
             return;
         }
 
-        if (!codigoVinculo.trim()) {
-            Alert.alert("Atenção", "Digite o código informado pelo responsável.");
-            return;
-        }
+        const novoFilho: Usuario = {
+            id_usuario: String(Date.now()),
+            nome: nome.trim(),
+            email: email.trim() || undefined,
+            id_tipo: 2,
+        };
 
-        try {
-            const usuarioPaiSalvo = await AsyncStorage.getItem("@usuario_pai");
+        setFilhos((filhosAtuais) => [...filhosAtuais, novoFilho]);
 
-            console.log("Usuário pai salvo:", usuarioPaiSalvo);
+        setNome("");
+        setEmail("");
 
-            if (!usuarioPaiSalvo) {
-                Alert.alert("Erro", "Nenhum responsável cadastrado neste aparelho.");
-                return;
-            }
+        Alert.alert("Sucesso", "Filho cadastrado com sucesso.");
+    }
 
-            const usuarioPai = JSON.parse(usuarioPaiSalvo);
-
-            console.log("Código digitado:", codigoVinculo.trim());
-            console.log("Código do responsável:", usuarioPai.codigoVinculo);
-
-            if (usuarioPai.codigoVinculo !== codigoVinculo.trim()) {
-                Alert.alert("Código inválido", "O código informado não confere.");
-                return;
-            }
-
-            const filho = {
-                nome: nomeFilho.trim(),
-                tipoUsuario: "Filho",
-                codigoVinculo: codigoVinculo.trim(),
-                responsavel: usuarioPai.nome,
-                emailResponsavel: usuarioPai.email,
-            };
-
-            await AsyncStorage.setItem("@usuario_filho", JSON.stringify(filho));
-
-            console.log("Filho vinculado:", filho);
-
-            Alert.alert("Sucesso", "Filho vinculado com sucesso!");
-
-            navigation.navigate("Login");
-        } catch (error) {
-            console.log("Erro ao vincular filho:", error);
-            Alert.alert("Erro", "Não foi possível vincular o filho.");
-        }
+    function excluirFilho(id_usuario: string) {
+        Alert.alert(
+            "Excluir filho",
+            "Deseja realmente excluir este filho?",
+            [
+                {
+                    text: "Cancelar",
+                    style: "cancel",
+                },
+                {
+                    text: "Excluir",
+                    style: "destructive",
+                    onPress: () => {
+                        setFilhos((filhosAtuais) =>
+                            filhosAtuais.filter(
+                                (filho) => filho.id_usuario !== id_usuario
+                            )
+                        );
+                    },
+                },
+            ]
+        );
     }
 
     return (
@@ -81,47 +137,92 @@ export default function VincularFilho() {
             <KeyboardAvoidingView
                 style={styles.keyboardAvoiding}
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
-                keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
             >
                 <ScrollView
                     contentContainerStyle={styles.scrollContent}
                     keyboardShouldPersistTaps="handled"
-                    keyboardDismissMode="on-drag"
                     showsVerticalScrollIndicator={false}
                 >
-                    <View style={styles.containerForm}>
-                        <Text style={styles.infoText}>
-                            Informe o código recebido pelo responsável.
+                    <Text style={styles.subtitulo}>
+                        Cadastre os filhos que poderão receber tarefas.
+                    </Text>
+
+                    <Text style={styles.label}>Nome do filho</Text>
+
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Digite o nome do filho"
+                        value={nome}
+                        onChangeText={setNome}
+                        autoCapitalize="words"
+                    />
+
+                    <Text style={styles.label}>E-mail</Text>
+
+                    <TextInput
+                        style={styles.input}
+                        placeholder="email@exemplo.com"
+                        value={email}
+                        onChangeText={setEmail}
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                    />
+
+                    <TouchableOpacity
+                        style={styles.botaoCadastrar}
+                        onPress={cadastrarFilho}
+                    >
+                        <Text style={styles.botaoCadastrarTexto}>
+                            Cadastrar Filho
                         </Text>
+                    </TouchableOpacity>
 
-                        <Text style={styles.label}>Nome do Filho</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Digite o nome do filho"
-                            value={nomeFilho}
-                            onChangeText={setNomeFilho}
-                        />
+                    <Text style={styles.secaoTitulo}>Filhos cadastrados</Text>
 
-                        <Text style={styles.label}>Código do Responsável</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Ex: PAI-1234"
-                            value={codigoVinculo}
-                            onChangeText={setCodigoVinculo}
-                            autoCapitalize="characters"
-                        />
+                    {filhos.length === 0 ? (
+                        <View style={styles.cardVazio}>
+                            <MaterialIcons
+                                name="person-outline"
+                                size={38}
+                                color="#999"
+                            />
 
-                        <Button
-                            title="Vincular Filho"
-                            style={styles.botao}
-                            onPress={vincularFilho}
-                        />
-                    </View>
+                            <Text style={styles.textoVazio}>
+                                Nenhum filho cadastrado.
+                            </Text>
+                        </View>
+                    ) : (
+                        filhos.map((filho) => (
+                            <View
+                                key={filho.id_usuario}
+                                style={styles.cardFilho}
+                            >
+                                <View style={styles.cardFilhoInfo}>
+                                    <Text style={styles.nomeFilho}>
+                                        {filho.nome}
+                                    </Text>
+
+                                    <Text style={styles.emailFilho}>
+                                        {filho.email || "Sem e-mail informado"}
+                                    </Text>
+                                </View>
+
+                                <TouchableOpacity
+                                    onPress={() =>
+                                        excluirFilho(filho.id_usuario)
+                                    }
+                                >
+                                    <MaterialIcons
+                                        name="delete-outline"
+                                        size={26}
+                                        color="#dc3545"
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                        ))
+                    )}
                 </ScrollView>
             </KeyboardAvoidingView>
         </SafeAreaView>
     );
 }
-
-
-

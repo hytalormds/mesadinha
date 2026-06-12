@@ -66,35 +66,68 @@ export default StyleSheet.create({
         marginTop: 24,
     },
     cardValorStatusContainer: {
-    alignItems: "flex-end",
-    gap: 6,
-},
+        alignItems: "flex-end",
+        gap: 6,
+    },
 
-statusBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 20,
-},
+    statusBadge: {
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 20,
+    },
 
-statusTexto: {
-    color: "#ffffff",
-    fontSize: 11,
-    fontWeight: "700",
-},
+    statusTexto: {
+        color: "#ffffff",
+        fontSize: 11,
+        fontWeight: "700",
+    },
 
-statusConcluida: {
-    backgroundColor: "#28a745",
-},
+    statusConcluida: {
+        backgroundColor: "#28a745",
+    },
 
-statusEmAndamento: {
-    backgroundColor: "#007BFF",
-},
+    statusEmAndamento: {
+        backgroundColor: "#007BFF",
+    },
 
-statusEmAberto: {
-    backgroundColor: "#ffc107",
-},
+    statusEmAberto: {
+        backgroundColor: "#ffc107",
+    },
 
-statusExpirado: {
-    backgroundColor: "#dc3545",
-},
+    statusExpirado: {
+        backgroundColor: "#dc3545",
+    },
+   
+    filhosContainer: {
+        width: "100%",
+        flexDirection: "row",
+        flexWrap: "wrap",
+        gap: 10,
+        marginBottom: 16,
+    },
+
+    filhoCard: {
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        borderRadius: 10,
+        borderWidth: 1.5,
+        borderColor: "#d9d9d9",
+        backgroundColor: "#ffffff",
+    },
+
+    filhoCardSelecionado: {
+        borderColor: "#007BFF",
+        backgroundColor: "#eaf3ff",
+    },
+
+    filhoNome: {
+        color: "#333333",
+        fontSize: 14,
+        fontWeight: "600",
+    },
+
+    filhoNomeSelecionado: {
+        color: "#007BFF",
+        fontWeight: "700",
+    },
 });

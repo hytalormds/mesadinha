@@ -8,22 +8,35 @@ import {
     KeyboardAvoidingView,
     Platform,
     Alert,
+    TouchableOpacity,
 } from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import {
+    useNavigation,
+    useRoute,
+    useFocusEffect,
+} from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { RouteProp } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import styles from "./styles";
 import { Button } from "@/componentes/Button";
-import type { RootStackParamList } from "@/types/navigation";
+import type {
+    RootStackParamList,
+    Tarefa,
+    Usuario,
+} from "@/types/navigation";
+
 
 const LIMITE_DESCRICAO = 250;
+const USUARIOS_STORAGE_KEY = "@mesadinha:usuarios";
 
 export default function CadastroTarefa() {
     const navigation =
         useNavigation<
             NativeStackNavigationProp<RootStackParamList, "CadastroTarefa">
         >();
+
     const route = useRoute<RouteProp<RootStackParamList, "CadastroTarefa">>();
 
     const tarefaEditando = route.params?.tarefaEditando;
@@ -32,12 +45,45 @@ export default function CadastroTarefa() {
     const [descricao, setDescricao] = React.useState("");
     const [dataLimite, setDataLimite] = React.useState("");
     const [valor_recompensa, setvalor_recompensa] = React.useState("");
+    const [usuarioResponsavelId, setUsuarioResponsavelId] = React.useState("");
+    const [filhosCadastrados, setFilhosCadastrados] = React.useState<Usuario[]>([]);
 
+    async function carregarFilhos() {
+        try {
+            const usuariosSalvos = await AsyncStorage.getItem(
+                USUARIOS_STORAGE_KEY
+            );
+
+            if (usuariosSalvos) {
+                const usuarios: Usuario[] = JSON.parse(usuariosSalvos);
+
+                const filhos = usuarios.filter(
+                    (usuario) => usuario.id_tipo === 2
+                );
+
+                setFilhosCadastrados(filhos);
+            } else {
+                setFilhosCadastrados([]);
+            }
+        } catch (error) {
+            console.log("Erro ao carregar filhos:", error);
+            setFilhosCadastrados([]);
+        }
+    }
+    useFocusEffect(
+        React.useCallback(() => {
+            carregarFilhos();
+        }, [])
+    );
     React.useEffect(() => {
         if (tarefaEditando) {
             setTitulo(tarefaEditando.titulo);
             setDescricao(tarefaEditando.descricao ?? "");
             setDataLimite(tarefaEditando.dataLimite ?? "");
+            setUsuarioResponsavelId(
+                tarefaEditando.fk_usuario_responsavel ?? ""
+            );
+
             setvalor_recompensa(
                 tarefaEditando.valor_recompensa
                     ? formatarNumeroParaMoeda(tarefaEditando.valor_recompensa)
@@ -48,6 +94,7 @@ export default function CadastroTarefa() {
             setDescricao("");
             setDataLimite("");
             setvalor_recompensa("");
+            setUsuarioResponsavelId("");
         }
     }, [tarefaEditando]);
 
@@ -121,6 +168,11 @@ export default function CadastroTarefa() {
     }
 
     function validarFormulario() {
+        if (!usuarioResponsavelId) {
+            Alert.alert("Atenção", "Selecione o filho responsável pela tarefa.");
+            return false;
+        }
+
         if (!titulo.trim()) {
             Alert.alert("Atenção", "Digite o título da tarefa.");
             return false;
@@ -162,7 +214,16 @@ export default function CadastroTarefa() {
             return;
         }
 
-        const tarefaSalva = {
+        const usuarioResponsavel = FILHOS_CADASTRADOS.find(
+            (usuario) => usuario.id_usuario === usuarioResponsavelId
+        );
+
+        if (!usuarioResponsavel) {
+            Alert.alert("Atenção", "Filho responsável não encontrado.");
+            return;
+        }
+
+        const tarefaSalva: Tarefa = {
             id: tarefaEditando?.id ?? String(Date.now()),
             titulo,
             descricao,
@@ -170,6 +231,9 @@ export default function CadastroTarefa() {
             valor_recompensa: converterMoedaParaNumero(valor_recompensa),
             concluida: tarefaEditando?.concluida ?? false,
             status: tarefaEditando?.status ?? "Em Aberto",
+
+            fk_usuario_responsavel: usuarioResponsavel.id_usuario,
+            nome_usuario_responsavel: usuarioResponsavel.nome,
         };
 
         navigation.popTo("ListaTarefas", {
@@ -191,6 +255,41 @@ export default function CadastroTarefa() {
                     showsVerticalScrollIndicator={false}
                 >
                     <View style={styles.containerForm}>
+                        <Text style={styles.label}>Filho responsável</Text>
+
+                        <View style={styles.filhosContainer}>
+                            {FILHOS_CADASTRADOS.map((usuario) => {
+                                const selecionado =
+                                    usuarioResponsavelId === usuario.id_usuario;
+
+                                return (
+                                    <TouchableOpacity
+                                        key={usuario.id_usuario}
+                                        style={[
+                                            styles.filhoCard,
+                                            selecionado &&
+                                            styles.filhoCardSelecionado,
+                                        ]}
+                                        onPress={() =>
+                                            setUsuarioResponsavelId(
+                                                usuario.id_usuario
+                                            )
+                                        }
+                                    >
+                                        <Text
+                                            style={[
+                                                styles.filhoNome,
+                                                selecionado &&
+                                                styles.filhoNomeSelecionado,
+                                            ]}
+                                        >
+                                            {usuario.nome}
+                                        </Text>
+                                    </TouchableOpacity>
+                                );
+                            })}
+                        </View>
+
                         <Text style={styles.label}>Título</Text>
 
                         <TextInput
@@ -221,7 +320,8 @@ export default function CadastroTarefa() {
                         <Text
                             style={[
                                 styles.contadorCaracteres,
-                                descricao.length >= LIMITE_DESCRICAO && styles.contadorCaracteresLimite,
+                                descricao.length >= LIMITE_DESCRICAO &&
+                                styles.contadorCaracteresLimite,
                             ]}
                         >
                             {descricao.length}/{LIMITE_DESCRICAO} caracteres

@@ -288,7 +288,20 @@ export default function ListaTarefas() {
                                         : `${tarefas.length} tarefas cadastradas`}
                                 </Text>
                             </View>
+                            <TouchableOpacity
+                                style={styles.botaoFilhos}
+                                onPress={() => navigation.push("VincularFilho")}
+                            >
+                                <MaterialIcons
+                                    name="person-add"
+                                    size={20}
+                                    color="#007BFF"
+                                />
 
+                                <Text style={styles.botaoFilhosTexto}>
+                                    Filhos
+                                </Text>
+                            </TouchableOpacity>
                             <TouchableOpacity
                                 style={styles.botaoSair}
                                 onPress={confirmarSair}
@@ -456,7 +469,18 @@ export default function ListaTarefas() {
                                                         "Não informada"}
                                                 </Text>
                                             </View>
+                                            <View style={styles.cardInfoRow}>
+                                                <MaterialIcons
+                                                    name="person"
+                                                    size={18}
+                                                    color="#666"
+                                                />
 
+                                                <Text style={styles.cardInfoTexto}>
+                                                    Responsável:{" "}
+                                                    {tarefa.nome_usuario_responsavel || "Não vinculado"}
+                                                </Text>
+                                            </View>
                                             <Text
                                                 style={
                                                     styles.cardDescricaoTitulo

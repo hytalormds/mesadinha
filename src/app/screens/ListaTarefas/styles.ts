@@ -253,4 +253,53 @@ export default StyleSheet.create({
     filtroTextoAtivo: {
         color: "#ffffff",
     },
+    statusConcluida: {
+        backgroundColor: "#28a745",
+    },
+    statusEmAndamento: {
+        backgroundColor: "#007BFF",
+    },
+    statusPendente: {
+        backgroundColor: "#ffc107",
+    },
+    statusExpirado: {
+        backgroundColor: "#dc3545",
+    },
+    statusBadge: {
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 20,
+        alignSelf: "flex-start",
+        marginTop: 6,
+    },
+    statusTexto: {
+        color: "#ffffff",
+        fontSize: 11,
+        fontWeight: "700",
+    },
+    statusEmAberto: {
+        backgroundColor: "#ffc107",
+    },
+    cardValorStatusContainer
+        : {
+        flexDirection: "row",
+        alignItems: "center",
+        marginTop: 8,
+    },
+    botaoFilhos: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 4,
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 8,
+        backgroundColor: "#eaf3ff",
+        marginRight: 8,
+    },
+
+    botaoFilhosTexto: {
+        color: "#007BFF",
+        fontSize: 13,
+        fontWeight: "700",
+    },
 });
