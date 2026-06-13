@@ -199,40 +199,9 @@ export default StyleSheet.create({
     filtroTextoAtivo: {
         color: "#ffffff",
     },
-    statusConcluida: {
-        backgroundColor: "#28a745",
-    },
-    statusEmAndamento: {
-        backgroundColor: "#007BFF",
-    },
+
     statusPendente: {
         backgroundColor: "#ffc107",
-    },
-    statusExpirado: {
-        backgroundColor: "#dc3545",
-    },
-    statusBadge: {
-        paddingHorizontal: 10,
-        paddingVertical: 4,
-        borderRadius: 20,
-        alignSelf: "flex-start",
-        marginTop: 6,
-    },
-    statusTexto: {
-        color: "#ffffff",
-        fontSize: 11,
-        fontWeight: "700",
-    },
-    statusEmAberto: {
-        backgroundColor: "#ffc107",
-    },
-
-    statusAguardandoAprovacao: {
-        backgroundColor: "#6f42c1",
-    },
-
-    statusRecusada: {
-        backgroundColor: "#6c757d",
     },
 
     headerContainer: {

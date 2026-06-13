@@ -18,6 +18,7 @@ import styles from "./styles";
 import { Button } from "@/componentes/Button";
 import { ButtonIcon } from "@/componentes/ButtonIcon";
 import { Title } from "@/componentes/Title";
+import { StatusBadge } from "@/componentes/StatusBadge";
 import type {
     RootStackParamList,
     Tarefa,
@@ -37,6 +38,9 @@ import {
     obterStatusTarefa,
     tarefaPertenceAoFilhoLogado,
 } from "@/services/tarefaService";
+import { creditarValorNaCarteira } from "@/services/carteiraService";
+import { criarMovimentacaoEntrada } from "@/services/movimentacaoService";
+
 
 const STORAGE_KEY = STORAGE_KEYS.tarefas;
 const USUARIO_LOGADO_STORAGE_KEY = STORAGE_KEYS.usuarioLogado;
@@ -268,31 +272,6 @@ export default function ListaTarefas() {
         return data;
     }
 
-    function getStatusStyle(status: StatusTarefa) {
-        switch (status) {
-            case "Concluída":
-                return styles.statusConcluida;
-
-            case "Em Andamento":
-                return styles.statusEmAndamento;
-
-            case "Em Aberto":
-                return styles.statusEmAberto;
-
-            case "Expirado":
-                return styles.statusExpirado;
-
-            case "Aguardando Aprovação":
-                return styles.statusAguardandoAprovacao;
-
-            case "Recusada":
-                return styles.statusRecusada;
-
-            default:
-                return styles.statusEmAberto;
-        }
-    }
-
     function alterarStatusTarefa(id: string, novoStatus: StatusTarefa) {
         setTarefas((tarefasAtuais) =>
             tarefasAtuais.map((tarefa) =>
@@ -391,45 +370,19 @@ export default function ListaTarefas() {
             return;
         }
 
-        let carteiraDaCrianca: Carteira | null = null;
+        const resultadoCarteira = creditarValorNaCarteira(
+            carteiras,
+            criancaId,
+            valorRecompensa
+        );
 
-        setCarteiras((carteirasAtuais) => {
-            const carteiraExistente = carteirasAtuais.find(
-                (carteira) => String(carteira.fk_usuario_id) === criancaId
-            );
+        const novaMovimentacao = criarMovimentacaoEntrada(
+            tarefaSelecionada,
+            resultadoCarteira.carteira.id_carteira,
+            valorRecompensa
+        );
 
-            if (carteiraExistente) {
-                carteiraDaCrianca = {
-                    ...carteiraExistente,
-                    saldo: carteiraExistente.saldo + valorRecompensa,
-                };
-
-                return carteirasAtuais.map((carteira) =>
-                    String(carteira.fk_usuario_id) === criancaId
-                        ? carteiraDaCrianca as Carteira
-                        : carteira
-                );
-            }
-
-            carteiraDaCrianca = {
-                id_carteira: String(Date.now()),
-                saldo: valorRecompensa,
-                fk_usuario_id: criancaId,
-            };
-
-            return [...carteirasAtuais, carteiraDaCrianca];
-        });
-
-        const idCarteira = carteiraDaCrianca?.id_carteira ?? String(Date.now());
-
-        const novaMovimentacao: Movimentacao = {
-            id_movimentacao: String(Date.now()),
-            tipo_movimentacao: "entrada",
-            data: new Date().toISOString(),
-            valor: valorRecompensa,
-            fk_tarefa_id: tarefaSelecionada.id,
-            fk_carteira_id: idCarteira,
-        };
+        setCarteiras(resultadoCarteira.carteiras);
 
         setMovimentacoes((movimentacoesAtuais) => [
             novaMovimentacao,
@@ -454,6 +407,8 @@ export default function ListaTarefas() {
             "A recompensa foi adicionada ao cofrinho da criança."
         );
     }
+
+
     return (
         <SafeAreaView style={styles.safeArea}>
             <KeyboardAvoidingView
@@ -628,16 +583,7 @@ export default function ListaTarefas() {
                                                             {formatarValor(tarefa.valor_recompensa)}
                                                         </Text>
 
-                                                        <View
-                                                            style={[
-                                                                styles.statusBadge,
-                                                                getStatusStyle(statusAtual),
-                                                            ]}
-                                                        >
-                                                            <Text style={styles.statusTexto}>
-                                                                {statusAtual}
-                                                            </Text>
-                                                        </View>
+                                                        <StatusBadge status={statusAtual} />
                                                     </View>
                                                 </View>
                                                 <View
