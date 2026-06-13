@@ -99,6 +99,7 @@ export function CardTarefa({
                     </Text>
                 </View>
 
+
                 <View style={styles.cardInfoRow}>
                     <MaterialIcons
                         name="child-care"
@@ -113,7 +114,17 @@ export function CardTarefa({
                             "Não vinculada"}
                     </Text>
                 </View>
+                <View style={styles.cardInfoRow}>
+                    <MaterialIcons
+                        name="event"
+                        size={18}
+                        color="#666666"
+                    />
 
+                    <Text style={styles.cardInfoTexto}>
+                        Data limite: {tarefa.dataLimite || "Não informada"}
+                    </Text>
+                </View>
                 <Text style={styles.cardDescricaoTitulo}>
                     Descrição
                 </Text>
@@ -177,14 +188,14 @@ export function CardTarefa({
 
                     {(status === "Em Andamento" ||
                         status === "Recusada") && (
-                        <ButtonIcon
-                            name="check-circle"
-                            size={28}
-                            color="#095414"
-                            style={styles.botaoAcao}
-                            onPress={onEnviarParaAprovacao}
-                        />
-                    )}
+                            <ButtonIcon
+                                name="check-circle"
+                                size={28}
+                                color="#095414"
+                                style={styles.botaoAcao}
+                                onPress={onEnviarParaAprovacao}
+                            />
+                        )}
                 </View>
             )}
         </View>
