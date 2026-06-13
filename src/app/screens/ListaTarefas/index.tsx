@@ -394,26 +394,6 @@ export default function ListaTarefas() {
         "Expirado",
     ];
 
-    function nomeFiltro(status: FiltroStatus) {
-        if (status === "Em Aberto") {
-            return "Abertas";
-        }
-
-        if (status === "Em Andamento") {
-            return "Andamento";
-        }
-
-        if (status === "Aguardando Aprovação") {
-            return "Aguardando";
-        }
-
-        if (status === "Concluída") {
-            return "Concluídas";
-        }
-
-        return status;
-    }
-
     const usuarioEhPai = usuarioLogado?.id_tipo === 1;
     const usuarioEhFilho = usuarioLogado?.id_tipo === 2;
 
@@ -562,23 +542,6 @@ export default function ListaTarefas() {
                                             : ""}
                                 </Text>
                             </View>
-
-                            <View style={styles.headerActions}>
-                                <TouchableOpacity
-                                    style={styles.botaoSair}
-                                    onPress={confirmarSair}
-                                >
-                                    <MaterialIcons
-                                        name="logout"
-                                        size={20}
-                                        color="#dc3545"
-                                    />
-
-                                    <Text style={styles.botaoSairTexto}>
-                                        Sair
-                                    </Text>
-                                </TouchableOpacity>
-                            </View>
                         </View>
 
                         <View style={styles.containerForm}>
@@ -607,7 +570,7 @@ export default function ListaTarefas() {
                                                     styles.filtroTextoAtivo,
                                                 ]}
                                             >
-                                                {nomeFiltro(status)}
+                                                {status}
                                             </Text>
                                         </TouchableOpacity>
                                     ))}
@@ -685,7 +648,7 @@ export default function ListaTarefas() {
                                                         return;
                                                     }
 
-                                                    navigation.navigate(
+                                                    navigation.push(
                                                         "CadastroTarefa",
                                                         {
                                                             tarefaEditando:
@@ -836,7 +799,7 @@ export default function ListaTarefas() {
                                                             styles.botaoAcao
                                                         }
                                                         onPress={() =>
-                                                            navigation.navigate(
+                                                            navigation.push(
                                                                 "CadastroTarefa",
                                                                 {
                                                                     tarefaEditando:
@@ -916,7 +879,7 @@ export default function ListaTarefas() {
                         <Button
                             title="Adicionar Nova Tarefa"
                             style={styles.botao}
-                            onPress={() => navigation.navigate("CadastroTarefa")}
+                            onPress={() => navigation.push("CadastroTarefa")}
                         />
                     </View>
                 )}

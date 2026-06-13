@@ -3,10 +3,10 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { MaterialIcons } from "@expo/vector-icons";
 
-import Login from "@/app/screens/login";
+import Login from "@/app/screens/Login";
 import TelaCadastro from "@/app/screens/CadastroUsuario";
 import CadastroTarefa from "@/app/screens/CadastroTarefa";
-import VincularFilho from "@/app/screens/vincularFIlho";
+import VincularFilho from "@/app/screens/VincularFilho";
 import ListaTarefas from "@/app/screens/ListaTarefas";
 import Cofrinho from "@/app/screens/Cofrinho";
 import Familia from "@/app/screens/Familia";

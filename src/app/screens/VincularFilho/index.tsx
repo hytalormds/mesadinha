@@ -281,6 +281,17 @@ export default function VincularFilho() {
                         onChangeText={setNome}
                         autoCapitalize="words"
                     />
+
+                    <Text style={styles.label}>E-mail</Text>
+
+                    <TextInput
+                        style={styles.input}
+                        placeholder="email@exemplo.com"
+                        value={email}
+                        onChangeText={setEmail}
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                    />
                     <Text style={styles.label}>Senha</Text>
 
                     <View style={styles.passwordContainer}>
@@ -303,17 +314,6 @@ export default function VincularFilho() {
                             />
                         </TouchableOpacity>
                     </View>
-                    <Text style={styles.label}>E-mail</Text>
-
-                    <TextInput
-                        style={styles.input}
-                        placeholder="email@exemplo.com"
-                        value={email}
-                        onChangeText={setEmail}
-                        keyboardType="email-address"
-                        autoCapitalize="none"
-                    />
-
                     <TouchableOpacity
                         style={styles.botaoCadastrar}
                         onPress={cadastrarFilho}
