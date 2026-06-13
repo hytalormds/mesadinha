@@ -15,6 +15,10 @@ import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { STORAGE_KEYS } from "@/constants/storageKeys";
 import styles from "./styles";
+import {
+    formatarMoedaDigitada,
+    converterMoedaParaNumero,
+} from "@/utils/formatadores";
 import type {
     RootStackParamList,
     Usuario,
@@ -248,7 +252,7 @@ export default function Cofrinho() {
             return;
         }
 
-        const valor = Number(valorSaque.replace(",", "."));
+        const valor = converterMoedaParaNumero(valorSaque);
 
         if (!valor || valor <= 0) {
             Alert.alert("Atenção", "Digite um valor válido para sacar.");
@@ -573,10 +577,12 @@ export default function Cofrinho() {
 
                         <TextInput
                             style={styles.inputSaque}
-                            placeholder="Valor do saque"
-                            keyboardType="decimal-pad"
+                            placeholder="R$ 0,00"
+                            keyboardType="numeric"
                             value={valorSaque}
-                            onChangeText={setValorSaque}
+                            onChangeText={(texto) =>
+                                setValorSaque(formatarMoedaDigitada(texto))
+                            }
                         />
 
                         <View style={styles.modalBotoes}>

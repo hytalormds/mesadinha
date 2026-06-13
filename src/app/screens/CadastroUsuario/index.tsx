@@ -20,24 +20,20 @@ import { Button } from "@/componentes/Button";
 import type { RootStackParamList, Usuario } from "@/types/navigation";
 import { STORAGE_KEYS } from "@/constants/storageKeys";
 
-type TipoUsuario = "Pai" | "Filho";
-
 const USUARIOS_STORAGE_KEY = STORAGE_KEYS.usuarios;
 const EMAILS_TESTE = ["pai@mesadinha.com", "samuel@mesadinha.com"];
 
 export default function TelaCadastro() {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const [nome, setNome] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [senha, setSenha] = React.useState("");
   const [confirmarSenha, setConfirmarSenha] = React.useState("");
-  const [tipoUsuario, setTipoUsuario] = React.useState<TipoUsuario>("Pai");
   const [mostrarSenha, setMostrarSenha] = React.useState(false);
   const [mostrarConfirmarSenha, setMostrarConfirmarSenha] =
     React.useState(false);
-
-  const tiposUsuario: TipoUsuario[] = ["Pai", "Filho"];
 
   function senhaValida(valor: string) {
     const erros = [];
@@ -131,7 +127,7 @@ export default function TelaCadastro() {
         nome: nome.trim(),
         email: email.trim().toLowerCase(),
         senha,
-        id_tipo: tipoUsuario === "Pai" ? 1 : 2,
+        id_tipo: 1,
       };
 
       await AsyncStorage.setItem(
@@ -139,7 +135,7 @@ export default function TelaCadastro() {
         JSON.stringify([...usuarios, novoUsuario])
       );
 
-      Alert.alert("Sucesso", "Usuário cadastrado com sucesso.");
+      Alert.alert("Sucesso", "Responsável cadastrado com sucesso.");
       navigation.navigate("Login");
     } catch (error) {
       console.log("Erro ao cadastrar usuário:", error);
@@ -161,6 +157,7 @@ export default function TelaCadastro() {
         >
           <View style={styles.containerForm}>
             <Text style={styles.label}>Nome Completo:</Text>
+
             <TextInput
               style={styles.input}
               placeholder="Seu nome"
@@ -169,6 +166,7 @@ export default function TelaCadastro() {
             />
 
             <Text style={styles.label}>E-mail:</Text>
+
             <TextInput
               style={styles.input}
               placeholder="seu.email@exemplo.com"
@@ -179,6 +177,7 @@ export default function TelaCadastro() {
             />
 
             <Text style={styles.label}>Senha:</Text>
+
             <View style={styles.passwordContainer}>
               <TextInput
                 style={styles.passwordInput}
@@ -201,6 +200,7 @@ export default function TelaCadastro() {
             </View>
 
             <Text style={styles.label}>Confirmar Senha:</Text>
+
             <View style={styles.passwordContainer}>
               <TextInput
                 style={styles.passwordInput}
@@ -226,36 +226,8 @@ export default function TelaCadastro() {
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.label}>Tipo de Usuário:</Text>
-
-            <View style={styles.tipoUsuarioContainer}>
-              {tiposUsuario.map((tipo) => {
-                const selecionado = tipoUsuario === tipo;
-
-                return (
-                  <TouchableOpacity
-                    key={tipo}
-                    style={[
-                      styles.tipoUsuario,
-                      selecionado && styles.tipoUsuarioButtonSelected,
-                    ]}
-                    onPress={() => setTipoUsuario(tipo)}
-                  >
-                    <Text
-                      style={[
-                        styles.tipoUsuarioText,
-                        selecionado && styles.tipoUsuarioTextSelected,
-                      ]}
-                    >
-                      {tipo}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-
             <Button
-              title="Cadastrar"
+              title="Cadastrar Responsável"
               style={styles.botao}
               onPress={cadastrarUsuario}
             />
