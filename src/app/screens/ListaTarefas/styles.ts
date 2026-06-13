@@ -341,19 +341,42 @@ export default StyleSheet.create({
     },
 
     cardHeader: {
-    width: "100%",
-    gap: 10,
-},
+        width: "100%",
+        gap: 10,
+    },
 
-cardTituloContainer: {
-    width: "100%",
-},
+    cardTituloContainer: {
+        width: "100%",
+    },
 
-cardValorStatusContainer: {
-    width: "100%",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: 4,
-},
+    cardValorStatusContainer: {
+        width: "100%",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginTop: 4,
+    },
+    botaoConfirmarPai: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 6,
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        borderRadius: 10,
+    },
+
+    botaoConfirmarPaiAceitar: {
+        backgroundColor: "#095414",
+    },
+
+    botaoConfirmarPaiRecusar: {
+        backgroundColor: "#dc3545",
+    },
+
+    botaoConfirmarPaiTexto: {
+        color: "#ffffff",
+        fontSize: 13,
+        fontWeight: "700",
+    },
 });

@@ -11,7 +11,6 @@ import {
   Platform,
   Alert,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -20,9 +19,14 @@ import { Button } from "@/componentes/Button";
 import { Title } from "@/componentes/Title";
 import styles from "./styles";
 import type { RootStackParamList, Usuario } from "@/types/navigation";
+import { STORAGE_KEYS } from "@/constants/storageKeys";
+import {
+  buscarItem,
+  salvarItem,
+} from "@/services/storageService";
 
-const USUARIOS_STORAGE_KEY = "@mesadinha:usuarios";
-const USUARIO_LOGADO_STORAGE_KEY = "@mesadinha:usuario_logado";
+const USUARIOS_STORAGE_KEY = STORAGE_KEYS.usuarios;
+const USUARIO_LOGADO_STORAGE_KEY = STORAGE_KEYS.usuarioLogado;
 
 const USUARIO_PAI_TESTE: Usuario = {
   id_usuario: "1",
@@ -33,14 +37,16 @@ const USUARIO_PAI_TESTE: Usuario = {
 };
 
 const USUARIO_FILHO_TESTE: Usuario = {
-    id_usuario: "2",
-    nome: "Samuel",
-    email: "samuel@mesadinha.com",
-    senha: "123456",
-    id_tipo: 2,
+  id_usuario: "2",
+  nome: "Samuel",
+  email: "samuel@mesadinha.com",
+  senha: "123456",
+  id_tipo: 2,
 };
 
-
+function validarEmail(valor: string) {
+  return valor.trim().includes("@");
+}
 
 export default function Login() {
   const navigation =
@@ -59,7 +65,7 @@ export default function Login() {
       return false;
     }
 
-    if (!email.includes("@")) {
+    if (!validarEmail(email)) {
       Alert.alert("Atenção", "Digite um e-mail válido com @.");
       return false;
     }
@@ -78,11 +84,8 @@ export default function Login() {
     }
 
     try {
-      const usuariosSalvos = await AsyncStorage.getItem(USUARIOS_STORAGE_KEY);
-
-      const usuariosCadastrados: Usuario[] = usuariosSalvos
-        ? JSON.parse(usuariosSalvos)
-        : [];
+      const usuariosCadastrados =
+        (await buscarItem<Usuario[]>(USUARIOS_STORAGE_KEY)) ?? [];
 
       const usuariosDisponiveis: Usuario[] = [
         USUARIO_PAI_TESTE,
@@ -90,21 +93,22 @@ export default function Login() {
         ...usuariosCadastrados,
       ];
 
-      const usuarioEncontrado = usuariosDisponiveis.find(
-        (usuario) =>
-          usuario.email.toLowerCase() === email.trim().toLowerCase() &&
-          usuario.senha === senha
-      );
+      const emailDigitado = email.trim().toLowerCase();
+      const senhaDigitada = senha.trim();
+
+      const usuarioEncontrado = usuariosDisponiveis.find((usuario) => {
+        const emailUsuario = String(usuario.email).trim().toLowerCase();
+        const senhaUsuario = String(usuario.senha ?? "").trim();
+
+        return emailUsuario === emailDigitado && senhaUsuario === senhaDigitada;
+      });
 
       if (!usuarioEncontrado) {
         Alert.alert("Atenção", "E-mail ou senha inválidos.");
         return;
       }
 
-      await AsyncStorage.setItem(
-        USUARIO_LOGADO_STORAGE_KEY,
-        JSON.stringify(usuarioEncontrado)
-      );
+      await salvarItem(USUARIO_LOGADO_STORAGE_KEY, usuarioEncontrado);
 
       navigation.reset({
         index: 0,

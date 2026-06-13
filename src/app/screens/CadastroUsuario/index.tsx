@@ -18,10 +18,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import styles from "./styles";
 import { Button } from "@/componentes/Button";
 import type { RootStackParamList, Usuario } from "@/types/navigation";
+import { STORAGE_KEYS } from "@/constants/storageKeys";
 
 type TipoUsuario = "Pai" | "Filho";
 
-const USUARIOS_STORAGE_KEY = "@mesadinha:usuarios";
+const USUARIOS_STORAGE_KEY = STORAGE_KEYS.usuarios;
 const EMAILS_TESTE = ["pai@mesadinha.com", "samuel@mesadinha.com"];
 
 export default function TelaCadastro() {
@@ -81,7 +82,7 @@ export default function TelaCadastro() {
       return false;
     }
 
-    const errosSenha = senhaValida(senha);
+    const errosSenha = obterErrosSenha(senha);
 
     if (errosSenha.length > 0) {
       Alert.alert(

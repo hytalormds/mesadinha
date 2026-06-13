@@ -8,7 +8,6 @@ import {
     TouchableOpacity,
     Alert,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -27,11 +26,22 @@ import type {
     Carteira,
     Movimentacao,
 } from "@/types/navigation";
+import { STORAGE_KEYS } from "@/constants/storageKeys";
+import {
+    buscarItem,
+    salvarItem,
+    removerItem,
+} from "@/services/storageService";
+import { formatarValor } from "@/utils/formatadores";
+import {
+    obterStatusTarefa,
+    tarefaPertenceAoFilhoLogado,
+} from "@/services/tarefaService";
 
-const STORAGE_KEY = "@mesadinha:tarefas";
-const USUARIO_LOGADO_STORAGE_KEY = "@mesadinha:usuario_logado";
-const CARTEIRAS_STORAGE_KEY = "@mesadinha:carteiras";
-const MOVIMENTACOES_STORAGE_KEY = "@mesadinha:movimentacoes";
+const STORAGE_KEY = STORAGE_KEYS.tarefas;
+const USUARIO_LOGADO_STORAGE_KEY = STORAGE_KEYS.usuarioLogado;
+const CARTEIRAS_STORAGE_KEY = STORAGE_KEYS.carteiras;
+const MOVIMENTACOES_STORAGE_KEY = STORAGE_KEYS.movimentacoes;
 
 type FiltroStatus = StatusTarefa | "Todas";
 
@@ -55,12 +65,12 @@ export default function ListaTarefas() {
     React.useEffect(() => {
         async function carregarUsuarioLogado() {
             try {
-                const usuarioSalvo = await AsyncStorage.getItem(
+                const usuarioSalvo = await buscarItem<Usuario>(
                     USUARIO_LOGADO_STORAGE_KEY
                 );
 
                 if (usuarioSalvo) {
-                    setUsuarioLogado(JSON.parse(usuarioSalvo));
+                    setUsuarioLogado(usuarioSalvo);
                     return;
                 }
 
@@ -84,13 +94,9 @@ export default function ListaTarefas() {
     React.useEffect(() => {
         async function carregarTarefas() {
             try {
-                const tarefasSalvas = await AsyncStorage.getItem(STORAGE_KEY);
+                const tarefasSalvas = await buscarItem<Tarefa[]>(STORAGE_KEY);
 
-                if (tarefasSalvas) {
-                    setTarefas(JSON.parse(tarefasSalvas));
-                } else {
-                    setTarefas([]);
-                }
+                setTarefas(tarefasSalvas ?? []);
             } catch (error) {
                 console.log("Erro ao carregar tarefas:", error);
                 setTarefas([]);
@@ -109,10 +115,7 @@ export default function ListaTarefas() {
             }
 
             try {
-                await AsyncStorage.setItem(
-                    STORAGE_KEY,
-                    JSON.stringify(tarefas)
-                );
+                await salvarItem(STORAGE_KEY, tarefas);
             } catch (error) {
                 console.log("Erro ao salvar tarefas:", error);
             }
@@ -127,10 +130,7 @@ export default function ListaTarefas() {
             }
 
             try {
-                await AsyncStorage.setItem(
-                    CARTEIRAS_STORAGE_KEY,
-                    JSON.stringify(carteiras)
-                );
+                await salvarItem(CARTEIRAS_STORAGE_KEY, carteiras);
             } catch (error) {
                 console.log("Erro ao salvar carteiras:", error);
             }
@@ -141,15 +141,11 @@ export default function ListaTarefas() {
     React.useEffect(() => {
         async function carregarMovimentacoes() {
             try {
-                const movimentacoesSalvas = await AsyncStorage.getItem(
+                const movimentacoesSalvas = await buscarItem<Movimentacao[]>(
                     MOVIMENTACOES_STORAGE_KEY
                 );
 
-                if (movimentacoesSalvas) {
-                    setMovimentacoes(JSON.parse(movimentacoesSalvas));
-                } else {
-                    setMovimentacoes([]);
-                }
+                setMovimentacoes(movimentacoesSalvas ?? []);
             } catch (error) {
                 console.log("Erro ao carregar movimentações:", error);
                 setMovimentacoes([]);
@@ -163,15 +159,11 @@ export default function ListaTarefas() {
     React.useEffect(() => {
         async function carregarCarteiras() {
             try {
-                const carteirasSalvas = await AsyncStorage.getItem(
+                const carteirasSalvas = await buscarItem<Carteira[]>(
                     CARTEIRAS_STORAGE_KEY
                 );
 
-                if (carteirasSalvas) {
-                    setCarteiras(JSON.parse(carteirasSalvas));
-                } else {
-                    setCarteiras([]);
-                }
+                setCarteiras(carteirasSalvas ?? []);
             } catch (error) {
                 console.log("Erro ao carregar carteiras:", error);
                 setCarteiras([]);
@@ -189,10 +181,7 @@ export default function ListaTarefas() {
             }
 
             try {
-                await AsyncStorage.setItem(
-                    MOVIMENTACOES_STORAGE_KEY,
-                    JSON.stringify(movimentacoes)
-                );
+                await salvarItem(MOVIMENTACOES_STORAGE_KEY, movimentacoes);
             } catch (error) {
                 console.log("Erro ao salvar movimentações:", error);
             }
@@ -240,7 +229,7 @@ export default function ListaTarefas() {
                 text: "Sair",
                 style: "destructive",
                 onPress: async () => {
-                    await AsyncStorage.removeItem(USUARIO_LOGADO_STORAGE_KEY);
+                    await removerItem(USUARIO_LOGADO_STORAGE_KEY);
 
                     navigation.reset({
                         index: 0,
@@ -249,17 +238,6 @@ export default function ListaTarefas() {
                 },
             },
         ]);
-    }
-
-    function formatarValor(valor?: number) {
-        if (valor === undefined || valor === null) {
-            return "R$ 0,00";
-        }
-
-        return valor.toLocaleString("pt-BR", {
-            style: "currency",
-            currency: "BRL",
-        });
     }
 
     function converterDataBRParaDate(dataBR?: string) {
@@ -288,37 +266,6 @@ export default function ListaTarefas() {
         }
 
         return data;
-    }
-
-    function obterStatusTarefa(tarefa: Tarefa): StatusTarefa {
-        if (tarefa.status === "Concluída" || tarefa.concluida) {
-            return "Concluída";
-        }
-
-        if (
-            tarefa.status === "Aguardando Aprovação" ||
-            tarefa.status === "Recusada" ||
-            tarefa.status === "Expirado"
-        ) {
-            return tarefa.status;
-        }
-
-        const dataLimiteConvertida = converterDataBRParaDate(
-            tarefa.dataLimite
-        );
-
-        if (dataLimiteConvertida) {
-            const hoje = new Date();
-
-            hoje.setHours(0, 0, 0, 0);
-            dataLimiteConvertida.setHours(0, 0, 0, 0);
-
-            if (dataLimiteConvertida < hoje) {
-                return "Expirado";
-            }
-        }
-
-        return tarefa.status ?? "Em Aberto";
     }
 
     function getStatusStyle(status: StatusTarefa) {
@@ -542,6 +489,22 @@ export default function ListaTarefas() {
                                             : ""}
                                 </Text>
                             </View>
+
+                            <TouchableOpacity
+                                style={styles.botaoSair}
+                                activeOpacity={0.7}
+                                onPress={confirmarSair}
+                            >
+                                <MaterialIcons
+                                    name="logout"
+                                    size={20}
+                                    color="#dc3545"
+                                />
+
+                                <Text style={styles.botaoSairTexto}>
+                                    Sair
+                                </Text>
+                            </TouchableOpacity>
                         </View>
 
                         <View style={styles.containerForm}>
@@ -606,31 +569,10 @@ export default function ListaTarefas() {
                                     const statusAtual =
                                         obterStatusTarefa(tarefa);
 
-                                    const usuarioLogadoId = String(usuarioLogado.id_usuario);
-
-                                    const idsPossiveisDaCrianca = [
-                                        tarefa.fk_usuario_crianca,
-                                        tarefa.fk_usuario_responsavel,
-                                    ]
-                                        .filter(Boolean)
-                                        .map((id) => String(id));
-
-                                    const nomeCriancaDaTarefa = String(
-                                        tarefa.nome_usuario_crianca ??
-                                        tarefa.nome_usuario_responsavel ??
-                                        ""
-                                    )
-                                        .trim()
-                                        .toLowerCase();
-
-                                    const nomeUsuarioLogado = String(usuarioLogado.nome)
-                                        .trim()
-                                        .toLowerCase();
-
-                                    const tarefaEhDoFilhoLogado =
-                                        usuarioEhFilho &&
-                                        (idsPossiveisDaCrianca.includes(usuarioLogadoId) ||
-                                            nomeCriancaDaTarefa === nomeUsuarioLogado);
+                                    const tarefaEhDoFilhoLogado = tarefaPertenceAoFilhoLogado(
+                                        tarefa,
+                                        usuarioLogado
+                                    );
                                     return (
                                         <View
                                             key={tarefa.id}
@@ -757,55 +699,37 @@ export default function ListaTarefas() {
 
                                             {usuarioEhPai && (
                                                 <View style={styles.cardAcoes}>
-                                                    {statusAtual ===
-                                                        "Aguardando Aprovação" && (
-                                                            <>
-                                                                <ButtonIcon
-                                                                    name="check-circle"
-                                                                    size={28}
-                                                                    color="#095414"
-                                                                    style={
-                                                                        styles.botaoAcao
-                                                                    }
-                                                                    onPress={() =>
-                                                                        aceitarTarefa(
-                                                                            tarefa
-                                                                        )
-                                                                    }
-                                                                />
+                                                    {statusAtual === "Aguardando Aprovação" && (
+                                                        <>
+                                                            <ButtonIcon
+                                                                name="check-circle"
+                                                                size={28}
+                                                                color="#095414"
+                                                                style={styles.botaoAcao}
+                                                                onPress={() => aceitarTarefa(tarefa)}
+                                                            />
 
-                                                                <ButtonIcon
-                                                                    name="cancel"
-                                                                    size={28}
-                                                                    color="#dc3545"
-                                                                    style={
-                                                                        styles.botaoAcao
-                                                                    }
-                                                                    onPress={() =>
-                                                                        alterarStatusTarefa(
-                                                                            tarefa.id,
-                                                                            "Recusada"
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </>
-                                                        )}
+                                                            <ButtonIcon
+                                                                name="cancel"
+                                                                size={28}
+                                                                color="#dc3545"
+                                                                style={styles.botaoAcao}
+                                                                onPress={() =>
+                                                                    alterarStatusTarefa(tarefa.id, "Recusada")
+                                                                }
+                                                            />
+                                                        </>
+                                                    )}
 
                                                     <ButtonIcon
                                                         name="edit"
                                                         size={28}
                                                         color="#007BFF"
-                                                        style={
-                                                            styles.botaoAcao
-                                                        }
+                                                        style={styles.botaoAcao}
                                                         onPress={() =>
-                                                            navigation.push(
-                                                                "CadastroTarefa",
-                                                                {
-                                                                    tarefaEditando:
-                                                                        tarefa,
-                                                                }
-                                                            )
+                                                            navigation.push("CadastroTarefa", {
+                                                                tarefaEditando: tarefa,
+                                                            })
                                                         }
                                                     />
 
@@ -813,14 +737,8 @@ export default function ListaTarefas() {
                                                         name="delete-outline"
                                                         size={28}
                                                         color="#dc3545"
-                                                        style={
-                                                            styles.botaoAcao
-                                                        }
-                                                        onPress={() =>
-                                                            apagarTarefa(
-                                                                tarefa.id
-                                                            )
-                                                        }
+                                                        style={styles.botaoAcao}
+                                                        onPress={() => apagarTarefa(tarefa.id)}
                                                     />
                                                 </View>
                                             )}

@@ -9,17 +9,17 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-
 import styles from "./styles";
 import type {
     RootStackParamList,
     Usuario,
     Carteira,
 } from "@/types/navigation";
+import { STORAGE_KEYS } from "@/constants/storageKeys";
 
-const USUARIO_LOGADO_STORAGE_KEY = "@mesadinha:usuario_logado";
-const USUARIOS_STORAGE_KEY = "@mesadinha:usuarios";
-const CARTEIRAS_STORAGE_KEY = "@mesadinha:carteiras";
+const USUARIO_LOGADO_STORAGE_KEY = STORAGE_KEYS.usuarioLogado;
+const USUARIOS_STORAGE_KEY = STORAGE_KEYS.usuarios;
+const CARTEIRAS_STORAGE_KEY = STORAGE_KEYS.carteiras;
 
 const USUARIO_RESPONSAVEL_PADRAO: Usuario = {
     id_usuario: "1",

@@ -9,7 +9,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-
+import { STORAGE_KEYS } from "@/constants/storageKeys";
 import styles from "./styles";
 import type {
     RootStackParamList,
@@ -19,11 +19,11 @@ import type {
     Tarefa,
 } from "@/types/navigation";
 
-const USUARIO_LOGADO_STORAGE_KEY = "@mesadinha:usuario_logado";
-const USUARIOS_STORAGE_KEY = "@mesadinha:usuarios";
-const CARTEIRAS_STORAGE_KEY = "@mesadinha:carteiras";
-const MOVIMENTACOES_STORAGE_KEY = "@mesadinha:movimentacoes";
-const TAREFAS_STORAGE_KEY = "@mesadinha:tarefas";
+const USUARIO_LOGADO_STORAGE_KEY = STORAGE_KEYS.usuarioLogado;
+const USUARIOS_STORAGE_KEY = STORAGE_KEYS.usuarios;
+const CARTEIRAS_STORAGE_KEY = STORAGE_KEYS.carteiras;
+const MOVIMENTACOES_STORAGE_KEY = STORAGE_KEYS.movimentacoes;
+const TAREFAS_STORAGE_KEY = STORAGE_KEYS.tarefas;
 
 export default function Cofrinho() {
     const navigation =

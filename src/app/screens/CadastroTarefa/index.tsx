@@ -26,11 +26,21 @@ import type {
     Tarefa,
     Usuario,
 } from "@/types/navigation";
+import { STORAGE_KEYS } from "@/constants/storageKeys";
+import {
+    formatarValor,
+    formatarMoedaDigitada,
+    converterMoedaParaNumero,
+} from "@/utils/formatadores";
 
-
+import {
+    formatarDataDigitada,
+    dataValida,
+} from "@/utils/datas";
 const LIMITE_DESCRICAO = 250;
-const USUARIOS_STORAGE_KEY = "@mesadinha:usuarios";
-const USUARIO_LOGADO_STORAGE_KEY = "@mesadinha:usuario_logado";
+
+const USUARIOS_STORAGE_KEY = STORAGE_KEYS.usuarios;
+const USUARIO_LOGADO_STORAGE_KEY = STORAGE_KEYS.usuarioLogado;
 
 export default function CadastroTarefa() {
     const navigation =
@@ -89,7 +99,7 @@ export default function CadastroTarefa() {
 
             setvalor_recompensa(
                 tarefaEditando.valor_recompensa
-                    ? formatarNumeroParaMoeda(tarefaEditando.valor_recompensa)
+                    ? formatarValor(tarefaEditando.valor_recompensa)
                     : ""
             );
         } else {
@@ -149,74 +159,6 @@ export default function CadastroTarefa() {
 
         carregarUsuarioLogado();
     }, []);
-    function formatarDataDigitada(texto: string) {
-        const numeros = texto.replace(/\D/g, "").slice(0, 8);
-
-        if (numeros.length <= 2) {
-            return numeros;
-        }
-
-        if (numeros.length <= 4) {
-            return `${numeros.slice(0, 2)}/${numeros.slice(2)}`;
-        }
-
-        return `${numeros.slice(0, 2)}/${numeros.slice(
-            2,
-            4
-        )}/${numeros.slice(4)}`;
-    }
-
-    function dataValida(dataTexto: string) {
-        const partes = dataTexto.split("/");
-
-        if (partes.length !== 3) {
-            return false;
-        }
-
-        const dia = Number(partes[0]);
-        const mes = Number(partes[1]);
-        const ano = Number(partes[2]);
-
-        if (!dia || !mes || !ano) {
-            return false;
-        }
-
-        const dataTeste = new Date(ano, mes - 1, dia);
-
-        return (
-            dataTeste.getFullYear() === ano &&
-            dataTeste.getMonth() === mes - 1 &&
-            dataTeste.getDate() === dia
-        );
-    }
-
-    function formatarvalor_recompensa(texto: string) {
-        const numeros = texto.replace(/\D/g, "");
-
-        if (!numeros) {
-            return "";
-        }
-
-        const valor = Number(numeros) / 100;
-
-        return valor.toLocaleString("pt-BR", {
-            style: "currency",
-            currency: "BRL",
-        });
-    }
-
-    function formatarNumeroParaMoeda(valor: number) {
-        return valor.toLocaleString("pt-BR", {
-            style: "currency",
-            currency: "BRL",
-        });
-    }
-
-    function converterMoedaParaNumero(valor: string) {
-        const numeros = valor.replace(/\D/g, "");
-
-        return Number(numeros) / 100;
-    }
 
     function validarFormulario() {
         if (!usuarioResponsavelId) {
@@ -432,7 +374,7 @@ export default function CadastroTarefa() {
                             value={valor_recompensa}
                             onChangeText={(text) =>
                                 setvalor_recompensa(
-                                    formatarvalor_recompensa(text)
+                                    formatarMoedaDigitada(text)
                                 )
                             }
                         />
