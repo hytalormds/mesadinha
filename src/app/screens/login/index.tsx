@@ -12,6 +12,7 @@ import {
   Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
@@ -50,10 +51,16 @@ export default function Login() {
 
   const [email, setEmail] = React.useState("");
   const [senha, setSenha] = React.useState("");
+  const [mostrarSenha, setMostrarSenha] = React.useState(false);
 
   function validarFormulario() {
     if (!email.trim()) {
       Alert.alert("Atenção", "Digite seu e-mail.");
+      return false;
+    }
+
+    if (!email.includes("@")) {
+      Alert.alert("Atenção", "Digite um e-mail válido com @.");
       return false;
     }
 
@@ -101,7 +108,7 @@ export default function Login() {
 
       navigation.reset({
         index: 0,
-        routes: [{ name: "ListaTarefas" }],
+        routes: [{ name: "MainTabs" }],
       });
     } catch (error) {
       console.log("Erro ao fazer login:", error);
@@ -155,16 +162,34 @@ export default function Login() {
               <View style={styles.fieldContainer}>
                 <Text style={styles.label}>Senha</Text>
 
-                <TextInput
-                  style={[styles.input, passwordFocus && styles.inputFocus]}
-                  placeholder="Sua senha segura"
-                  placeholderTextColor="#999999"
-                  value={senha}
-                  onChangeText={setSenha}
-                  secureTextEntry
-                  onFocus={() => setPasswordFocus(true)}
-                  onBlur={() => setPasswordFocus(false)}
-                />
+                <View
+                  style={[
+                    styles.passwordContainer,
+                    passwordFocus && styles.inputFocus,
+                  ]}
+                >
+                  <TextInput
+                    style={styles.passwordInput}
+                    placeholder="Sua senha segura"
+                    placeholderTextColor="#999999"
+                    value={senha}
+                    onChangeText={setSenha}
+                    secureTextEntry={!mostrarSenha}
+                    onFocus={() => setPasswordFocus(true)}
+                    onBlur={() => setPasswordFocus(false)}
+                  />
+
+                  <TouchableOpacity
+                    style={styles.eyeButton}
+                    onPress={() => setMostrarSenha(!mostrarSenha)}
+                  >
+                    <MaterialIcons
+                      name={mostrarSenha ? "visibility-off" : "visibility"}
+                      size={22}
+                      color="#666666"
+                    />
+                  </TouchableOpacity>
+                </View>
               </View>
 
               <Button

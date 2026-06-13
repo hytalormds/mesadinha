@@ -39,6 +39,32 @@ export default StyleSheet.create({
     marginBottom: 10,
   },
 
+  passwordContainer: {
+    height: 44,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    paddingLeft: 10,
+    paddingRight: 6,
+    marginTop: 10,
+    marginBottom: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+  },
+
+  passwordInput: {
+    flex: 1,
+    height: "100%",
+  },
+
+  eyeButton: {
+    width: 36,
+    height: 36,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
   botao: {
     backgroundColor: "#007bff",
     padding: 15,

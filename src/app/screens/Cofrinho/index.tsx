@@ -3,7 +3,6 @@ import {
     Text,
     View,
     ScrollView,
-    TouchableOpacity,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -251,22 +250,9 @@ export default function Cofrinho() {
                 showsVerticalScrollIndicator={false}
             >
                 <View style={styles.header}>
-                    <TouchableOpacity
-                        style={styles.botaoVoltar}
-                        onPress={() => navigation.goBack()}
-                    >
-                        <MaterialIcons
-                            name="arrow-back"
-                            size={24}
-                            color="#007BFF"
-                        />
-                    </TouchableOpacity>
-
                     <Text style={styles.titulo}>
                         {usuarioEhPai ? "Cofrinhos" : "Meu Cofrinho"}
                     </Text>
-
-                    <View style={styles.espacoHeader} />
                 </View>
 
                 {usuarioEhPai && (
