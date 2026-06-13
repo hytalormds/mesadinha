@@ -12,11 +12,12 @@ import type { RootStackParamList } from "@/types/navigation";
 import styles from "./styles";
 import Familia from "@/app/screens/Familia";
 
-const Stack = createNativeStackNavigator<RootStackParamList>();
+const Stack = createNativeStackNavigator<RootStackParamList, undefined>();
 
 export default function Routes() {
     return (
         <Stack.Navigator
+            id={undefined}
             initialRouteName="Login"
             screenOptions={{
                 headerShown: true,
