@@ -262,6 +262,41 @@ export default function ListaTarefas() {
         );
     }
 
+    function confirmarInicioTarefa(id: string) {
+        Alert.alert(
+            "Iniciar tarefa",
+            "Tem certeza que deseja iniciar esta tarefa?",
+            [
+                {
+                    text: "Cancelar",
+                    style: "cancel",
+                },
+                {
+                    text: "Iniciar",
+                    onPress: () => alterarStatusTarefa(id, "Em Andamento"),
+                },
+            ]
+        );
+    }
+
+    function confirmarFinalizacaoTarefa(id: string) {
+        Alert.alert(
+            "Finalizar tarefa",
+            "Tem certeza que deseja finalizar esta tarefa?",
+            [
+                {
+                    text: "Cancelar",
+                    style: "cancel",
+                },
+                {
+                    text: "Finalizar",
+                    onPress: () =>
+                        alterarStatusTarefa(id, "Aguardando Aprovação"),
+                },
+            ]
+        );
+    }
+
     function apagarTarefa(id: string) {
         Alert.alert(
             "Excluir tarefa",
@@ -375,6 +410,23 @@ export default function ListaTarefas() {
         );
     }
 
+    function confirmarAceiteTarefa(tarefa: Tarefa) {
+        Alert.alert(
+            "Aprovar tarefa",
+            "Tem certeza que deseja aprovar esta tarefa?",
+            [
+                {
+                    text: "Cancelar",
+                    style: "cancel",
+                },
+                {
+                    text: "Aprovar",
+                    onPress: () => aceitarTarefa(tarefa),
+                },
+            ]
+        );
+    }
+
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -476,18 +528,15 @@ export default function ListaTarefas() {
                                                 })
                                             }
                                             onExcluir={() => apagarTarefa(tarefa.id)}
-                                            onAceitar={() => aceitarTarefa(tarefa)}
+                                            onAceitar={() => confirmarAceiteTarefa(tarefa)}
                                             onRecusar={() =>
                                                 alterarStatusTarefa(tarefa.id, "Recusada")
                                             }
                                             onIniciar={() =>
-                                                alterarStatusTarefa(tarefa.id, "Em Andamento")
+                                                confirmarInicioTarefa(tarefa.id)
                                             }
                                             onEnviarParaAprovacao={() =>
-                                                alterarStatusTarefa(
-                                                    tarefa.id,
-                                                    "Aguardando Aprovação"
-                                                )
+                                                confirmarFinalizacaoTarefa(tarefa.id)
                                             }
                                         />
                                     );

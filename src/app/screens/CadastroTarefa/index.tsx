@@ -8,6 +8,7 @@ import {
     KeyboardAvoidingView,
     Platform,
     Alert,
+    type ScrollView as ScrollViewType,
 } from "react-native";
 import {
     useNavigation,
@@ -57,6 +58,17 @@ export default function CadastroTarefa() {
     const [usuarioResponsavelId, setUsuarioResponsavelId] = React.useState("");
     const [filhosCadastrados, setFilhosCadastrados] = React.useState<Usuario[]>([]);
     const [usuarioLogado, setUsuarioLogado] = React.useState<Usuario | null>(null);
+    const scrollViewRef = React.useRef<ScrollViewType>(null);
+
+    function subirFormulario(posicao: number) {
+        setTimeout(() => {
+            scrollViewRef.current?.scrollTo({
+                y: posicao,
+                animated: true,
+            });
+        }, 250);
+    }
+
     async function carregarFilhos() {
         try {
             const usuarios = await buscarItem<Usuario[]>(
@@ -225,6 +237,7 @@ export default function CadastroTarefa() {
                 keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
             >
                 <ScrollView
+                    ref={scrollViewRef}
                     contentContainerStyle={styles.scrollContent}
                     keyboardShouldPersistTaps="handled"
                     keyboardDismissMode="on-drag"
@@ -287,6 +300,7 @@ export default function CadastroTarefa() {
                             placeholder="R$ 0,00"
                             keyboardType="numeric"
                             value={valor_recompensa}
+                            onFocus={() => subirFormulario(360)}
                             onChangeText={(text) =>
                                 setvalor_recompensa(
                                     formatarMoedaDigitada(text)
@@ -305,6 +319,7 @@ export default function CadastroTarefa() {
                             }
                             keyboardType="numeric"
                             maxLength={10}
+                            onFocus={() => subirFormulario(430)}
                         />
 
                         <Button

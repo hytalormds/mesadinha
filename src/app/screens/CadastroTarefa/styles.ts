@@ -12,7 +12,7 @@ export default StyleSheet.create({
 
     scrollContent: {
         flexGrow: 1,
-        paddingBottom: 40,
+        paddingBottom: 220,
     },
 
     contadorCaracteres: {

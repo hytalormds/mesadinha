@@ -467,18 +467,6 @@ export default function Cofrinho() {
                                 {formatarValor(saldoUsuarioLogado)}
                             </Text>
                         </View>
-
-                        <View style={styles.cardInfo}>
-                            <Text style={styles.infoTitulo}>
-                                Como o saldo aumenta?
-                            </Text>
-
-                            <Text style={styles.infoTexto}>
-                                Quando você conclui uma tarefa e o responsável
-                                aceita a conclusão, o valor da recompensa é
-                                adicionado ao seu cofrinho.
-                            </Text>
-                        </View>
                     </>
                 )}
 
