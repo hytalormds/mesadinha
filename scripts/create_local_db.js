@@ -9,7 +9,7 @@ const dbPath = path.join(
   "infra",
   "database",
   "typeorm",
-  "dt-money",
+  "mesadinha",
   "database.sqlite",
 );
 
@@ -40,7 +40,6 @@ CREATE TABLE IF NOT EXISTS usuarios (
 CREATE TABLE IF NOT EXISTS familia (
   id_familia INTEGER PRIMARY KEY AUTOINCREMENT,
   nome TEXT NOT NULL,
-  codigo_convite TEXT NOT NULL UNIQUE,
   fk_usuario_responsavel INTEGER NOT NULL,
   FOREIGN KEY (fk_usuario_responsavel) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
 );

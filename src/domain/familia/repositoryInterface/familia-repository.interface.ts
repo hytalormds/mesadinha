@@ -6,7 +6,6 @@ import {
 
 export interface CreateFamiliaParams {
   nome: string;
-  codigoConvite: string;
   fkUsuarioResponsavel: number;
 }
 
@@ -21,6 +20,5 @@ export interface FamiliaRepositoryInterface {
   addUsuarioFamilia(
     params: AddUsuarioFamiliaParams,
   ): Promise<UsuarioFamilia>;
-  findByCodigoConvite(codigoConvite: string): Promise<Familia | null>;
   findMembershipByUserId(userId: number): Promise<UsuarioFamilia | null>;
 }

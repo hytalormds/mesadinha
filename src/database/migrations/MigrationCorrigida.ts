@@ -33,7 +33,6 @@ export async function migrate(db: SQLiteDatabase) {
     CREATE TABLE IF NOT EXISTS familia (
       id_familia INTEGER PRIMARY KEY AUTOINCREMENT,
       nome TEXT NOT NULL,
-      codigo_convite TEXT NOT NULL UNIQUE,
       fk_usuario_responsavel INTEGER NOT NULL,
 
       FOREIGN KEY (fk_usuario_responsavel)

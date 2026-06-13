@@ -4,26 +4,21 @@ import S from "fluent-json-schema";
 const body = S.object()
   .prop("email", S.string().required())
   .prop("name", S.string().required())
-  .prop("password", S.string().required())
-  .prop("nomeFamilia", S.string());
+  .prop("password", S.string().required());
 
-const successResponse = S.object()
-  .prop("user", S.ref("User#"))
-  .prop("token", S.string().required())
-  .prop(
-    "familia",
-    S.object()
-      .prop("idFamilia", S.number())
-      .prop("nome", S.string()),
-  );
-
-export const registerSchema: FastifySchema = {
+export const registerChildSchema: FastifySchema = {
   tags: ["Auth"],
   body,
+  security: [{ bearerAuth: [] }],
   response: {
-    200: successResponse,
+    201: S.object()
+      .prop("user", S.ref("User#"))
+      .prop("token", S.string()),
     401: {
       $ref: "Unauthorized#",
+    },
+    403: {
+      $ref: "Forbidden#",
     },
     422: {
       $ref: "UnprocessableEntity#",

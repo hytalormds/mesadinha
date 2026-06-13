@@ -37,16 +37,6 @@ export class FamiliaRepository implements FamiliaRepositoryInterface {
     }
   }
 
-  async findByCodigoConvite(codigoConvite: string): Promise<Familia | null> {
-    try {
-      return await this.familiaRepository.findOne({
-        where: { codigoConvite },
-      });
-    } catch (error) {
-      throw new DatabaseError("Falha ao buscar familia por codigo", error);
-    }
-  }
-
   async findMembershipByUserId(userId: number): Promise<UsuarioFamilia | null> {
     try {
       return await this.usuarioFamiliaRepository.findOne({

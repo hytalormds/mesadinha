@@ -5,6 +5,7 @@ export interface CreateUserParams {
   email: string;
   password: string;
   idTipo?: number;
+  nomeFamilia?: string;
 }
 
 export interface UserRepositoryInterface {

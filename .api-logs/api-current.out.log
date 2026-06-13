@@ -1,0 +1,15 @@
+
+> mesadinha@1.0.0 api:dev
+> tsx watch --tsconfig tsconfig.backend.json src/server.ts
+
+[SWAGGER] Ready
+[DATABASE] Connecting...
+🌱 Seeders rodados com sucesso!
+[DATABASE] Connected.
+Api rodando na porta 3001
+19:52:41 [tsx] change in ./src\infra\database\typeorm\mesadinha\migrations\1760000000000-CreateFamilyStructure.ts Restarting...
+c[SWAGGER] Ready
+[DATABASE] Connecting...
+🌱 Seeders rodados com sucesso!
+[DATABASE] Connected.
+Api rodando na porta 3001

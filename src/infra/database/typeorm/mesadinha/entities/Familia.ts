@@ -18,14 +18,6 @@ export class Familia {
   @Column({ name: "nome", type: "varchar", nullable: false })
   nome: string;
 
-  @Column({
-    name: "codigo_convite",
-    type: "varchar",
-    nullable: false,
-    unique: true,
-  })
-  codigoConvite: string;
-
   @Column({ name: "fk_usuario_responsavel", type: "int", nullable: false })
   fkUsuarioResponsavel: number;
 

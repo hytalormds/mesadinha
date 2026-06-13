@@ -22,12 +22,6 @@ export class CreateFamilyStructure1760000000000 implements MigrationInterface {
           },
           { name: "nome", type: "varchar", isNullable: false },
           {
-            name: "codigo_convite",
-            type: "varchar",
-            isNullable: false,
-            isUnique: true,
-          },
-          {
             name: "fk_usuario_responsavel",
             type: "integer",
             isNullable: false,
