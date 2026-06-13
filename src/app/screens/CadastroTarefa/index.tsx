@@ -14,29 +14,27 @@ import {
     useRoute,
     useFocusEffect,
 } from "@react-navigation/native";
-import { buscarItem } from "@/services/storageService";
 import type { RouteProp } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import styles from "./styles";
 import { Button } from "@/componentes/Button";
-import { SeletorFilho } from "@/componentes/SeletorFIlho";
+import { SeletorFilho } from "@/componentes/SeletorFilho";
 import type {
     RootStackParamList,
     Usuario,
 } from "@/types/navigation";
 import { STORAGE_KEYS } from "@/constants/storageKeys";
+import { buscarItem } from "@/services/storageService";
 import {
     formatarValor,
     formatarMoedaDigitada,
-    converterMoedaParaNumero,
 } from "@/utils/formatadores";
-
+import { formatarDataDigitada } from "@/utils/datas";
 import {
-    formatarDataDigitada,
-} from "@/utils/datas";
-
-import { validarCadastroTarefa, montarTarefaCadastro } from "@/services/cadastroTarefaService";
+    validarCadastroTarefa,
+    montarTarefaCadastro,
+} from "@/services/cadastroTarefaService";
 const LIMITE_DESCRICAO = 250;
 
 const USUARIOS_STORAGE_KEY = STORAGE_KEYS.usuarios;
