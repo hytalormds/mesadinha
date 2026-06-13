@@ -21,13 +21,6 @@ const USUARIO_LOGADO_STORAGE_KEY = STORAGE_KEYS.usuarioLogado;
 const USUARIOS_STORAGE_KEY = STORAGE_KEYS.usuarios;
 const CARTEIRAS_STORAGE_KEY = STORAGE_KEYS.carteiras;
 
-const USUARIO_RESPONSAVEL_PADRAO: Usuario = {
-    id_usuario: "1",
-    nome: "Responsável",
-    email: "pai@mesadinha.com",
-    id_tipo: 1,
-};
-
 export default function Familia() {
     const navigation =
         useNavigation<
@@ -67,11 +60,7 @@ export default function Familia() {
                     ? JSON.parse(usuariosSalvos)
                     : [];
 
-                const membrosComResponsavel = [
-                    USUARIO_RESPONSAVEL_PADRAO,
-                    ...usuariosCadastrados,
-                    usuario,
-                ];
+                const membrosComResponsavel = [...usuariosCadastrados, usuario];
 
                 const membrosUnicos = membrosComResponsavel.filter(
                     (membro, index, array) =>
@@ -82,7 +71,11 @@ export default function Familia() {
                         ) === index
                 );
 
-                const membrosOrdenados = membrosUnicos.sort((a, b) => {
+                const filhos = membrosUnicos.filter(
+                    (membro) => membro.id_tipo === 2
+                );
+
+                const membrosOrdenados = filhos.sort((a, b) => {
                     if (a.id_tipo !== b.id_tipo) {
                         return a.id_tipo - b.id_tipo;
                     }
@@ -176,7 +169,7 @@ export default function Familia() {
                     />
 
                     <Text style={styles.resumoTitulo}>
-                        Membros cadastrados
+                        Filhos cadastrados
                     </Text>
 
                     <Text style={styles.quantidadeMembros}>
@@ -193,12 +186,11 @@ export default function Familia() {
                 </View>
 
                 <Text style={styles.secaoTitulo}>
-                    Membros da família
+                    Filhos da família
                 </Text>
 
                 {membros.map((membro) => {
                     const saldo = obterSaldoUsuario(membro.id_usuario);
-                    const ehResponsavel = membro.id_tipo === 1;
 
                     return (
                         <View
@@ -207,11 +199,7 @@ export default function Familia() {
                         >
                             <View style={styles.iconeContainer}>
                                 <MaterialIcons
-                                    name={
-                                        ehResponsavel
-                                            ? "supervisor-account"
-                                            : "child-care"
-                                    }
+                                    name="child-care"
                                     size={28}
                                     color="#007BFF"
                                 />

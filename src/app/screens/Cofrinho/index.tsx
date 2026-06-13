@@ -1,8 +1,12 @@
 import React from "react";
 import {
-    Text,
-    View,
+    Alert,
+    Modal,
     ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -39,6 +43,8 @@ export default function Cofrinho() {
     const [movimentacoes, setMovimentacoes] = React.useState<Movimentacao[]>([]);
     const [tarefas, setTarefas] = React.useState<Tarefa[]>([]);
     const [carregando, setCarregando] = React.useState(true);
+    const [filhoSaque, setFilhoSaque] = React.useState<Usuario | null>(null);
+    const [valorSaque, setValorSaque] = React.useState("");
 
     React.useEffect(() => {
         async function carregarDados() {
@@ -185,6 +191,99 @@ export default function Cofrinho() {
         return "Usuário não encontrado";
     }
 
+    function abrirSaque(filho: Usuario) {
+        setFilhoSaque(filho);
+        setValorSaque("");
+    }
+
+    function fecharSaque() {
+        setFilhoSaque(null);
+        setValorSaque("");
+    }
+
+    async function realizarSaque(valor: number, carteiraFilho: Carteira) {
+        const carteirasAtualizadas = carteiras.map((carteira) => {
+            if (carteira.id_carteira === carteiraFilho.id_carteira) {
+                return {
+                    ...carteira,
+                    saldo: carteira.saldo - valor,
+                };
+            }
+
+            return carteira;
+        });
+
+        const novaMovimentacao: Movimentacao = {
+            id_movimentacao: String(Date.now()),
+            tipo_movimentacao: "saida",
+            data: new Date().toISOString(),
+            valor,
+            fk_carteira_id: carteiraFilho.id_carteira,
+        };
+
+        const movimentacoesAtualizadas = [
+            novaMovimentacao,
+            ...movimentacoes,
+        ];
+
+        await AsyncStorage.setItem(
+            CARTEIRAS_STORAGE_KEY,
+            JSON.stringify(carteirasAtualizadas)
+        );
+
+        await AsyncStorage.setItem(
+            MOVIMENTACOES_STORAGE_KEY,
+            JSON.stringify(movimentacoesAtualizadas)
+        );
+
+        setCarteiras(carteirasAtualizadas);
+        setMovimentacoes(movimentacoesAtualizadas);
+        fecharSaque();
+
+        Alert.alert("Sucesso", "Saque realizado com sucesso.");
+    }
+
+    function confirmarSaque() {
+        if (!filhoSaque) {
+            return;
+        }
+
+        const valor = Number(valorSaque.replace(",", "."));
+
+        if (!valor || valor <= 0) {
+            Alert.alert("Atenção", "Digite um valor válido para sacar.");
+            return;
+        }
+
+        const carteiraFilho = obterCarteiraUsuario(filhoSaque.id_usuario);
+
+        if (!carteiraFilho) {
+            Alert.alert("Atenção", "Este filho ainda não possui saldo.");
+            return;
+        }
+
+        if (valor > carteiraFilho.saldo) {
+            Alert.alert("Atenção", "O valor do saque é maior que o saldo.");
+            return;
+        }
+
+        Alert.alert(
+            "Confirmar saque",
+            `Tem certeza que deseja sacar ${formatarValor(valor)} de ${filhoSaque.nome}?`,
+            [
+                {
+                    text: "Cancelar",
+                    style: "cancel",
+                },
+                {
+                    text: "Sacar",
+                    style: "destructive",
+                    onPress: () => realizarSaque(valor, carteiraFilho),
+                },
+            ]
+        );
+    }
+
     const usuarioEhPai = usuarioLogado?.id_tipo === 1;
     const usuarioEhFilho = usuarioLogado?.id_tipo === 2;
 
@@ -326,6 +425,19 @@ export default function Cofrinho() {
                                             <Text style={styles.valorFilho}>
                                                 {formatarValor(saldo)}
                                             </Text>
+
+                                            <TouchableOpacity
+                                                style={styles.botaoSacar}
+                                                onPress={() =>
+                                                    abrirSaque(filho)
+                                                }
+                                            >
+                                                <Text
+                                                    style={styles.botaoSacarTexto}
+                                                >
+                                                    Sacar
+                                                </Text>
+                                            </TouchableOpacity>
                                         </View>
                                     </View>
                                 );
@@ -452,6 +564,55 @@ export default function Cofrinho() {
                     })
                 )}
             </ScrollView>
+
+            <Modal
+                visible={!!filhoSaque}
+                transparent
+                animationType="fade"
+                onRequestClose={fecharSaque}
+            >
+                <View style={styles.modalFundo}>
+                    <View style={styles.modalCard}>
+                        <Text style={styles.modalTitulo}>Sacar dinheiro</Text>
+
+                        <Text style={styles.modalTexto}>
+                            {filhoSaque
+                                ? `Saldo de ${filhoSaque.nome}: ${formatarValor(
+                                    obterSaldoUsuario(filhoSaque.id_usuario)
+                                )}`
+                                : ""}
+                        </Text>
+
+                        <TextInput
+                            style={styles.inputSaque}
+                            placeholder="Valor do saque"
+                            keyboardType="decimal-pad"
+                            value={valorSaque}
+                            onChangeText={setValorSaque}
+                        />
+
+                        <View style={styles.modalBotoes}>
+                            <TouchableOpacity
+                                style={styles.botaoCancelar}
+                                onPress={fecharSaque}
+                            >
+                                <Text style={styles.botaoCancelarTexto}>
+                                    Cancelar
+                                </Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                style={styles.botaoConfirmar}
+                                onPress={confirmarSaque}
+                            >
+                                <Text style={styles.botaoConfirmarTexto}>
+                                    Sacar
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
         </SafeAreaView>
     );
 }

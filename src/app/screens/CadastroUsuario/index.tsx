@@ -82,7 +82,7 @@ export default function TelaCadastro() {
       return false;
     }
 
-    const errosSenha = obterErrosSenha(senha);
+    const errosSenha = senhaValida(senha);
 
     if (errosSenha.length > 0) {
       Alert.alert(

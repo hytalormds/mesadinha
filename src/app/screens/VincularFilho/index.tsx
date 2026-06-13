@@ -96,11 +96,6 @@ export default function VincularFilho() {
                     setUsuarioLogado(usuario);
 
                     if (usuario.id_tipo !== 1) {
-                        Alert.alert(
-                            "Acesso negado",
-                            "Somente o responsável pode cadastrar filhos."
-                        );
-
                         navigation.reset({
                             index: 0,
                             routes: [

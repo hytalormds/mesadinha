@@ -131,6 +131,23 @@ export default StyleSheet.create({
         marginTop: 4,
     },
 
+    botaoSacar: {
+        marginTop: 8,
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 8,
+        backgroundColor: "#fff5f5",
+        borderWidth: 1,
+        borderColor: "#ffd6d6",
+        alignItems: "center",
+    },
+
+    botaoSacarTexto: {
+        color: "#dc3545",
+        fontSize: 12,
+        fontWeight: "700",
+    },
+
     cardSaldo: {
         backgroundColor: "#ffffff",
         borderRadius: 18,
@@ -236,5 +253,73 @@ export default StyleSheet.create({
         fontSize: 15,
         fontWeight: "800",
         color: "#dc3545",
+    },
+
+    modalFundo: {
+        flex: 1,
+        backgroundColor: "rgba(0, 0, 0, 0.45)",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 20,
+    },
+
+    modalCard: {
+        width: "100%",
+        backgroundColor: "#ffffff",
+        borderRadius: 14,
+        padding: 20,
+    },
+
+    modalTitulo: {
+        fontSize: 20,
+        fontWeight: "700",
+        color: "#1a1a1a",
+        marginBottom: 8,
+    },
+
+    modalTexto: {
+        fontSize: 14,
+        color: "#666666",
+        marginBottom: 14,
+    },
+
+    inputSaque: {
+        height: 48,
+        borderWidth: 1,
+        borderColor: "#dddddd",
+        borderRadius: 8,
+        paddingHorizontal: 12,
+        fontSize: 15,
+        marginBottom: 16,
+    },
+
+    modalBotoes: {
+        flexDirection: "row",
+        justifyContent: "flex-end",
+        gap: 10,
+    },
+
+    botaoCancelar: {
+        paddingHorizontal: 14,
+        paddingVertical: 10,
+        borderRadius: 8,
+        backgroundColor: "#f1f3f5",
+    },
+
+    botaoCancelarTexto: {
+        color: "#555555",
+        fontWeight: "700",
+    },
+
+    botaoConfirmar: {
+        paddingHorizontal: 14,
+        paddingVertical: 10,
+        borderRadius: 8,
+        backgroundColor: "#dc3545",
+    },
+
+    botaoConfirmarTexto: {
+        color: "#ffffff",
+        fontWeight: "700",
     },
 });

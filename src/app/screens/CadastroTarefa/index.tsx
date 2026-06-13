@@ -19,7 +19,7 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import styles from "./styles";
 import { Button } from "@/componentes/Button";
-import { SeletorFilho } from "@/componentes/SeletorFilho";
+import { SeletorFilho } from "@/componentes/SeletorFIlho";
 import type {
     RootStackParamList,
     Usuario,
