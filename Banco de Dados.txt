@@ -1,0 +1,79 @@
+tipo_usuario (
+  id_tipo INTEGER PK AUTOINCREMENT,
+  descricao VARCHAR NOT NULL UNIQUE
+)
+
+usuarios (
+  id_usuario INTEGER PK AUTOINCREMENT,
+  nome VARCHAR(50) NOT NULL,
+  email VARCHAR NOT NULL UNIQUE,
+  senha VARCHAR NOT NULL,
+  id_tipo INTEGER NOT NULL FK -> tipo_usuario(id_tipo)
+)
+
+familia (
+  id_familia INTEGER PK AUTOINCREMENT,
+  nome VARCHAR NOT NULL,
+  codigo_convite VARCHAR NOT NULL UNIQUE,
+  fk_usuario_responsavel INTEGER NOT NULL FK -> usuarios(id_usuario)
+)
+
+usuario_familia (
+  id_usuario_familia INTEGER PK AUTOINCREMENT,
+  fk_usuario_id INTEGER NOT NULL FK -> usuarios(id_usuario),
+  fk_familia_id INTEGER NOT NULL FK -> familia(id_familia),
+  papel VARCHAR NOT NULL -- "responsavel" ou "crianca"
+)
+
+carteira (
+  id_carteira INTEGER PK AUTOINCREMENT,
+  saldo REAL NOT NULL DEFAULT 0,
+  fk_usuario_id INTEGER NOT NULL UNIQUE FK -> usuarios(id_usuario)
+)
+
+status_tarefa (
+  id_status INTEGER PK AUTOINCREMENT,
+  descricao VARCHAR NOT NULL UNIQUE
+)
+
+tarefa (
+  id_tarefa INTEGER PK AUTOINCREMENT,
+  valor_recompensa REAL NOT NULL,
+  data_limite DATETIME NULL,
+  titulo VARCHAR NOT NULL,
+  descricao VARCHAR NULL,
+  fk_status_tarefa INTEGER NOT NULL FK -> status_tarefa(id_status),
+  fk_usuario_responsavel INTEGER NOT NULL FK -> usuarios(id_usuario),
+  fk_usuario_crianca INTEGER NOT NULL FK -> usuarios(id_usuario),
+  fk_familia_id INTEGER NOT NULL FK -> familia(id_familia)
+)
+
+movimentacao (
+  id_movimentacao INTEGER PK AUTOINCREMENT,
+  tipo_movimentacao VARCHAR NOT NULL CHECK ('entrada', 'saida'),
+  data DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  valor REAL NOT NULL,
+  fk_tarefa_id INTEGER NULL FK -> tarefa(id_tarefa),
+  fk_carteira_id INTEGER NOT NULL FK -> carteira(id_carteira)
+)
+
+tipo_usuario 1:N usuarios
+usuarios 1:1 carteira
+usuarios 1:N familia, como responsável
+usuarios N:N familia, via usuario_familia
+familia 1:N tarefa
+usuarios 1:N tarefa, como responsável
+usuarios 1:N tarefa, como criança
+status_tarefa 1:N tarefa
+carteira 1:N movimentacao
+tarefa 1:N movimentacao
+
+tipo_usuario:
+1 - Responsável
+2 - Dependente
+
+status_tarefa:
+1 - Concluída
+2 - Em Andamento
+3 - Em Aberto
+4 - Expirado

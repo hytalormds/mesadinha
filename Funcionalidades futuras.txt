@@ -1,0 +1,2 @@
+Funcionalidades futuras:
+- responsável escrever motivo de recusar uma tarefa
