@@ -37,6 +37,8 @@ import {
     formatarDataDigitada,
     dataValida,
 } from "@/utils/datas";
+
+import { validarCadastroTarefa } from "@/services/cadastroTarefaService";
 const LIMITE_DESCRICAO = 250;
 
 const USUARIOS_STORAGE_KEY = STORAGE_KEYS.usuarios;
@@ -161,41 +163,15 @@ export default function CadastroTarefa() {
     }, []);
 
     function validarFormulario() {
-        if (!usuarioResponsavelId) {
-            Alert.alert("Atenção", "Selecione o filho responsável pela tarefa.");
-            return false;
-        }
+        const resultado = validarCadastroTarefa({
+            titulo,
+            descricao,
+            dataLimite,
+            valorRecompensa: valor_recompensa,
+        });
 
-        if (!titulo.trim()) {
-            Alert.alert("Atenção", "Digite o título da tarefa.");
-            return false;
-        }
-
-        if (!descricao.trim()) {
-            Alert.alert("Atenção", "Digite a descrição da tarefa.");
-            return false;
-        }
-
-        if (!valor_recompensa.trim()) {
-            Alert.alert("Atenção", "Digite o valor da recompensa.");
-            return false;
-        }
-
-        if (converterMoedaParaNumero(valor_recompensa) <= 0) {
-            Alert.alert("Atenção", "Digite um valor de recompensa válido.");
-            return false;
-        }
-
-        if (!dataLimite.trim()) {
-            Alert.alert("Atenção", "Digite a data limite da tarefa.");
-            return false;
-        }
-
-        if (!dataValida(dataLimite)) {
-            Alert.alert(
-                "Atenção",
-                "Digite uma data válida no formato DD/MM/AAAA."
-            );
+        if (!resultado.valido) {
+            Alert.alert("Atenção", resultado.mensagem);
             return false;
         }
 

@@ -32,6 +32,7 @@ import type {
     Carteira,
     Movimentacao,
 } from "@/types/navigation";
+
 import { STORAGE_KEYS } from "@/constants/storageKeys";
 import {
     buscarItem,
@@ -44,7 +45,6 @@ import {
 } from "@/services/tarefaService";
 import { creditarValorNaCarteira } from "@/services/carteiraService";
 import { criarMovimentacaoEntrada } from "@/services/movimentacaoService";
-
 
 const STORAGE_KEY = STORAGE_KEYS.tarefas;
 const USUARIO_LOGADO_STORAGE_KEY = STORAGE_KEYS.usuarioLogado;
@@ -246,34 +246,6 @@ export default function ListaTarefas() {
                 },
             },
         ]);
-    }
-
-    function converterDataBRParaDate(dataBR?: string) {
-        if (!dataBR) {
-            return null;
-        }
-
-        const partes = dataBR.split("/");
-
-        if (partes.length !== 3) {
-            return null;
-        }
-
-        const dia = Number(partes[0]);
-        const mes = Number(partes[1]) - 1;
-        const ano = Number(partes[2]);
-
-        const data = new Date(ano, mes, dia);
-
-        if (
-            data.getFullYear() !== ano ||
-            data.getMonth() !== mes ||
-            data.getDate() !== dia
-        ) {
-            return null;
-        }
-
-        return data;
     }
 
     function alterarStatusTarefa(id: string, novoStatus: StatusTarefa) {
