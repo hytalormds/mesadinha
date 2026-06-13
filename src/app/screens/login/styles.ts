@@ -83,6 +83,34 @@ export default StyleSheet.create({
     backgroundColor: "#f0f7ff",
   },
 
+  passwordContainer: {
+    width: "100%",
+    height: 44,
+    borderWidth: 1.5,
+    borderColor: "#e0e0e0",
+    borderRadius: 10,
+    paddingLeft: 14,
+    paddingRight: 8,
+    backgroundColor: "#ffffff",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  passwordInput: {
+    flex: 1,
+    height: "100%",
+    fontSize: 15,
+    color: "#1a1a1a",
+    fontFamily: "System",
+  },
+
+  eyeButton: {
+    width: 36,
+    height: 36,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
   button: {
     width: "100%",
     height: 48,

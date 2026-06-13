@@ -21,6 +21,7 @@ import styles from "./styles";
 
 const USUARIOS_STORAGE_KEY = "@mesadinha:usuarios";
 const USUARIO_LOGADO_STORAGE_KEY = "@mesadinha:usuario_logado";
+const EMAILS_TESTE = ["pai@mesadinha.com", "samuel@mesadinha.com"];
 
 export default function VincularFilho() {
     const navigation =
@@ -34,6 +35,7 @@ export default function VincularFilho() {
     const [carregouFilhos, setCarregouFilhos] = React.useState(false);
     const [usuarioLogado, setUsuarioLogado] = React.useState<Usuario | null>(null);
     const [senha, setSenha] = React.useState("");
+    const [mostrarSenha, setMostrarSenha] = React.useState(false);
     React.useEffect(() => {
         async function carregarFilhos() {
             try {
@@ -124,6 +126,28 @@ export default function VincularFilho() {
 
         carregarUsuarioLogado();
     }, []);
+    function senhaValida(valor: string) {
+        const erros = [];
+
+        if (valor.length < 8) {
+            erros.push("mínimo de 8 caracteres");
+        }
+
+        if (!/[0-9]/.test(valor)) {
+            erros.push("um número");
+        }
+
+        if (!/[A-Z]/.test(valor)) {
+            erros.push("uma letra maiúscula");
+        }
+
+        if (!/[^A-Za-z0-9]/.test(valor)) {
+            erros.push("um caractere especial");
+        }
+
+        return erros;
+    }
+
     function validarFormulario() {
         if (!nome.trim()) {
             Alert.alert("Atenção", "Digite o nome do filho.");
@@ -135,8 +159,33 @@ export default function VincularFilho() {
             return false;
         }
 
+        if (!email.includes("@")) {
+            Alert.alert("Atenção", "O e-mail precisa ter @.");
+            return false;
+        }
+
         if (!senha.trim()) {
             Alert.alert("Atenção", "Digite a senha do filho.");
+            return false;
+        }
+
+        const errosSenha = senhaValida(senha);
+
+        if (errosSenha.length > 0) {
+            Alert.alert(
+                "Senha inválida",
+                `A senha precisa ter:\n- ${errosSenha.join("\n- ")}`
+            );
+            return false;
+        }
+
+        const emailDigitado = email.trim().toLowerCase();
+        const emailJaCadastrado =
+            EMAILS_TESTE.includes(emailDigitado) ||
+            filhos.some((filho) => filho.email.toLowerCase() === emailDigitado);
+
+        if (emailJaCadastrado) {
+            Alert.alert("Atenção", "Este e-mail já está cadastrado.");
             return false;
         }
 
@@ -229,13 +278,26 @@ export default function VincularFilho() {
                     />
                     <Text style={styles.label}>Senha</Text>
 
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Digite uma senha para o filho"
-                        value={senha}
-                        onChangeText={setSenha}
-                        secureTextEntry
-                    />
+                    <View style={styles.passwordContainer}>
+                        <TextInput
+                            style={styles.passwordInput}
+                            placeholder="Digite uma senha para o filho"
+                            value={senha}
+                            onChangeText={setSenha}
+                            secureTextEntry={!mostrarSenha}
+                        />
+
+                        <TouchableOpacity
+                            style={styles.eyeButton}
+                            onPress={() => setMostrarSenha(!mostrarSenha)}
+                        >
+                            <MaterialIcons
+                                name={mostrarSenha ? "visibility-off" : "visibility"}
+                                size={22}
+                                color="#666666"
+                            />
+                        </TouchableOpacity>
+                    </View>
                     <Text style={styles.label}>E-mail</Text>
 
                     <TextInput

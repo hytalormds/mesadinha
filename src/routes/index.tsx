@@ -2,10 +2,10 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { MaterialIcons } from "@expo/vector-icons";
 
-import Login from "@/app/screens/Login";
+import Login from "@/app/screens/login";
 import TelaCadastro from "@/app/screens/CadastroUsuario";
 import CadastroTarefa from "@/app/screens/CadastroTarefa";
-import VincularFilho from "@/app/screens/VincularFilho";
+import VincularFilho from "@/app/screens/vincularFIlho";
 import ListaTarefas from "@/app/screens/ListaTarefas";
 import Cofrinho from "@/app/screens/Cofrinho";
 import type { RootStackParamList } from "@/types/navigation";
@@ -17,6 +17,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 export default function Routes() {
     return (
         <Stack.Navigator
+            id="RootStack"
             initialRouteName="Login"
             screenOptions={{
                 headerShown: true,
