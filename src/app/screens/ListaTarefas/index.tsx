@@ -19,6 +19,8 @@ import { Button } from "@/componentes/Button";
 import { ButtonIcon } from "@/componentes/ButtonIcon";
 import { Title } from "@/componentes/Title";
 import { StatusBadge } from "@/componentes/StatusBadge";
+import { EmptyState } from "@/componentes/EmptyState";
+
 import {
     FiltroStatus,
     type FiltroStatusTarefa,
@@ -332,10 +334,11 @@ export default function ListaTarefas() {
     if (!usuarioLogado) {
         return (
             <SafeAreaView style={styles.safeArea}>
-                <View style={styles.cardVazio}>
-                    <Text style={styles.textoVazio}>
-                        Carregando usuário...
-                    </Text>
+                <View style={styles.containerForm}>
+                    <EmptyState
+                        icon="person-outline"
+                        title="Carregando usuário..."
+                    />
                 </View>
             </SafeAreaView>
         );
@@ -463,29 +466,23 @@ export default function ListaTarefas() {
                             />
 
                             {tarefasFiltradas.length === 0 ? (
-                                <View style={styles.cardVazio}>
-                                    <MaterialIcons
-                                        name="assignment"
-                                        size={42}
-                                        color="#999"
-                                    />
-
-                                    <Text style={styles.textoVazio}>
-                                        {tarefasPermitidas.length === 0
+                                <EmptyState
+                                    icon="assignment"
+                                    title={
+                                        tarefasPermitidas.length === 0
                                             ? usuarioEhPai
                                                 ? "Não há tarefa cadastrada."
                                                 : "Você ainda não possui tarefas vinculadas."
-                                            : `Não há tarefa com status ${filtroStatus}.`}
-                                    </Text>
-
-                                    <Text style={styles.textoVazioDescricao}>
-                                        {tarefasPermitidas.length === 0
+                                            : `Não há tarefa com status ${filtroStatus}.`
+                                    }
+                                    description={
+                                        tarefasPermitidas.length === 0
                                             ? usuarioEhPai
                                                 ? 'Clique no botão "Adicionar Nova Tarefa" para criar sua primeira tarefa.'
                                                 : "Aguarde o responsável cadastrar uma tarefa para você."
-                                            : "Altere o filtro acima para visualizar outras tarefas."}
-                                    </Text>
-                                </View>
+                                            : "Altere o filtro acima para visualizar outras tarefas."
+                                    }
+                                />
                             ) : (
                                 tarefasFiltradas.map((tarefa, index) => {
                                     const statusAtual =

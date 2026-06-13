@@ -27,31 +27,6 @@ export default StyleSheet.create({
         paddingBottom: 20,
     },
 
-    cardVazio: {
-        minHeight: 180,
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: "#e8edf3",
-        backgroundColor: "#f8fbff",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: 20,
-    },
-
-    textoVazio: {
-        marginTop: 10,
-        fontSize: 15,
-        color: "#777",
-        textAlign: "center",
-    },
-
-    textoVazioDescricao: {
-        marginTop: 6,
-        fontSize: 13,
-        color: "#888",
-        textAlign: "center",
-    },
-
     cardTarefa: {
         backgroundColor: "#fff",
         borderRadius: 12,

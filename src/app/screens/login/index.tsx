@@ -30,7 +30,7 @@ const USUARIO_LOGADO_STORAGE_KEY = STORAGE_KEYS.usuarioLogado;
 
 const USUARIO_PAI_TESTE: Usuario = {
   id_usuario: "1",
-  nome: "Responsável",
+  nome: "Pai",
   email: "pai@mesadinha.com",
   senha: "123456",
   id_tipo: 1,
