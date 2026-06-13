@@ -165,40 +165,6 @@ export default StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
     },
-    filtrosContainer: {
-        width: "100%",
-        marginTop: 8,
-        marginBottom: 16,
-    },
-
-    filtrosScroll: {
-        gap: 8,
-        paddingRight: 8,
-    },
-
-    filtroBotao: {
-        paddingVertical: 9,
-        paddingHorizontal: 15,
-        borderRadius: 18,
-        backgroundColor: "#f4f6f8",
-        borderWidth: 1,
-        borderColor: "#e1e5ea",
-    },
-
-    filtroBotaoAtivo: {
-        backgroundColor: "#007BFF",
-        borderColor: "#007BFF",
-    },
-
-    filtroTexto: {
-        color: "#555",
-        fontSize: 13,
-        fontWeight: "700",
-    },
-
-    filtroTextoAtivo: {
-        color: "#ffffff",
-    },
 
     statusPendente: {
         backgroundColor: "#ffc107",

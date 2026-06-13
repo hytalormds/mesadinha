@@ -19,6 +19,10 @@ import { Button } from "@/componentes/Button";
 import { ButtonIcon } from "@/componentes/ButtonIcon";
 import { Title } from "@/componentes/Title";
 import { StatusBadge } from "@/componentes/StatusBadge";
+import {
+    FiltroStatus,
+    type FiltroStatusTarefa,
+} from "@/componentes/FiltroStatus";
 import type {
     RootStackParamList,
     Tarefa,
@@ -47,7 +51,7 @@ const USUARIO_LOGADO_STORAGE_KEY = STORAGE_KEYS.usuarioLogado;
 const CARTEIRAS_STORAGE_KEY = STORAGE_KEYS.carteiras;
 const MOVIMENTACOES_STORAGE_KEY = STORAGE_KEYS.movimentacoes;
 
-type FiltroStatus = StatusTarefa | "Todas";
+type FiltroStatus = FiltroStatusTarefa;
 
 export default function ListaTarefas() {
     const route = useRoute<RouteProp<RootStackParamList, "ListaTarefas">>();
@@ -310,16 +314,6 @@ export default function ListaTarefas() {
         );
     }
 
-    const filtrosStatus: FiltroStatus[] = [
-        "Todas",
-        "Em Aberto",
-        "Em Andamento",
-        "Aguardando Aprovação",
-        "Concluída",
-        "Recusada",
-        "Expirado",
-    ];
-
     const usuarioEhPai = usuarioLogado?.id_tipo === 1;
     const usuarioEhFilho = usuarioLogado?.id_tipo === 2;
 
@@ -463,37 +457,10 @@ export default function ListaTarefas() {
                         </View>
 
                         <View style={styles.containerForm}>
-                            <View style={styles.filtrosContainer}>
-                                <ScrollView
-                                    horizontal
-                                    showsHorizontalScrollIndicator={false}
-                                    contentContainerStyle={styles.filtrosScroll}
-                                >
-                                    {filtrosStatus.map((status) => (
-                                        <TouchableOpacity
-                                            key={status}
-                                            style={[
-                                                styles.filtroBotao,
-                                                filtroStatus === status &&
-                                                styles.filtroBotaoAtivo,
-                                            ]}
-                                            onPress={() =>
-                                                setFiltroStatus(status)
-                                            }
-                                        >
-                                            <Text
-                                                style={[
-                                                    styles.filtroTexto,
-                                                    filtroStatus === status &&
-                                                    styles.filtroTextoAtivo,
-                                                ]}
-                                            >
-                                                {status}
-                                            </Text>
-                                        </TouchableOpacity>
-                                    ))}
-                                </ScrollView>
-                            </View>
+                            <FiltroStatus
+                                statusSelecionado={filtroStatus}
+                                onSelecionarStatus={setFiltroStatus}
+                            />
 
                             {tarefasFiltradas.length === 0 ? (
                                 <View style={styles.cardVazio}>
