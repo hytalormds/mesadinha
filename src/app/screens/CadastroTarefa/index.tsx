@@ -8,22 +8,21 @@ import {
     KeyboardAvoidingView,
     Platform,
     Alert,
-    TouchableOpacity,
 } from "react-native";
 import {
     useNavigation,
     useRoute,
     useFocusEffect,
 } from "@react-navigation/native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { buscarItem } from "@/services/storageService";
 import type { RouteProp } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import styles from "./styles";
 import { Button } from "@/componentes/Button";
+import { SeletorFilho } from "@/componentes/SeletorFIlho";
 import type {
     RootStackParamList,
-    Tarefa,
     Usuario,
 } from "@/types/navigation";
 import { STORAGE_KEYS } from "@/constants/storageKeys";
@@ -35,10 +34,9 @@ import {
 
 import {
     formatarDataDigitada,
-    dataValida,
 } from "@/utils/datas";
 
-import { validarCadastroTarefa } from "@/services/cadastroTarefaService";
+import { validarCadastroTarefa, montarTarefaCadastro } from "@/services/cadastroTarefaService";
 const LIMITE_DESCRICAO = 250;
 
 const USUARIOS_STORAGE_KEY = STORAGE_KEYS.usuarios;
@@ -63,21 +61,15 @@ export default function CadastroTarefa() {
     const [usuarioLogado, setUsuarioLogado] = React.useState<Usuario | null>(null);
     async function carregarFilhos() {
         try {
-            const usuariosSalvos = await AsyncStorage.getItem(
+            const usuarios = await buscarItem<Usuario[]>(
                 USUARIOS_STORAGE_KEY
             );
 
-            if (usuariosSalvos) {
-                const usuarios: Usuario[] = JSON.parse(usuariosSalvos);
+            const filhos = (usuarios ?? []).filter(
+                (usuario) => usuario.id_tipo === 2
+            );
 
-                const filhos = usuarios.filter(
-                    (usuario) => usuario.id_tipo === 2
-                );
-
-                setFilhosCadastrados(filhos);
-            } else {
-                setFilhosCadastrados([]);
-            }
+            setFilhosCadastrados(filhos);
         } catch (error) {
             console.log("Erro ao carregar filhos:", error);
             setFilhosCadastrados([]);
@@ -116,12 +108,11 @@ export default function CadastroTarefa() {
     React.useEffect(() => {
         async function carregarUsuarioLogado() {
             try {
-                const usuarioSalvo = await AsyncStorage.getItem(
+                const usuario = await buscarItem<Usuario>(
                     USUARIO_LOGADO_STORAGE_KEY
                 );
 
-                if (usuarioSalvo) {
-                    const usuario: Usuario = JSON.parse(usuarioSalvo);
+                if (usuario) {
 
                     setUsuarioLogado(usuario);
 
@@ -205,24 +196,15 @@ export default function CadastroTarefa() {
             return;
         }
 
-        const tarefaSalva: Tarefa = {
-            id: tarefaEditando?.id ?? String(Date.now()),
-            id_tarefa: tarefaEditando?.id_tarefa,
+        const tarefaSalva = montarTarefaCadastro({
+            tarefaEditando,
             titulo,
             descricao,
             dataLimite,
-            valor_recompensa: converterMoedaParaNumero(valor_recompensa),
-            concluida: tarefaEditando?.concluida ?? false,
-            status: tarefaEditando?.status ?? "Em Aberto",
-
-            fk_usuario_responsavel: usuarioLogado.id_usuario,
-            nome_usuario_responsavel: usuarioLogado.nome,
-
-            fk_usuario_crianca: criancaSelecionada.id_usuario,
-            nome_usuario_crianca: criancaSelecionada.nome,
-
-            fk_familia_id: tarefaEditando?.fk_familia_id,
-        };
+            valorRecompensa: valor_recompensa,
+            usuarioResponsavel: usuarioLogado,
+            usuarioCrianca: criancaSelecionada,
+        });
 
         navigation.reset({
             index: 0,
@@ -253,57 +235,16 @@ export default function CadastroTarefa() {
                     <View style={styles.containerForm}>
                         <Text style={styles.label}>Filho responsável</Text>
 
-                        {filhosCadastrados.length === 0 ? (
-                            <View style={styles.semFilhosContainer}>
-                                <Text style={styles.semFilhosTexto}>
-                                    Nenhum filho cadastrado.
-                                </Text>
-
-                                <TouchableOpacity
-                                    style={styles.botaoCadastrarFilho}
-                                    onPress={() =>
-                                        navigation.navigate("MainTabs", {
-                                            screen: "VincularFilho",
-                                        })
-                                    }
-                                >
-                                    <Text style={styles.botaoCadastrarFilhoTexto}>
-                                        Cadastrar Filho
-                                    </Text>
-                                </TouchableOpacity>
-                            </View>
-                        ) : (
-                            <View style={styles.filhosContainer}>
-                                {filhosCadastrados.map((usuario) => {
-                                    const selecionado =
-                                        usuarioResponsavelId === usuario.id_usuario;
-
-                                    return (
-                                        <TouchableOpacity
-                                            key={usuario.id_usuario}
-                                            style={[
-                                                styles.filhoCard,
-                                                selecionado &&
-                                                styles.filhoCardSelecionado,
-                                            ]}
-                                            onPress={() =>
-                                                setUsuarioResponsavelId(usuario.id_usuario)
-                                            }
-                                        >
-                                            <Text
-                                                style={[
-                                                    styles.filhoNome,
-                                                    selecionado &&
-                                                    styles.filhoNomeSelecionado,
-                                                ]}
-                                            >
-                                                {usuario.nome}
-                                            </Text>
-                                        </TouchableOpacity>
-                                    );
-                                })}
-                            </View>
-                        )}
+                        <SeletorFilho
+                            filhos={filhosCadastrados}
+                            filhoSelecionadoId={usuarioResponsavelId}
+                            onSelecionarFilho={setUsuarioResponsavelId}
+                            onCadastrarFilho={() =>
+                                navigation.navigate("MainTabs", {
+                                    screen: "VincularFilho",
+                                })
+                            }
+                        />
                         <Text style={styles.label}>Título</Text>
 
                         <TextInput
