@@ -6,6 +6,7 @@ import { sign } from "jsonwebtoken";
 import { AuthReponse } from "../interfaces/authResponse";
 import { UnauthenticatedError } from "../../../shared/errors/unauthenticated.error";
 import { ForbiddenError } from "../../../shared/errors/forbidden.error";
+import { User } from "../../../infra/database/typeorm/mesadinha/entities/User";
 
 export class RegisterUseCase {
   private authRepository: UserTypeormRepository;
@@ -91,7 +92,7 @@ export class RegisterChildUseCase {
   }: {
     child: CreateUserParams;
     familiaId?: number;
-  }): Promise<AuthReponse> {
+  }): Promise<User> {
     if (!familiaId) {
       throw new ForbiddenError("Responsavel sem familia cadastrada");
     }
@@ -116,9 +117,6 @@ export class RegisterChildUseCase {
 
     delete userCreated.password;
 
-    return {
-      token: "",
-      user: userCreated,
-    };
+    return userCreated;
   }
 }

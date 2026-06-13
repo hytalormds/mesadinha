@@ -19,7 +19,10 @@ export class UpdateTarefaUseCase {
       throw new NotFoundError("Tarefa não encontrada");
     }
 
-    if (tarefa.fkUsuarioResponsavel !== params.userId) {
+    if (
+      tarefa.fkUsuarioResponsavel !== params.userId ||
+      (params.familiaId && tarefa.fkFamiliaId !== params.familiaId)
+    ) {
       throw new NotFoundError("Tarefa não encontrada para o usuário");
     }
 

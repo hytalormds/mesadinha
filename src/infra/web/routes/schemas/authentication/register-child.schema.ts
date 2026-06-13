@@ -11,9 +11,7 @@ export const registerChildSchema: FastifySchema = {
   body,
   security: [{ bearerAuth: [] }],
   response: {
-    201: S.object()
-      .prop("user", S.ref("User#"))
-      .prop("token", S.string()),
+    201: S.object().prop("user", S.ref("User#")),
     401: {
       $ref: "Unauthorized#",
     },

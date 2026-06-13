@@ -23,6 +23,6 @@ export class RegisterChildController {
       familiaId: request.user.familiaId,
     });
 
-    reply.status(201).send(child);
+    reply.status(201).send({ user: child });
   };
 }

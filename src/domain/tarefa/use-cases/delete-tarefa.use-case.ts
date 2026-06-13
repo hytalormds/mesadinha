@@ -13,6 +13,7 @@ export class DeleteTarefaUseCase {
   async execute({
     idTarefa,
     userId,
+    familiaId,
   }: {
     idTarefa: number;
     userId: number;
@@ -24,7 +25,10 @@ export class DeleteTarefaUseCase {
       throw new NotFoundError(`Tarefa com ID ${idTarefa} não encontrada!`);
     }
 
-    if (tarefa.fkUsuarioResponsavel !== userId) {
+    if (
+      tarefa.fkUsuarioResponsavel !== userId ||
+      (familiaId && tarefa.fkFamiliaId !== familiaId)
+    ) {
       throw new UnauthenticatedError(
         "Sem autorização para excluir esta tarefa!",
       );

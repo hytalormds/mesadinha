@@ -26,11 +26,11 @@ export class CheckAuthtenticationMiddleware {
       throw new UnauthenticatedError("Nao possui token");
     }
 
-    const { email } = jwt.verify(token, process.env.APP_SCRETET_KEY) as {
-      email: string;
-    };
-
     try {
+      const { email } = jwt.verify(token, process.env.APP_SCRETET_KEY) as {
+        email: string;
+      };
+
       const user = await this.authRepository.findByEmail(email);
       if (!user) {
         throw new UnauthenticatedError("Usuario nao encontrado");
