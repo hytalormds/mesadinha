@@ -1,6 +1,6 @@
 import "fastify";
-import { User } from "../infra/database/typeorm/dt-money/entities/User";
-import { PapelFamilia } from "../infra/database/typeorm/dt-money/entities/UsuarioFamilia";
+import { User } from "../infra/database/typeorm/mesadinha/entities/User";
+import { PapelFamilia } from "../infra/database/typeorm/mesadinha/entities/UsuarioFamilia";
 
 declare module "fastify" {
   interface FastifyRequest {

@@ -1,4 +1,4 @@
-import { UserTypeormRepository } from "../../../infra/database/typeorm/dt-money/repositories/user.repository";
+import { UserTypeormRepository } from "../../../infra/database/typeorm/mesadinha/repositories/user.repository";
 import { CreateUserParams } from "../repositoryInterface/user-repository.interface";
 import { hashSync } from "bcrypt";
 import { sign } from "jsonwebtoken";

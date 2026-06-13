@@ -1,4 +1,4 @@
-import { UserTypeormRepository } from "../../../infra/database/typeorm/dt-money/repositories/user.repository";
+import { UserTypeormRepository } from "../../../infra/database/typeorm/mesadinha/repositories/user.repository";
 import { compare } from "bcrypt";
 import { sign } from "jsonwebtoken";
 import { AuthLoginRequest } from "../interfaces/authLoginRequest";

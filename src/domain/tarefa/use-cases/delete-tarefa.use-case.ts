@@ -1,4 +1,4 @@
-import { TarefaRepository } from "../../../infra/database/typeorm/dt-money/repositories/tarefa.repository";
+import { TarefaRepository } from "../../../infra/database/typeorm/mesadinha/repositories/tarefa.repository";
 import { NotFoundError } from "../../../shared/errors/not-found.error";
 import { UnauthenticatedError } from "../../../shared/errors/unauthenticated.error";
 import { TarefaRepositoryInterface } from "../repositoryInterface/tarefa-repository.interface";
@@ -10,7 +10,14 @@ export class DeleteTarefaUseCase {
     this.tarefaRepository = new TarefaRepository();
   }
 
-  async execute({ idTarefa, userId }: { idTarefa: number; userId: number }) {
+  async execute({
+    idTarefa,
+    userId,
+  }: {
+    idTarefa: number;
+    userId: number;
+    familiaId?: number;
+  }) {
     const tarefa = await this.tarefaRepository.findById(idTarefa);
 
     if (!tarefa) {

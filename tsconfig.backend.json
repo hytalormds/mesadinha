@@ -25,9 +25,9 @@
     "src/infra/web/controllers/transaction/**/*",
     "src/infra/web/routes/transaction.routes.ts",
     "src/infra/web/routes/schemas/transactions/**/*",
-    "src/infra/database/typeorm/dt-money/entities/Transaction.ts",
-    "src/infra/database/typeorm/dt-money/entities/TransactionCategory.ts",
-    "src/infra/database/typeorm/dt-money/entities/TransactionType.ts",
-    "src/infra/database/typeorm/dt-money/repositories/transaction.repository.ts"
+    "src/infra/database/typeorm/mesadinha/entities/Transaction.ts",
+    "src/infra/database/typeorm/mesadinha/entities/TransactionCategory.ts",
+    "src/infra/database/typeorm/mesadinha/entities/TransactionType.ts",
+    "src/infra/database/typeorm/mesadinha/repositories/transaction.repository.ts"
   ]
 }

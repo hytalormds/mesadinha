@@ -1,5 +1,5 @@
-import { Tarefa } from "../../../infra/database/typeorm/dt-money/entities/Tarefa";
-import { TarefaRepository } from "../../../infra/database/typeorm/dt-money/repositories/tarefa.repository";
+import { Tarefa } from "../../../infra/database/typeorm/mesadinha/entities/Tarefa";
+import { TarefaRepository } from "../../../infra/database/typeorm/mesadinha/repositories/tarefa.repository";
 import {
   CreateTarefaParams,
   TarefaRepositoryInterface,

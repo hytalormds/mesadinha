@@ -1,5 +1,5 @@
-import { DtMoneyDataSource } from "./typeorm/dt-money/data-source";
-import { SeederService } from "./typeorm/dt-money/seeders";
+import { DtMoneyDataSource } from "./typeorm/mesadinha/data-source";
+import { SeederService } from "./typeorm/mesadinha/seeders";
 
 export const connect = async () => {
   try {

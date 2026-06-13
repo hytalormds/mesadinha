@@ -1,4 +1,4 @@
-import { User } from "../../../infra/database/typeorm/dt-money/entities/User";
+import { User } from "../../../infra/database/typeorm/mesadinha/entities/User";
 
 export interface AuthReponse {
   user: User;

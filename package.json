@@ -11,8 +11,8 @@
     "api:dev": "tsx watch --tsconfig tsconfig.backend.json src/server.ts",
     "api:start": "ts-node -P tsconfig.backend.json src/index.ts",
     "api:typeorm": "typeorm-ts-node-commonjs",
-    "api:migration:run": "npx ts-node -P tsconfig.backend.json ./node_modules/typeorm/cli.js migration:run -d src/infra/database/typeorm/dt-money/data-source.ts",
-    "api:migration:revert": "npx ts-node -P tsconfig.backend.json ./node_modules/typeorm/cli.js migration:revert -d src/infra/database/typeorm/dt-money/data-source.ts"
+    "api:migration:run": "npx ts-node -P tsconfig.backend.json ./node_modules/typeorm/cli.js migration:run -d src/infra/database/typeorm/mesadinha/data-source.ts",
+    "api:migration:revert": "npx ts-node -P tsconfig.backend.json ./node_modules/typeorm/cli.js migration:revert -d src/infra/database/typeorm/mesadinha/data-source.ts"
   },
   "dependencies": {
     "@fastify/cors": "^11.0.0",

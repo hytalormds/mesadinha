@@ -1,7 +1,7 @@
 import { FastifyRequest } from "fastify";
 import jwt from "jsonwebtoken";
-import { FamiliaRepository } from "../../database/typeorm/dt-money/repositories/familia.repository";
-import { UserTypeormRepository } from "../../database/typeorm/dt-money/repositories/user.repository";
+import { FamiliaRepository } from "../../database/typeorm/mesadinha/repositories/familia.repository";
+import { UserTypeormRepository } from "../../database/typeorm/mesadinha/repositories/user.repository";
 import { UnauthenticatedError } from "../../../shared/errors/unauthenticated.error";
 
 export class CheckAuthtenticationMiddleware {

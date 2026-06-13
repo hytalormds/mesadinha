@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { PapelFamilia } from "../../database/typeorm/dt-money/entities/UsuarioFamilia";
+import { PapelFamilia } from "../../database/typeorm/mesadinha/entities/UsuarioFamilia";
 import { ForbiddenError } from "../../../shared/errors/forbidden.error";
 import { UnauthenticatedError } from "../../../shared/errors/unauthenticated.error";
 

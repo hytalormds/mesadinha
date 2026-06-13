@@ -1,9 +1,11 @@
-import { Tarefa } from "../../../infra/database/typeorm/dt-money/entities/Tarefa";
+import { Tarefa } from "../../../infra/database/typeorm/mesadinha/entities/Tarefa";
 import { OrderDirection } from "../../../interfaces/order-direction";
 import { Paginated } from "../../../interfaces/paginated";
 
 export interface GetTarefasParams {
   userId: number;
+  familiaId?: number;
+  papel?: "responsavel" | "crianca";
   pagination?: {
     page: number;
     perPage: number;
@@ -27,6 +29,8 @@ export interface UpdateTarefaParams {
   valorRecompensa?: number;
   dataLimite?: Date;
   fkStatusTarefa?: number;
+  fkUsuarioCrianca?: number;
+  familiaId?: number;
 }
 
 export interface CreateTarefaParams {
@@ -36,6 +40,8 @@ export interface CreateTarefaParams {
   dataLimite?: Date;
   fkStatusTarefa: number;
   userId: number;
+  fkUsuarioCrianca: number;
+  familiaId?: number;
 }
 
 export interface TarefaResumoResponse {
