@@ -6,7 +6,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import Login from "@/app/screens/Login";
 import TelaCadastro from "@/app/screens/CadastroUsuario";
 import CadastroTarefa from "@/app/screens/CadastroTarefa";
-import VincularFilho from "@/app/screens/VincularFilho";
+import VincularFilho from "@/app/screens/VincularFIlho";
 import ListaTarefas from "@/app/screens/ListaTarefas";
 import Cofrinho from "@/app/screens/Cofrinho";
 import Familia from "@/app/screens/Familia";
