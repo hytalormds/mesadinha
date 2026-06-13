@@ -42,6 +42,7 @@ import {
 import {
     obterStatusTarefa,
     tarefaPertenceAoFilhoLogado,
+    validarRecusaTarefa,
 } from "@/services/tarefaService";
 import { creditarValorNaCarteira } from "@/services/carteiraService";
 import { criarMovimentacaoEntrada } from "@/services/movimentacaoService";
@@ -320,7 +321,37 @@ export default function ListaTarefas() {
             ]
         );
     }
+    function confirmarRecusaTarefa(tarefa: Tarefa) {
+        const statusAtual = obterStatusTarefa(tarefa);
 
+        const resultado = validarRecusaTarefa(
+            tarefa,
+            usuarioEhPai,
+            statusAtual
+        );
+
+        if (!resultado.valido) {
+            Alert.alert("Atenção", resultado.mensagem);
+            return;
+        }
+
+        Alert.alert(
+            "Recusar tarefa",
+            "Tem certeza que deseja recusar esta tarefa?",
+            [
+                {
+                    text: "Cancelar",
+                    style: "cancel",
+                },
+                {
+                    text: "Recusar",
+                    style: "destructive",
+                    onPress: () =>
+                        alterarStatusTarefa(tarefa.id, "Recusada"),
+                },
+            ]
+        );
+    }
     const usuarioEhPai = usuarioLogado?.id_tipo === 1;
     const usuarioEhFilho = usuarioLogado?.id_tipo === 2;
 
@@ -347,7 +378,25 @@ export default function ListaTarefas() {
                 </View>
             </SafeAreaView>
         );
+    };
+
+    function confirmarAceiteTarefa(tarefa: Tarefa) {
+        Alert.alert(
+            "Aprovar tarefa",
+            "Tem certeza que deseja aprovar esta tarefa?",
+            [
+                {
+                    text: "Cancelar",
+                    style: "cancel",
+                },
+                {
+                    text: "Aprovar",
+                    onPress: () => aceitarTarefa(tarefa),
+                },
+            ]
+        );
     }
+
     function aceitarTarefa(tarefaSelecionada: Tarefa) {
         const criancaId = String(
             tarefaSelecionada.fk_usuario_crianca ??
@@ -409,24 +458,6 @@ export default function ListaTarefas() {
             "A recompensa foi adicionada ao cofrinho da criança."
         );
     }
-
-    function confirmarAceiteTarefa(tarefa: Tarefa) {
-        Alert.alert(
-            "Aprovar tarefa",
-            "Tem certeza que deseja aprovar esta tarefa?",
-            [
-                {
-                    text: "Cancelar",
-                    style: "cancel",
-                },
-                {
-                    text: "Aprovar",
-                    onPress: () => aceitarTarefa(tarefa),
-                },
-            ]
-        );
-    }
-
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -529,15 +560,13 @@ export default function ListaTarefas() {
                                             }
                                             onExcluir={() => apagarTarefa(tarefa.id)}
                                             onAceitar={() => confirmarAceiteTarefa(tarefa)}
-                                            onRecusar={() =>
-                                                alterarStatusTarefa(tarefa.id, "Recusada")
+                                            onRecusar={() => confirmarRecusaTarefa(tarefa)
                                             }
                                             onIniciar={() =>
                                                 confirmarInicioTarefa(tarefa.id)
                                             }
                                             onEnviarParaAprovacao={() =>
-                                                confirmarFinalizacaoTarefa(tarefa.id)
-                                            }
+                                                confirmarFinalizacaoTarefa(tarefa.id)}
                                         />
                                     );
                                 })

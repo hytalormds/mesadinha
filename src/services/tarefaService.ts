@@ -61,3 +61,35 @@ export function tarefaPertenceAoFilhoLogado(
       nomeCriancaDaTarefa === nomeUsuarioLogado)
   );
 }
+
+export function validarRecusaTarefa(
+  tarefa: Tarefa,
+  usuarioEhPai: boolean,
+  statusAtual: StatusTarefa
+) {
+  if (!usuarioEhPai) {
+    return {
+      valido: false,
+      mensagem: "Somente o responsável pode recusar tarefas.",
+    };
+  }
+
+  if (tarefa.recompensa_creditada || tarefa.concluida) {
+    return {
+      valido: false,
+      mensagem: "Não é possível recusar uma tarefa já concluída.",
+    };
+  }
+
+  if (statusAtual !== "Aguardando Aprovação") {
+    return {
+      valido: false,
+      mensagem:
+        "A tarefa só pode ser recusada quando estiver aguardando aprovação.",
+    };
+  }
+
+  return {
+    valido: true,
+  };
+}

@@ -1,6 +1,5 @@
 import React from "react";
 import { Text, TouchableOpacity } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -12,12 +11,16 @@ import VincularFilho from "@/app/screens/VincularFilho";
 import ListaTarefas from "@/app/screens/ListaTarefas";
 import Cofrinho from "@/app/screens/Cofrinho";
 import Familia from "@/app/screens/Familia";
+
 import { STORAGE_KEYS } from "@/constants/storageKeys";
+import { buscarItem } from "@/services/storageService";
+
 import type {
   MainTabParamList,
   RootStackParamList,
   Usuario,
 } from "@/types/navigation";
+
 import styles from "./styles";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -30,13 +33,9 @@ function MainTabs() {
 
   React.useEffect(() => {
     async function carregarUsuario() {
-      const usuarioSalvo = await AsyncStorage.getItem(
-        STORAGE_KEYS.usuarioLogado,
-      );
+      const usuario = await buscarItem<Usuario>(STORAGE_KEYS.usuarioLogado);
 
-      if (usuarioSalvo) {
-        setUsuarioLogado(JSON.parse(usuarioSalvo));
-      }
+      setUsuarioLogado(usuario);
     }
 
     carregarUsuario();
@@ -56,20 +55,6 @@ function MainTabs() {
           height: 82,
           paddingTop: 8,
           paddingBottom: 22,
-        },
-        tabBarButton: (props) => {
-          const abaFilhosBloqueada =
-            route.name === "VincularFilho" && usuarioEhFilho;
-          const { ref, ...buttonProps } = props;
-
-          return (
-            <TouchableOpacity
-              {...buttonProps}
-              disabled={abaFilhosBloqueada}
-              activeOpacity={abaFilhosBloqueada ? 1 : 0.7}
-              style={[props.style, abaFilhosBloqueada && { opacity: 0.35 }]}
-            />
-          );
         },
         tabBarIcon: ({ color, size }) => {
           let iconName: keyof typeof MaterialIcons.glyphMap = "home";
@@ -96,11 +81,13 @@ function MainTabs() {
         options={{ title: "Home" }}
       />
 
-      <Tab.Screen
-        name="VincularFilho"
-        component={VincularFilho}
-        options={{ title: "Filhos" }}
-      />
+      {!usuarioEhFilho && (
+        <Tab.Screen
+          name="VincularFilho"
+          component={VincularFilho}
+          options={{ title: "Filhos" }}
+        />
+      )}
 
       <Tab.Screen
         name="Cofrinho"
@@ -156,6 +143,7 @@ export default function Routes() {
           headerLeft: () => (
             <TouchableOpacity
               style={styles.headerBackButton}
+              activeOpacity={0.7}
               onPress={() => {
                 if (navigation.canGoBack()) {
                   navigation.goBack();

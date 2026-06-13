@@ -27,7 +27,7 @@ export default StyleSheet.create({
 
   label: {
     marginTop: 10,
-    
+
   },
 
   input: {
@@ -76,42 +76,6 @@ export default StyleSheet.create({
   botaoText: {
     color: "#fff",
     fontWeight: "bold",
-  },
-
-  // Tipo de usuário
-  tipoUsuarioContainer: {
-    flexDirection: "row",
-    gap: 10,
-    marginTop: 10,
-    marginBottom: 20,
-  },
-
-  tipoUsuario: {
-    flex: 1,
-    height: 56,
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  tipoUsuarioButtonSelected: {
-    backgroundColor: "#007bff",
-    borderColor: "#007bff",
-  },
-
-  tipoUsuarioText: {
-    color: "#000",
-    fontWeight: "bold",
-    fontSize: 15,
-  },
-
-  tipoUsuarioTextSelected: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 15,
   },
 
   botaoFooter: {
