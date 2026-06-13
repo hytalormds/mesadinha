@@ -121,7 +121,12 @@ export default function CadastroTarefa() {
 
                         navigation.reset({
                             index: 0,
-                            routes: [{ name: "ListaTarefas" }],
+                            routes: [
+                                {
+                                    name: "MainTabs",
+                                    params: { screen: "ListaTarefas" },
+                                },
+                            ],
                         });
                     }
 
@@ -301,8 +306,17 @@ export default function CadastroTarefa() {
             fk_familia_id: tarefaEditando?.fk_familia_id,
         };
 
-        navigation.popTo("ListaTarefas", {
-            tarefaSalva,
+        navigation.reset({
+            index: 0,
+            routes: [
+                {
+                    name: "MainTabs",
+                    params: {
+                        screen: "ListaTarefas",
+                        params: { tarefaSalva },
+                    },
+                },
+            ],
         });
     }
     return (
@@ -329,7 +343,11 @@ export default function CadastroTarefa() {
 
                                 <TouchableOpacity
                                     style={styles.botaoCadastrarFilho}
-                                    onPress={() => navigation.push("VincularFilho")}
+                                    onPress={() =>
+                                        navigation.navigate("MainTabs", {
+                                            screen: "VincularFilho",
+                                        })
+                                    }
                                 >
                                     <Text style={styles.botaoCadastrarFilhoTexto}>
                                         Cadastrar Filho

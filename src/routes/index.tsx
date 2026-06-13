@@ -1,4 +1,5 @@
-﻿import { Text, TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity } from "react-native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { MaterialIcons } from "@expo/vector-icons";
 
@@ -8,11 +9,78 @@ import CadastroTarefa from "@/app/screens/CadastroTarefa";
 import VincularFilho from "@/app/screens/vincularFIlho";
 import ListaTarefas from "@/app/screens/ListaTarefas";
 import Cofrinho from "@/app/screens/Cofrinho";
-import type { RootStackParamList } from "@/types/navigation";
-import styles from "./styles";
 import Familia from "@/app/screens/Familia";
+import type { MainTabParamList, RootStackParamList } from "@/types/navigation";
+import styles from "./styles";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
+const Tab = createBottomTabNavigator<MainTabParamList>();
+
+function MainTabs() {
+    return (
+        <Tab.Navigator
+            id="MainTabs"
+            initialRouteName="ListaTarefas"
+            screenOptions={({ route }) => ({
+                headerShown: false,
+                tabBarActiveTintColor: "#007BFF",
+                tabBarInactiveTintColor: "#777",
+                tabBarStyle: {
+                    height: 82,
+                    paddingTop: 8,
+                    paddingBottom: 22,
+                },
+                tabBarIcon: ({ color, size }) => {
+                    let iconName: keyof typeof MaterialIcons.glyphMap = "home";
+
+                    if (route.name === "VincularFilho") {
+                        iconName = "person-add";
+                    }
+
+                    if (route.name === "Cofrinho") {
+                        iconName = "savings";
+                    }
+
+                    if (route.name === "Familia") {
+                        iconName = "groups";
+                    }
+
+                    return (
+                        <MaterialIcons
+                            name={iconName}
+                            size={size}
+                            color={color}
+                        />
+                    );
+                },
+            })}
+        >
+            <Tab.Screen
+                name="ListaTarefas"
+                component={ListaTarefas}
+                options={{ title: "Home" }}
+            />
+
+            <Tab.Screen
+                name="VincularFilho"
+                component={VincularFilho}
+                options={{ title: "Filhos" }}
+            />
+
+            <Tab.Screen
+                name="Cofrinho"
+                component={Cofrinho}
+                options={{ title: "Cofrinho" }}
+            />
+
+            <Tab.Screen
+                name="Familia"
+                component={Familia}
+                options={{ title: "Família" }}
+            />
+        </Tab.Navigator>
+    );
+}
 
 export default function Routes() {
     return (
@@ -39,6 +107,12 @@ export default function Routes() {
             />
 
             <Stack.Screen
+                name="MainTabs"
+                component={MainTabs}
+                options={{ headerShown: false }}
+            />
+
+            <Stack.Screen
                 name="CadastroTarefa"
                 component={CadastroTarefa}
                 options={({ navigation }) => ({
@@ -53,7 +127,9 @@ export default function Routes() {
                                     return;
                                 }
 
-                                navigation.navigate("ListaTarefas");
+                                navigation.navigate("MainTabs", {
+                                    screen: "ListaTarefas",
+                                });
                             }}
                         >
                             <MaterialIcons
@@ -66,29 +142,6 @@ export default function Routes() {
                         </TouchableOpacity>
                     ),
                 })}
-            />
-
-            <Stack.Screen
-                name="VincularFilho"
-                component={VincularFilho}
-                options={{ title: "Vincular Filho" }}
-            />
-
-            <Stack.Screen
-                name="ListaTarefas"
-                component={ListaTarefas}
-                options={{ headerShown: false }}
-            />
-
-            <Stack.Screen
-                name="Cofrinho"
-                component={Cofrinho}
-                options={{ headerShown: false }}
-            />
-            <Stack.Screen
-                name="Familia"
-                component={Familia}
-                options={{ headerShown: false }}
             />
         </Stack.Navigator>
     );

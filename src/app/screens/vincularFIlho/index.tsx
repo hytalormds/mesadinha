@@ -103,7 +103,12 @@ export default function VincularFilho() {
 
                         navigation.reset({
                             index: 0,
-                            routes: [{ name: "ListaTarefas" }],
+                            routes: [
+                                {
+                                    name: "MainTabs",
+                                    params: { screen: "ListaTarefas" },
+                                },
+                            ],
                         });
                     }
 

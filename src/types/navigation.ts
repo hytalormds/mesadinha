@@ -1,3 +1,5 @@
+import type { NavigatorScreenParams } from "@react-navigation/native";
+
 export type StatusTarefa =
     | "Concluída"
     | "Em Andamento"
@@ -78,9 +80,17 @@ export type MembroFamiliaComSaldo = {
     papel: PapelFamilia;
 };
 
+export type MainTabParamList = {
+    ListaTarefas: { tarefaSalva?: Tarefa } | undefined;
+    VincularFilho: undefined;
+    Cofrinho: undefined;
+    Familia: undefined;
+};
+
 export type RootStackParamList = {
     Login: undefined;
     TelaCadastro: undefined;
+    MainTabs: NavigatorScreenParams<MainTabParamList> | undefined;
     CadastroTarefa: { tarefaEditando?: Tarefa } | undefined;
     VincularFilho: undefined;
     ListaTarefas: { tarefaSalva?: Tarefa } | undefined;

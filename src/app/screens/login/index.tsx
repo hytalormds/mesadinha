@@ -108,7 +108,7 @@ export default function Login() {
 
       navigation.reset({
         index: 0,
-        routes: [{ name: "ListaTarefas" }],
+        routes: [{ name: "MainTabs" }],
       });
     } catch (error) {
       console.log("Erro ao fazer login:", error);

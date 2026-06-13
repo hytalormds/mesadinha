@@ -167,23 +167,22 @@ export default StyleSheet.create({
     },
     filtrosContainer: {
         width: "100%",
-        paddingHorizontal: 20,
         marginTop: 8,
-        marginBottom: 12,
+        marginBottom: 16,
     },
 
     filtrosScroll: {
         gap: 8,
-        paddingRight: 20,
+        paddingRight: 8,
     },
 
     filtroBotao: {
-        paddingVertical: 8,
-        paddingHorizontal: 14,
-        borderRadius: 20,
-        backgroundColor: "#ffffff",
+        paddingVertical: 9,
+        paddingHorizontal: 15,
+        borderRadius: 18,
+        backgroundColor: "#f4f6f8",
         borderWidth: 1,
-        borderColor: "#d9d9d9",
+        borderColor: "#e1e5ea",
     },
 
     filtroBotaoAtivo: {
@@ -192,9 +191,9 @@ export default StyleSheet.create({
     },
 
     filtroTexto: {
-        color: "#666666",
+        color: "#555",
         fontSize: 13,
-        fontWeight: "600",
+        fontWeight: "700",
     },
 
     filtroTextoAtivo: {
@@ -238,6 +237,9 @@ export default StyleSheet.create({
 
     headerContainer: {
         width: "100%",
+        flexDirection: "row",
+        alignItems: "flex-start",
+        justifyContent: "space-between",
         marginBottom: 16,
     },
 
@@ -246,16 +248,13 @@ export default StyleSheet.create({
     },
 
     textContainer: {
-        width: "100%",
-        marginBottom: 12,
+        flex: 1,
+        paddingRight: 12,
     },
 
     headerActions: {
-        width: "100%",
         flexDirection: "row",
         alignItems: "center",
-        gap: 8,
-        flexWrap: "wrap",
     },
 
     titulo: {
@@ -312,9 +311,9 @@ export default StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         gap: 4,
-        paddingHorizontal: 12,
-        paddingVertical: 10,
-        borderRadius: 20,
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 18,
         backgroundColor: "#fff5f5",
         borderWidth: 1,
         borderColor: "#ffd6d6",
