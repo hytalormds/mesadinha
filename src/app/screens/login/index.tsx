@@ -18,31 +18,8 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Button } from "@/componentes/Button";
 import { Title } from "@/componentes/Title";
 import styles from "./styles";
-import type { RootStackParamList, Usuario } from "@/types/navigation";
-import { STORAGE_KEYS } from "@/constants/storageKeys";
-import {
-  buscarItem,
-  salvarItem,
-} from "@/services/storageService";
-
-const USUARIOS_STORAGE_KEY = STORAGE_KEYS.usuarios;
-const USUARIO_LOGADO_STORAGE_KEY = STORAGE_KEYS.usuarioLogado;
-
-const USUARIO_PAI_TESTE: Usuario = {
-  id_usuario: "1",
-  nome: "Pai",
-  email: "pai@mesadinha.com",
-  senha: "123456",
-  id_tipo: 1,
-};
-
-const USUARIO_FILHO_TESTE: Usuario = {
-  id_usuario: "2",
-  nome: "Samuel",
-  email: "samuel@mesadinha.com",
-  senha: "123456",
-  id_tipo: 2,
-};
+import type { RootStackParamList } from "@/types/navigation";
+import { authenticate } from "@/services/mesadinha/auth.services";
 
 function validarEmail(valor: string) {
   return valor.trim().includes("@");
@@ -54,7 +31,6 @@ export default function Login() {
 
   const [emailFocus, setEmailFocus] = React.useState(false);
   const [passwordFocus, setPasswordFocus] = React.useState(false);
-
   const [email, setEmail] = React.useState("");
   const [senha, setSenha] = React.useState("");
   const [mostrarSenha, setMostrarSenha] = React.useState(false);
@@ -84,31 +60,10 @@ export default function Login() {
     }
 
     try {
-      const usuariosCadastrados =
-        (await buscarItem<Usuario[]>(USUARIOS_STORAGE_KEY)) ?? [];
-
-      const usuariosDisponiveis: Usuario[] = [
-        USUARIO_PAI_TESTE,
-        USUARIO_FILHO_TESTE,
-        ...usuariosCadastrados,
-      ];
-
-      const emailDigitado = email.trim().toLowerCase();
-      const senhaDigitada = senha.trim();
-
-      const usuarioEncontrado = usuariosDisponiveis.find((usuario) => {
-        const emailUsuario = String(usuario.email).trim().toLowerCase();
-        const senhaUsuario = String(usuario.senha ?? "").trim();
-
-        return emailUsuario === emailDigitado && senhaUsuario === senhaDigitada;
+      await authenticate({
+        email: email.trim().toLowerCase(),
+        password: senha.trim(),
       });
-
-      if (!usuarioEncontrado) {
-        Alert.alert("Atenção", "E-mail ou senha inválidos.");
-        return;
-      }
-
-      await salvarItem(USUARIO_LOGADO_STORAGE_KEY, usuarioEncontrado);
 
       navigation.reset({
         index: 0,
@@ -142,7 +97,8 @@ export default function Login() {
               <Title style={styles.title}>Bem-vindo!</Title>
 
               <Text style={styles.subtitle}>
-                Faça login para visualizar e controlar as tarefas e mesada do(s) seu(s) filho(s).
+                Faça login para visualizar e controlar as tarefas e mesada do(s)
+                seu(s) filho(s).
               </Text>
             </View>
 

@@ -1,6 +1,7 @@
 import { Repository } from "typeorm";
 import { Familia } from "../entities/Familia";
 import { UsuarioFamilia } from "../entities/UsuarioFamilia";
+import { User } from "../entities/User";
 import { DtMoneyDataSource } from "../data-source";
 import { DatabaseError } from "../../../../../shared/errors/database.error";
 import {
@@ -44,6 +45,24 @@ export class FamiliaRepository implements FamiliaRepositoryInterface {
       });
     } catch (error) {
       throw new DatabaseError("Falha ao buscar vinculo familiar", error);
+    }
+  }
+
+  async findChildrenByFamiliaId(familiaId: number): Promise<User[]> {
+    try {
+      const memberships = await this.usuarioFamiliaRepository.find({
+        where: {
+          fkFamiliaId: familiaId,
+          papel: "crianca",
+        },
+        relations: {
+          usuario: true,
+        },
+      });
+
+      return memberships.map((membership) => membership.usuario);
+    } catch (error) {
+      throw new DatabaseError("Falha ao buscar filhos da familia", error);
     }
   }
 }

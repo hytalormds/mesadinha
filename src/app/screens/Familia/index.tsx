@@ -1,237 +1,77 @@
 import React from "react";
-import {
-    Text,
-    View,
-    ScrollView,
-} from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Alert, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import styles from "./styles";
-import type {
-    RootStackParamList,
-    Usuario,
-    Carteira,
-} from "@/types/navigation";
-import { STORAGE_KEYS } from "@/constants/storageKeys";
+import { useFocusEffect } from "@react-navigation/native";
 
-const USUARIO_LOGADO_STORAGE_KEY = STORAGE_KEYS.usuarioLogado;
-const USUARIOS_STORAGE_KEY = STORAGE_KEYS.usuarios;
-const CARTEIRAS_STORAGE_KEY = STORAGE_KEYS.carteiras;
+import type { Usuario } from "@/types/navigation";
+import { listChildren } from "@/services/mesadinha/auth.services";
+import { getCurrentUser } from "@/services/mesadinha/session.service";
+import styles from "./styles";
 
 export default function Familia() {
-    const navigation =
-        useNavigation<
-            NativeStackNavigationProp<RootStackParamList, "Familia">
-        >();
+  const usuario = getCurrentUser();
+  const [filhos, setFilhos] = React.useState<Usuario[]>([]);
 
-    const [usuarioLogado, setUsuarioLogado] =
-        React.useState<Usuario | null>(null);
-
-    const [membros, setMembros] = React.useState<Usuario[]>([]);
-    const [carteiras, setCarteiras] = React.useState<Carteira[]>([]);
-    const [carregando, setCarregando] = React.useState(true);
-
-    React.useEffect(() => {
-        async function carregarDados() {
-            try {
-                const usuarioSalvo = await AsyncStorage.getItem(
-                    USUARIO_LOGADO_STORAGE_KEY
-                );
-
-                if (!usuarioSalvo) {
-                    navigation.reset({
-                        index: 0,
-                        routes: [{ name: "Login" }],
-                    });
-                    return;
-                }
-
-                const usuario: Usuario = JSON.parse(usuarioSalvo);
-                setUsuarioLogado(usuario);
-
-                const usuariosSalvos = await AsyncStorage.getItem(
-                    USUARIOS_STORAGE_KEY
-                );
-
-                const usuariosCadastrados: Usuario[] = usuariosSalvos
-                    ? JSON.parse(usuariosSalvos)
-                    : [];
-
-                const membrosComResponsavel = [...usuariosCadastrados, usuario];
-
-                const membrosUnicos = membrosComResponsavel.filter(
-                    (membro, index, array) =>
-                        array.findIndex(
-                            (item) =>
-                                String(item.id_usuario) ===
-                                String(membro.id_usuario)
-                        ) === index
-                );
-
-                const filhos = membrosUnicos.filter(
-                    (membro) => membro.id_tipo === 2
-                );
-
-                const membrosOrdenados = filhos.sort((a, b) => {
-                    if (a.id_tipo !== b.id_tipo) {
-                        return a.id_tipo - b.id_tipo;
-                    }
-
-                    return a.nome.localeCompare(b.nome);
-                });
-
-                setMembros(membrosOrdenados);
-
-                const carteirasSalvas = await AsyncStorage.getItem(
-                    CARTEIRAS_STORAGE_KEY
-                );
-
-                const carteirasCadastradas: Carteira[] = carteirasSalvas
-                    ? JSON.parse(carteirasSalvas)
-                    : [];
-
-                setCarteiras(carteirasCadastradas);
-            } catch (error) {
-                console.log("Erro ao carregar família:", error);
-            } finally {
-                setCarregando(false);
-            }
-        }
-
-        carregarDados();
-    }, []);
-
-    function formatarValor(valor?: number) {
-        return (valor ?? 0).toLocaleString("pt-BR", {
-            style: "currency",
-            currency: "BRL",
-        });
+  async function carregarFamilia() {
+    if (!usuario || usuario.id_tipo !== 1) {
+      setFilhos([]);
+      return;
     }
 
-    function obterSaldoUsuario(id_usuario: string) {
-        const carteira = carteiras.find(
-            (item) => String(item.fk_usuario_id) === String(id_usuario)
-        );
-
-        return carteira?.saldo ?? 0;
+    try {
+      setFilhos(await listChildren());
+    } catch (error) {
+      console.log("Erro ao carregar família:", error);
+      Alert.alert("Erro", "Não foi possível carregar a família.");
     }
+  }
 
-    function obterPerfil(usuario: Usuario) {
-        return usuario.id_tipo === 1 ? "Responsável" : "Filho";
-    }
+  useFocusEffect(
+    React.useCallback(() => {
+      carregarFamilia();
+    }, []),
+  );
 
-    const totalSaldos = membros.reduce((total, membro) => {
-        return total + obterSaldoUsuario(membro.id_usuario);
-    }, 0);
+  const membros = usuario ? [usuario, ...filhos] : filhos;
 
-    if (carregando) {
-        return (
-            <SafeAreaView style={styles.safeArea}>
-                <View style={styles.containerCentralizado}>
-                    <Text style={styles.textoCarregando}>
-                        Carregando família...
-                    </Text>
-                </View>
-            </SafeAreaView>
-        );
-    }
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.header}>
+          <Text style={styles.titulo}>Família</Text>
+        </View>
 
-    if (!usuarioLogado) {
-        return (
-            <SafeAreaView style={styles.safeArea}>
-                <View style={styles.containerCentralizado}>
-                    <Text style={styles.textoCarregando}>
-                        Usuário não encontrado.
-                    </Text>
-                </View>
-            </SafeAreaView>
-        );
-    }
+        <View style={styles.cardResumo}>
+          <MaterialIcons name="groups" size={42} color="#007BFF" />
 
-    return (
-        <SafeAreaView style={styles.safeArea}>
-            <ScrollView
-                contentContainerStyle={styles.scrollContent}
-                showsVerticalScrollIndicator={false}
-            >
-                <View style={styles.header}>
-                    <Text style={styles.titulo}>Família</Text>
-                </View>
+          <Text style={styles.resumoTitulo}>Membros cadastrados</Text>
 
-                <View style={styles.cardResumo}>
-                    <MaterialIcons
-                        name="groups"
-                        size={48}
-                        color="#007BFF"
-                    />
+          <Text style={styles.quantidadeMembros}>{membros.length}</Text>
+        </View>
 
-                    <Text style={styles.resumoTitulo}>
-                        Filhos cadastrados
-                    </Text>
+        <Text style={styles.secaoTitulo}>Membros</Text>
 
-                    <Text style={styles.quantidadeMembros}>
-                        {membros.length}
-                    </Text>
+        {membros.map((membro) => (
+          <View key={membro.id_usuario} style={styles.cardMembro}>
+            <View style={styles.iconeContainer}>
+              <MaterialIcons
+                name={membro.id_tipo === 1 ? "person" : "child-care"}
+                size={24}
+                color="#007BFF"
+              />
+            </View>
 
-                    <Text style={styles.resumoSaldoLabel}>
-                        Saldo total
-                    </Text>
-
-                    <Text style={styles.resumoSaldoValor}>
-                        {formatarValor(totalSaldos)}
-                    </Text>
-                </View>
-
-                <Text style={styles.secaoTitulo}>
-                    Filhos da família
-                </Text>
-
-                {membros.map((membro) => {
-                    const saldo = obterSaldoUsuario(membro.id_usuario);
-
-                    return (
-                        <View
-                            key={membro.id_usuario}
-                            style={styles.cardMembro}
-                        >
-                            <View style={styles.iconeContainer}>
-                                <MaterialIcons
-                                    name="child-care"
-                                    size={28}
-                                    color="#007BFF"
-                                />
-                            </View>
-
-                            <View style={styles.membroInfo}>
-                                <Text style={styles.nomeMembro}>
-                                    {membro.nome}
-                                </Text>
-
-                                <Text style={styles.emailMembro}>
-                                    {membro.email || "Sem e-mail informado"}
-                                </Text>
-
-                                <Text style={styles.perfilMembro}>
-                                    {obterPerfil(membro)}
-                                </Text>
-                            </View>
-
-                            <View style={styles.saldoContainer}>
-                                <Text style={styles.saldoLabel}>
-                                    Saldo
-                                </Text>
-
-                                <Text style={styles.saldoValor}>
-                                    {formatarValor(saldo)}
-                                </Text>
-                            </View>
-                        </View>
-                    );
-                })}
-            </ScrollView>
-        </SafeAreaView>
-    );
+            <View style={styles.membroInfo}>
+              <Text style={styles.nomeMembro}>{membro.nome}</Text>
+              <Text style={styles.emailMembro}>{membro.email}</Text>
+              <Text style={styles.perfilMembro}>
+                {membro.id_tipo === 1 ? "Responsável" : "Filho"}
+              </Text>
+            </View>
+          </View>
+        ))}
+      </ScrollView>
+    </SafeAreaView>
+  );
 }

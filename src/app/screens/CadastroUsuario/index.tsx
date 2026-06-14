@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import {
   Text,
   View,
@@ -9,7 +9,6 @@ import {
   Platform,
   Alert,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -17,11 +16,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import styles from "./styles";
 import { Button } from "@/componentes/Button";
-import type { RootStackParamList, Usuario } from "@/types/navigation";
-import { STORAGE_KEYS } from "@/constants/storageKeys";
-
-const USUARIOS_STORAGE_KEY = STORAGE_KEYS.usuarios;
-const EMAILS_TESTE = ["pai@mesadinha.com", "samuel@mesadinha.com"];
+import type { RootStackParamList } from "@/types/navigation";
+import { registerUser } from "@/services/mesadinha/auth.services";
 
 export default function TelaCadastro() {
   const navigation =
@@ -57,19 +53,14 @@ export default function TelaCadastro() {
     return erros;
   }
 
-  async function validarFormulario() {
+  function validarFormulario() {
     if (!nome.trim()) {
       Alert.alert("Atenção", "Por favor, insira seu nome completo.");
       return false;
     }
 
-    if (!email.trim()) {
-      Alert.alert("Atenção", "Por favor, insira seu e-mail.");
-      return false;
-    }
-
-    if (!email.includes("@")) {
-      Alert.alert("Atenção", "O e-mail precisa ter @.");
+    if (!email.trim() || !email.includes("@")) {
+      Alert.alert("Atenção", "Digite um e-mail válido.");
       return false;
     }
 
@@ -83,7 +74,7 @@ export default function TelaCadastro() {
     if (errosSenha.length > 0) {
       Alert.alert(
         "Senha inválida",
-        `A senha precisa ter:\n- ${errosSenha.join("\n- ")}`
+        `A senha precisa ter:\n- ${errosSenha.join("\n- ")}`,
       );
       return false;
     }
@@ -93,47 +84,20 @@ export default function TelaCadastro() {
       return false;
     }
 
-    const usuariosSalvos = await AsyncStorage.getItem(USUARIOS_STORAGE_KEY);
-    const usuarios: Usuario[] = usuariosSalvos ? JSON.parse(usuariosSalvos) : [];
-    const emailDigitado = email.trim().toLowerCase();
-
-    const emailJaCadastrado =
-      EMAILS_TESTE.includes(emailDigitado) ||
-      usuarios.some((usuario) => usuario.email.toLowerCase() === emailDigitado);
-
-    if (emailJaCadastrado) {
-      Alert.alert("Atenção", "Este e-mail já está cadastrado.");
-      return false;
-    }
-
     return true;
   }
 
   async function cadastrarUsuario() {
-    const formularioValido = await validarFormulario();
-
-    if (!formularioValido) {
+    if (!validarFormulario()) {
       return;
     }
 
     try {
-      const usuariosSalvos = await AsyncStorage.getItem(USUARIOS_STORAGE_KEY);
-      const usuarios: Usuario[] = usuariosSalvos
-        ? JSON.parse(usuariosSalvos)
-        : [];
-
-      const novoUsuario: Usuario = {
-        id_usuario: String(Date.now()),
-        nome: nome.trim(),
+      await registerUser({
+        name: nome.trim(),
         email: email.trim().toLowerCase(),
-        senha,
-        id_tipo: 1,
-      };
-
-      await AsyncStorage.setItem(
-        USUARIOS_STORAGE_KEY,
-        JSON.stringify([...usuarios, novoUsuario])
-      );
+        password: senha,
+      });
 
       Alert.alert("Sucesso", "Responsável cadastrado com sucesso.");
       navigation.navigate("Login");
@@ -217,9 +181,7 @@ export default function TelaCadastro() {
                 }
               >
                 <MaterialIcons
-                  name={
-                    mostrarConfirmarSenha ? "visibility-off" : "visibility"
-                  }
+                  name={mostrarConfirmarSenha ? "visibility-off" : "visibility"}
                   size={22}
                   color="#666666"
                 />

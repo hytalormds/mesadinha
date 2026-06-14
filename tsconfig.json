@@ -1,12 +1,21 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "ignoreDeprecations": "6.0",
+    "ignoreDeprecations": "5.0",
     "paths": {
       "@/*": [
         "./src/*"
       ]
     }
   },
-  "extends": "expo/tsconfig.base"
+  "extends": "expo/tsconfig.base",
+  "exclude": [
+    "src/domain/**/*",
+    "src/@types/**/*",
+    "src/infra/**/*",
+    "src/interfaces/**/*",
+    "src/server.ts",
+    "src/index.ts",
+    "tsconfig.backend.json"
+  ]
 }

@@ -22,18 +22,13 @@ import styles from "./styles";
 import { Button } from "@/componentes/Button";
 import { SeletorFilho } from "@/componentes/SeletorFilho";
 import type { RootStackParamList, Usuario } from "@/types/navigation";
-import { STORAGE_KEYS } from "@/constants/storageKeys";
-import { buscarItem } from "@/services/storageService";
 import { formatarValor, formatarMoedaDigitada } from "@/utils/formatadores";
 import { formatarDataDigitada } from "@/utils/datas";
-import {
-  validarCadastroTarefa,
-  montarTarefaCadastro,
-} from "@/services/cadastroTarefaService";
+import { validarCadastroTarefa } from "@/services/cadastroTarefaService";
+import { listChildren } from "@/services/mesadinha/auth.services";
+import { getCurrentUser } from "@/services/mesadinha/session.service";
+import { salvarTarefaApi } from "@/services/mesadinha/tarefa.services";
 const LIMITE_DESCRICAO = 250;
-
-const USUARIOS_STORAGE_KEY = STORAGE_KEYS.usuarios;
-const USUARIO_LOGADO_STORAGE_KEY = STORAGE_KEYS.usuarioLogado;
 
 export default function CadastroTarefa() {
   const navigation =
@@ -69,13 +64,7 @@ export default function CadastroTarefa() {
 
   async function carregarFilhos() {
     try {
-      const usuarios = await buscarItem<Usuario[]>(USUARIOS_STORAGE_KEY);
-
-      const filhos = (usuarios ?? []).filter(
-        (usuario) => usuario.id_tipo === 2,
-      );
-
-      setFilhosCadastrados(filhos);
+      setFilhosCadastrados(await listChildren());
     } catch (error) {
       console.log("Erro ao carregar filhos:", error);
       setFilhosCadastrados([]);
@@ -114,7 +103,7 @@ export default function CadastroTarefa() {
   React.useEffect(() => {
     async function carregarUsuarioLogado() {
       try {
-        const usuario = await buscarItem<Usuario>(USUARIO_LOGADO_STORAGE_KEY);
+        const usuario = getCurrentUser();
 
         if (usuario) {
           setUsuarioLogado(usuario);
@@ -172,7 +161,7 @@ export default function CadastroTarefa() {
     return true;
   }
 
-  function salvarTarefa() {
+  async function salvarTarefa() {
     if (!validarFormulario()) {
       return;
     }
@@ -199,28 +188,31 @@ export default function CadastroTarefa() {
       return;
     }
 
-    const tarefaSalva = montarTarefaCadastro({
-      tarefaEditando,
-      titulo,
-      descricao,
-      dataLimite,
-      valorRecompensa: valor_recompensa,
-      usuarioResponsavel: usuarioLogado,
-      usuarioCrianca: criancaSelecionada,
-    });
+    try {
+      await salvarTarefaApi({
+        tarefaEditando,
+        titulo,
+        descricao,
+        dataLimite,
+        valorRecompensa: valor_recompensa,
+        fkUsuarioCrianca: criancaSelecionada.id_usuario,
+      });
 
-    navigation.reset({
-      index: 0,
-      routes: [
-        {
-          name: "MainTabs",
-          params: {
-            screen: "ListaTarefas",
-            params: { tarefaSalva },
+      navigation.reset({
+        index: 0,
+        routes: [
+          {
+            name: "MainTabs",
+            params: {
+              screen: "ListaTarefas",
+            },
           },
-        },
-      ],
-    });
+        ],
+      });
+    } catch (error) {
+      console.log("Erro ao salvar tarefa:", error);
+      Alert.alert("Erro", "Não foi possível salvar a tarefa.");
+    }
   }
   return (
     <SafeAreaView style={styles.safeArea}>

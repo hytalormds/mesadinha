@@ -10,8 +10,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import type { RouteProp } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import styles from "./styles";
@@ -33,12 +32,6 @@ import type {
     Movimentacao,
 } from "@/types/navigation";
 
-import { STORAGE_KEYS } from "@/constants/storageKeys";
-import {
-    buscarItem,
-    salvarItem,
-    removerItem,
-} from "@/services/storageService";
 import {
     obterStatusTarefa,
     tarefaPertenceAoFilhoLogado,
@@ -46,17 +39,16 @@ import {
 } from "@/services/tarefaService";
 import { creditarValorNaCarteira } from "@/services/carteiraService";
 import { criarMovimentacaoEntrada } from "@/services/movimentacaoService";
-
-const STORAGE_KEY = STORAGE_KEYS.tarefas;
-const USUARIO_LOGADO_STORAGE_KEY = STORAGE_KEYS.usuarioLogado;
-const CARTEIRAS_STORAGE_KEY = STORAGE_KEYS.carteiras;
-const MOVIMENTACOES_STORAGE_KEY = STORAGE_KEYS.movimentacoes;
+import { clearSession, getCurrentUser } from "@/services/mesadinha/session.service";
+import {
+    atualizarStatusTarefaApi,
+    excluirTarefaApi,
+    listarTarefas,
+} from "@/services/mesadinha/tarefa.services";
 
 type FiltroStatus = FiltroStatusTarefa;
 
 export default function ListaTarefas() {
-    const route = useRoute<RouteProp<RootStackParamList, "ListaTarefas">>();
-
     const navigation =
         useNavigation<
             NativeStackNavigationProp<RootStackParamList, "ListaTarefas">
@@ -67,166 +59,36 @@ export default function ListaTarefas() {
     const [filtroStatus, setFiltroStatus] = React.useState<FiltroStatus>("Todas");
     const [usuarioLogado, setUsuarioLogado] = React.useState<Usuario | null>(null);
     const [carteiras, setCarteiras] = React.useState<Carteira[]>([]);
-    const [carregouCarteiras, setCarregouCarteiras] = React.useState(false);
 
     const [movimentacoes, setMovimentacoes] = React.useState<Movimentacao[]>([]);
-    const [carregouMovimentacoes, setCarregouMovimentacoes] = React.useState(false);
-    React.useEffect(() => {
-        async function carregarUsuarioLogado() {
-            try {
-                const usuarioSalvo = await buscarItem<Usuario>(
-                    USUARIO_LOGADO_STORAGE_KEY
-                );
+    async function carregarDados() {
+        try {
+            const usuario = getCurrentUser();
 
-                if (usuarioSalvo) {
-                    setUsuarioLogado(usuarioSalvo);
-                    return;
-                }
-
+            if (!usuario) {
                 navigation.reset({
                     index: 0,
                     routes: [{ name: "Login" }],
                 });
-            } catch (error) {
-                console.log("Erro ao carregar usuário logado:", error);
-
-                navigation.reset({
-                    index: 0,
-                    routes: [{ name: "Login" }],
-                });
-            }
-        }
-
-        carregarUsuarioLogado();
-    }, []);
-
-    React.useEffect(() => {
-        async function carregarTarefas() {
-            try {
-                const tarefasSalvas = await buscarItem<Tarefa[]>(STORAGE_KEY);
-
-                setTarefas(tarefasSalvas ?? []);
-            } catch (error) {
-                console.log("Erro ao carregar tarefas:", error);
-                setTarefas([]);
-            } finally {
-                setCarregouTarefas(true);
-            }
-        }
-
-        carregarTarefas();
-    }, []);
-
-    React.useEffect(() => {
-        async function salvarTarefas() {
-            if (!carregouTarefas) {
                 return;
             }
 
-            try {
-                await salvarItem(STORAGE_KEY, tarefas);
-            } catch (error) {
-                console.log("Erro ao salvar tarefas:", error);
-            }
+            setUsuarioLogado(usuario);
+            setTarefas(await listarTarefas());
+        } catch (error) {
+            console.log("Erro ao carregar tarefas:", error);
+            Alert.alert("Erro", "Não foi possível carregar as tarefas.");
+            setTarefas([]);
+        } finally {
+            setCarregouTarefas(true);
         }
+    }
 
-        salvarTarefas();
-    }, [tarefas, carregouTarefas]);
-    React.useEffect(() => {
-        async function salvarCarteiras() {
-            if (!carregouCarteiras) {
-                return;
-            }
-
-            try {
-                await salvarItem(CARTEIRAS_STORAGE_KEY, carteiras);
-            } catch (error) {
-                console.log("Erro ao salvar carteiras:", error);
-            }
-        }
-
-        salvarCarteiras();
-    }, [carteiras, carregouCarteiras]);
-    React.useEffect(() => {
-        async function carregarMovimentacoes() {
-            try {
-                const movimentacoesSalvas = await buscarItem<Movimentacao[]>(
-                    MOVIMENTACOES_STORAGE_KEY
-                );
-
-                setMovimentacoes(movimentacoesSalvas ?? []);
-            } catch (error) {
-                console.log("Erro ao carregar movimentações:", error);
-                setMovimentacoes([]);
-            } finally {
-                setCarregouMovimentacoes(true);
-            }
-        }
-
-        carregarMovimentacoes();
-    }, []);
-    React.useEffect(() => {
-        async function carregarCarteiras() {
-            try {
-                const carteirasSalvas = await buscarItem<Carteira[]>(
-                    CARTEIRAS_STORAGE_KEY
-                );
-
-                setCarteiras(carteirasSalvas ?? []);
-            } catch (error) {
-                console.log("Erro ao carregar carteiras:", error);
-                setCarteiras([]);
-            } finally {
-                setCarregouCarteiras(true);
-            }
-        }
-
-        carregarCarteiras();
-    }, []);
-    React.useEffect(() => {
-        async function salvarMovimentacoes() {
-            if (!carregouMovimentacoes) {
-                return;
-            }
-
-            try {
-                await salvarItem(MOVIMENTACOES_STORAGE_KEY, movimentacoes);
-            } catch (error) {
-                console.log("Erro ao salvar movimentações:", error);
-            }
-        }
-
-        salvarMovimentacoes();
-    }, [movimentacoes, carregouMovimentacoes]);
-    React.useEffect(() => {
-        if (!carregouTarefas) {
-            return;
-        }
-
-        const tarefaSalva = route.params?.tarefaSalva;
-
-        if (!tarefaSalva) {
-            return;
-        }
-
-        setTarefas((tarefasAtuais) => {
-            const tarefaJaExiste = tarefasAtuais.some(
-                (tarefa) => tarefa.id === tarefaSalva.id
-            );
-
-            if (tarefaJaExiste) {
-                return tarefasAtuais.map((tarefa) =>
-                    tarefa.id === tarefaSalva.id ? tarefaSalva : tarefa
-                );
-            }
-
-            return [...tarefasAtuais, tarefaSalva];
-        });
-
-        navigation.setParams({
-            tarefaSalva: undefined,
-        });
-    }, [route.params?.tarefaSalva, carregouTarefas]);
+    useFocusEffect(
+        React.useCallback(() => {
+            carregarDados();
+        }, []),
+    );
 
     function confirmarSair() {
         Alert.alert("Sair", "Deseja realmente sair?", [
@@ -234,11 +96,11 @@ export default function ListaTarefas() {
                 text: "Cancelar",
                 style: "cancel",
             },
-            {
-                text: "Sair",
-                style: "destructive",
-                onPress: async () => {
-                    await removerItem(USUARIO_LOGADO_STORAGE_KEY);
+                {
+                    text: "Sair",
+                    style: "destructive",
+                    onPress: async () => {
+                    clearSession();
 
                     navigation.reset({
                         index: 0,
@@ -249,7 +111,15 @@ export default function ListaTarefas() {
         ]);
     }
 
-    function alterarStatusTarefa(id: string, novoStatus: StatusTarefa) {
+    async function alterarStatusTarefa(id: string, novoStatus: StatusTarefa) {
+        try {
+            await atualizarStatusTarefaApi(id, novoStatus);
+        } catch (error) {
+            console.log("Erro ao atualizar tarefa:", error);
+            Alert.alert("Erro", "Não foi possível atualizar a tarefa.");
+            return;
+        }
+
         setTarefas((tarefasAtuais) =>
             tarefasAtuais.map((tarefa) =>
                 tarefa.id === id
@@ -310,7 +180,15 @@ export default function ListaTarefas() {
                 {
                     text: "Excluir",
                     style: "destructive",
-                    onPress: () => {
+                    onPress: async () => {
+                        try {
+                            await excluirTarefaApi(id);
+                        } catch (error) {
+                            console.log("Erro ao excluir tarefa:", error);
+                            Alert.alert("Erro", "Não foi possível excluir a tarefa.");
+                            return;
+                        }
+
                         setTarefas((tarefasAtuais) =>
                             tarefasAtuais.filter(
                                 (tarefa) => tarefa.id !== id

@@ -1,4 +1,5 @@
 import { Familia } from "../../../infra/database/typeorm/mesadinha/entities/Familia";
+import { User } from "../../../infra/database/typeorm/mesadinha/entities/User";
 import {
   PapelFamilia,
   UsuarioFamilia,
@@ -21,4 +22,5 @@ export interface FamiliaRepositoryInterface {
     params: AddUsuarioFamiliaParams,
   ): Promise<UsuarioFamilia>;
   findMembershipByUserId(userId: number): Promise<UsuarioFamilia | null>;
+  findChildrenByFamiliaId(familiaId: number): Promise<User[]>;
 }

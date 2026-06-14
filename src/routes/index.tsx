@@ -12,8 +12,7 @@ import ListaTarefas from "@/app/screens/ListaTarefas";
 import Cofrinho from "@/app/screens/Cofrinho";
 import Familia from "@/app/screens/Familia";
 
-import { STORAGE_KEYS } from "@/constants/storageKeys";
-import { buscarItem } from "@/services/storageService";
+import { getCurrentUser } from "@/services/mesadinha/session.service";
 
 import type {
   MainTabParamList,
@@ -32,13 +31,7 @@ function MainTabs() {
   );
 
   React.useEffect(() => {
-    async function carregarUsuario() {
-      const usuario = await buscarItem<Usuario>(STORAGE_KEYS.usuarioLogado);
-
-      setUsuarioLogado(usuario);
-    }
-
-    carregarUsuario();
+    setUsuarioLogado(getCurrentUser());
   }, []);
 
   const usuarioEhFilho = usuarioLogado?.id_tipo === 2;

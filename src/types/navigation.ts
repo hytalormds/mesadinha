@@ -22,12 +22,13 @@ export type Usuario = {
     email: string;
     senha?: string;
     id_tipo: TipoUsuario;
+    papel?: PapelFamilia;
+    familiaId?: number;
 };
 
 export type Familia = {
     id_familia: string;
     nome: string;
-    codigo_convite?: string;
     fk_usuario_responsavel: string;
 };
 
