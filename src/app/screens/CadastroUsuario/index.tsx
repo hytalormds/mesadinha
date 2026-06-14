@@ -18,6 +18,7 @@ import styles from "./styles";
 import { Button } from "@/componentes/Button";
 import type { RootStackParamList } from "@/types/navigation";
 import { registerUser } from "@/services/mesadinha/auth.services";
+import { AppError } from "@/shared/helper/appError";
 
 export default function TelaCadastro() {
   const navigation =
@@ -103,7 +104,12 @@ export default function TelaCadastro() {
       navigation.navigate("Login");
     } catch (error) {
       console.log("Erro ao cadastrar usuário:", error);
-      Alert.alert("Erro", "Não foi possível cadastrar o usuário.");
+      const message =
+        error instanceof AppError
+          ? error.message
+          : "Não foi possível cadastrar o usuário.";
+
+      Alert.alert("Erro", message);
     }
   }
 
