@@ -28,8 +28,6 @@ import type {
     Tarefa,
     StatusTarefa,
     Usuario,
-    Carteira,
-    Movimentacao,
 } from "@/types/navigation";
 
 import {
@@ -37,14 +35,13 @@ import {
     tarefaPertenceAoFilhoLogado,
     validarRecusaTarefa,
 } from "@/services/tarefaService";
-import { creditarValorNaCarteira } from "@/services/carteiraService";
-import { criarMovimentacaoEntrada } from "@/services/movimentacaoService";
 import { clearSession, getCurrentUser } from "@/services/mesadinha/session.service";
 import {
     atualizarStatusTarefaApi,
     excluirTarefaApi,
     listarTarefas,
 } from "@/services/mesadinha/tarefa.services";
+import { creditarTarefa } from "@/services/mesadinha/carteira.services";
 
 type FiltroStatus = FiltroStatusTarefa;
 
@@ -58,9 +55,6 @@ export default function ListaTarefas() {
     const [carregouTarefas, setCarregouTarefas] = React.useState(false);
     const [filtroStatus, setFiltroStatus] = React.useState<FiltroStatus>("Todas");
     const [usuarioLogado, setUsuarioLogado] = React.useState<Usuario | null>(null);
-    const [carteiras, setCarteiras] = React.useState<Carteira[]>([]);
-
-    const [movimentacoes, setMovimentacoes] = React.useState<Movimentacao[]>([]);
     async function carregarDados() {
         try {
             const usuario = getCurrentUser();
@@ -275,48 +269,25 @@ export default function ListaTarefas() {
         );
     }
 
-    function aceitarTarefa(tarefaSelecionada: Tarefa) {
+    async function aceitarTarefa(tarefaSelecionada: Tarefa) {
         const criancaId = String(
             tarefaSelecionada.fk_usuario_crianca ??
             tarefaSelecionada.fk_usuario_responsavel ??
             ""
         );
 
-        const valorRecompensa = tarefaSelecionada.valor_recompensa ?? 0;
-
         if (!criancaId) {
             Alert.alert("Atenção", "Criança da tarefa não encontrada.");
             return;
         }
 
-        if (valorRecompensa <= 0) {
-            Alert.alert("Atenção", "Valor da recompensa inválido.");
+        try {
+            await creditarTarefa(tarefaSelecionada.id);
+        } catch (error) {
+            console.log("Erro ao creditar tarefa:", error);
+            Alert.alert("Erro", "Não foi possível creditar a recompensa.");
             return;
         }
-
-        if (tarefaSelecionada.recompensa_creditada) {
-            alterarStatusTarefa(tarefaSelecionada.id, "Concluída");
-            return;
-        }
-
-        const resultadoCarteira = creditarValorNaCarteira(
-            carteiras,
-            criancaId,
-            valorRecompensa
-        );
-
-        const novaMovimentacao = criarMovimentacaoEntrada(
-            tarefaSelecionada,
-            resultadoCarteira.carteira.id_carteira,
-            valorRecompensa
-        );
-
-        setCarteiras(resultadoCarteira.carteiras);
-
-        setMovimentacoes((movimentacoesAtuais) => [
-            novaMovimentacao,
-            ...movimentacoesAtuais,
-        ]);
 
         setTarefas((tarefasAtuais) =>
             tarefasAtuais.map((tarefa) =>
