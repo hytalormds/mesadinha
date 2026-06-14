@@ -17,12 +17,12 @@ export class GetCarteirasUseCase {
     familiaId?: number;
     papel?: "responsavel" | "crianca";
   }) {
-    if (papel === "responsavel") {
-      if (!familiaId) {
-        throw new ForbiddenError("Responsavel sem familia cadastrada");
-      }
-
+    if (familiaId) {
       return this.carteiraRepository.findByFamiliaId(familiaId);
+    }
+
+    if (papel === "responsavel") {
+      throw new ForbiddenError("Responsavel sem familia cadastrada");
     }
 
     const carteira = await this.carteiraRepository.findByUsuarioId(userId);
