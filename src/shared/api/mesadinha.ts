@@ -12,7 +12,7 @@ const baseURL = process.env.EXPO_PUBLIC_API_URL ?? defaultBaseURL;
 
 export const mesadinhaApi = axios.create({
   baseURL,
-  timeout: 6000,
+  timeout: 15000,
 });
 
 mesadinhaApi.interceptors.response.use(

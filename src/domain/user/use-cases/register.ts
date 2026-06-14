@@ -7,6 +7,7 @@ import { AuthReponse } from "../interfaces/authResponse";
 import { UnauthenticatedError } from "../../../shared/errors/unauthenticated.error";
 import { ForbiddenError } from "../../../shared/errors/forbidden.error";
 import { User } from "../../../infra/database/typeorm/mesadinha/entities/User";
+import { getJwtSecret } from "../../../shared/config/env";
 
 export class RegisterUseCase {
   private authRepository: UserTypeormRepository;
@@ -42,7 +43,7 @@ export class RegisterUseCase {
         id: userCreated.id,
         email: userCreated.email,
       },
-      process.env.APP_SCRETET_KEY,
+      getJwtSecret(),
       {
         expiresIn: "365d",
         algorithm: "HS256",

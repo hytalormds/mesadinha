@@ -4,6 +4,7 @@ import { sign } from "jsonwebtoken";
 import { AuthLoginRequest } from "../interfaces/authLoginRequest";
 import { NotFoundError } from "../../../shared/errors/not-found.error";
 import { UnauthenticatedError } from "../../../shared/errors/unauthenticated.error";
+import { getJwtSecret } from "../../../shared/config/env";
 
 export class AuthenticateUseCase {
   private authRepository: UserTypeormRepository;
@@ -30,7 +31,7 @@ export class AuthenticateUseCase {
         id: user.id,
         email,
       },
-      process.env.APP_SCRETET_KEY,
+      getJwtSecret(),
       {
         expiresIn: "365d",
         algorithm: "HS256",

@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { FamiliaRepository } from "../../database/typeorm/mesadinha/repositories/familia.repository";
 import { UserTypeormRepository } from "../../database/typeorm/mesadinha/repositories/user.repository";
 import { UnauthenticatedError } from "../../../shared/errors/unauthenticated.error";
+import { getJwtSecret } from "../../../shared/config/env";
 
 export class CheckAuthtenticationMiddleware {
   private authRepository: UserTypeormRepository;
@@ -27,7 +28,7 @@ export class CheckAuthtenticationMiddleware {
     }
 
     try {
-      const { email } = jwt.verify(token, process.env.APP_SCRETET_KEY) as {
+      const { email } = jwt.verify(token, getJwtSecret()) as {
         email: string;
       };
 
