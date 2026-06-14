@@ -1,2 +1,6 @@
 Funcionalidades futuras:
 - responsável escrever motivo de recusar uma tarefa
+- possibilidade de excluir um filho
+- recuperar senha
+- notificação de data de expiração chegando, novas tarefas criadas
+- 
