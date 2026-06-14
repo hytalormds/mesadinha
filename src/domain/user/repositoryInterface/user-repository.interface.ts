@@ -10,5 +10,10 @@ export interface CreateUserParams {
 
 export interface UserRepositoryInterface {
   createUser(user: CreateUserParams): Promise<User>;
+  findById(id: number): Promise<User | null>;
   findByEmail(email: string): Promise<User | null>;
+  updateUser(
+    id: number,
+    user: Partial<Pick<CreateUserParams, "name" | "email" | "password">>,
+  ): Promise<User>;
 }

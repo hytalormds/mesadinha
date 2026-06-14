@@ -22,6 +22,7 @@ import {
   updateChild,
 } from "@/services/mesadinha/auth.services";
 import { getCurrentUser } from "@/services/mesadinha/session.service";
+import { AppError } from "@/shared/helper/appError";
 
 import styles from "./styles";
 
@@ -249,7 +250,12 @@ export default function VincularFilho() {
       Alert.alert("Sucesso", "Filho cadastrado com sucesso.");
     } catch (error) {
       console.log("Erro ao salvar filho:", error);
-      Alert.alert("Erro", "Não foi possível salvar os dados do filho.");
+      const message =
+        error instanceof AppError
+          ? error.message
+          : "Não foi possível salvar os dados do filho.";
+
+      Alert.alert("Erro", message);
     }
   }
 
@@ -314,7 +320,7 @@ export default function VincularFilho() {
               style={styles.passwordInput}
               placeholder={
                 estaEditando
-                  ? "Digite uma nova senha"
+                  ? "Deixe em branco para manter a senha atual"
                   : "Digite uma senha para o filho"
               }
               value={senha}

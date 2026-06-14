@@ -1,12 +1,12 @@
+import { Repository } from "typeorm";
 import { User } from "../entities/User";
 import { Carteira } from "../entities/Carteira";
-import {
-  UserRepositoryInterface,
-  CreateUserParams,
-} from "../../../../../domain/user/repositoryInterface/user-repository.interface";
-import { Repository } from "typeorm";
 import { DtMoneyDataSource } from "../data-source";
 import { DatabaseError } from "../../../../../shared/errors/database.error";
+import {
+  CreateUserParams,
+  UserRepositoryInterface,
+} from "../../../../../domain/user/repositoryInterface/user-repository.interface";
 
 export class UserTypeormRepository implements UserRepositoryInterface {
   private userRepository: Repository<User>;
@@ -33,20 +33,46 @@ export class UserTypeormRepository implements UserRepositoryInterface {
 
       return userCreated;
     } catch (error) {
-      throw new DatabaseError("Falha ao criar o usuário!", error);
+      throw new DatabaseError("Falha ao criar o usuario!", error);
+    }
+  }
+
+  async findById(id: number): Promise<User | null> {
+    try {
+      return await this.userRepository.findOne({
+        where: { id },
+      });
+    } catch (error) {
+      throw new DatabaseError("Falha ao buscar usuario!", error);
     }
   }
 
   async findByEmail(email: string): Promise<User | null> {
     try {
-      const user = await this.userRepository.findOne({
-        where: {
-          email,
-        },
+      return await this.userRepository.findOne({
+        where: { email },
       });
-      return user;
     } catch (error) {
-      throw new DatabaseError("Falha ao buscar isiário!", error);
+      throw new DatabaseError("Falha ao buscar usuario!", error);
+    }
+  }
+
+  async updateUser(
+    id: number,
+    user: Partial<Pick<CreateUserParams, "name" | "email" | "password">>,
+  ): Promise<User> {
+    try {
+      await this.userRepository.update(id, user);
+
+      const userUpdated = await this.findById(id);
+
+      if (!userUpdated) {
+        throw new Error("Usuario nao encontrado apos atualizacao");
+      }
+
+      return userUpdated;
+    } catch (error) {
+      throw new DatabaseError("Falha ao atualizar usuario!", error);
     }
   }
 }

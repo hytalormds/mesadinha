@@ -70,7 +70,7 @@ export async function updateChild(
   }
 
   const { data } = await mesadinhaApi.put<{ data: ApiUser }>(
-    `/children/${Number(idUsuario)}`,
+    `/auth/children/${Number(idUsuario)}`,
     body,
   );
 
