@@ -56,7 +56,10 @@ export const configure = (fastify: FastifyInstance) => {
     url: "/tarefa",
     method: "put",
     handler: updateTarefa.execute,
-    preHandler: [checkAuthenticated.execute, allowRoles("responsavel")],
+    preHandler: [
+      checkAuthenticated.execute,
+      allowRoles("responsavel", "crianca"),
+    ],
     schema: updateTarefaSchema,
   });
 };

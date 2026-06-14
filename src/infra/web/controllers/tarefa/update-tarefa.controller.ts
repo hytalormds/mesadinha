@@ -23,6 +23,7 @@ export class UpdateTarefaController {
       ...body,
       userId,
       familiaId,
+      papel: request.user.papel,
     });
 
     reply.status(204).send();

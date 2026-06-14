@@ -14,7 +14,7 @@ export class SeederService {
     const tipoUsuarioRepository = this.dataSource.getRepository(TipoUsuario);
 
     const tipos = [
-      { idTipo: 1, descricao: "Responsável" },
+      { idTipo: 1, descricao: "Responsavel" },
       { idTipo: 2, descricao: "Dependente" },
     ];
 
@@ -33,10 +33,12 @@ export class SeederService {
     const statusRepository = this.dataSource.getRepository(StatusTarefa);
 
     const status = [
-      { idStatus: 1, descricao: "Concluída" },
+      { idStatus: 1, descricao: "Concluida" },
       { idStatus: 2, descricao: "Em Andamento" },
       { idStatus: 3, descricao: "Em Aberto" },
       { idStatus: 4, descricao: "Expirado" },
+      { idStatus: 5, descricao: "Aguardando Aprovacao" },
+      { idStatus: 6, descricao: "Recusada" },
     ];
 
     for (const item of status) {

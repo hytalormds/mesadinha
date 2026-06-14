@@ -60,6 +60,13 @@ export default StyleSheet.create({
         gap: 8,
     },
 
+    cardAcoesFilhoTopo: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-end",
+        gap: 6,
+    },
+
     cardValor: {
         color: "#095414",
         fontSize: 15,
@@ -104,5 +111,14 @@ export default StyleSheet.create({
 
     botaoAcao: {
         padding: 4,
+    },
+
+    botaoAcaoTopo: {
+        width: 30,
+        height: 30,
+        alignItems: "center",
+        justifyContent: "center",
+        borderRadius: 15,
+        backgroundColor: "#f8f9fa",
     },
 });

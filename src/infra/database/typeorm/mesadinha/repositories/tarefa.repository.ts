@@ -49,6 +49,11 @@ export class TarefaRepository implements TarefaRepositoryInterface {
     try {
       return await this.tarefaRepository.findOne({
         where: { idTarefa },
+        relations: {
+          usuarioResponsavel: true,
+          usuarioCrianca: true,
+          status: true,
+        },
       });
     } catch (error) {
       throw new DatabaseError("Falha ao buscar tarefa por ID", error);
@@ -57,17 +62,37 @@ export class TarefaRepository implements TarefaRepositoryInterface {
 
   async updateTarefa(params: UpdateTarefaParams): Promise<void> {
     try {
-      await this.tarefaRepository.save({
-        idTarefa: params.idTarefa,
-        fkUsuarioResponsavel: params.userId,
-        fkUsuarioCrianca: params.fkUsuarioCrianca,
-        fkFamiliaId: params.familiaId,
-        fkStatusTarefa: params.fkStatusTarefa,
-        titulo: params.titulo,
-        descricao: params.descricao,
-        valorRecompensa: params.valorRecompensa,
-        dataLimite: params.dataLimite,
-      });
+      const updateData: Partial<Tarefa> = {};
+
+      if (params.fkUsuarioCrianca !== undefined) {
+        updateData.fkUsuarioCrianca = params.fkUsuarioCrianca;
+      }
+
+      if (params.familiaId !== undefined) {
+        updateData.fkFamiliaId = params.familiaId;
+      }
+
+      if (params.fkStatusTarefa !== undefined) {
+        updateData.fkStatusTarefa = params.fkStatusTarefa;
+      }
+
+      if (params.titulo !== undefined) {
+        updateData.titulo = params.titulo;
+      }
+
+      if (params.descricao !== undefined) {
+        updateData.descricao = params.descricao;
+      }
+
+      if (params.valorRecompensa !== undefined) {
+        updateData.valorRecompensa = params.valorRecompensa;
+      }
+
+      if (params.dataLimite !== undefined) {
+        updateData.dataLimite = params.dataLimite;
+      }
+
+      await this.tarefaRepository.update(params.idTarefa, updateData);
     } catch (error) {
       throw new DatabaseError("Falha ao atualizar a tarefa", error);
     }
@@ -154,6 +179,8 @@ export class TarefaRepository implements TarefaRepositoryInterface {
       const query = this.tarefaRepository
         .createQueryBuilder("tarefa")
         .leftJoinAndSelect("tarefa.status", "status")
+        .leftJoinAndSelect("tarefa.usuarioResponsavel", "usuarioResponsavel")
+        .leftJoinAndSelect("tarefa.usuarioCrianca", "usuarioCrianca")
         .where("tarefa.fkFamiliaId = :familiaId", { familiaId });
 
       if (papel === "crianca") {

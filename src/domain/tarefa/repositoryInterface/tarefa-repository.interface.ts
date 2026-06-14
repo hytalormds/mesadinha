@@ -24,6 +24,7 @@ export interface GetTarefasParams {
 export interface UpdateTarefaParams {
   idTarefa: number;
   userId: number;
+  papel?: "responsavel" | "crianca";
   titulo?: string;
   descricao?: string;
   valorRecompensa?: number;

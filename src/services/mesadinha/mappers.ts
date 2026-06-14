@@ -19,8 +19,8 @@ export type ApiTarefa = {
   fkUsuarioResponsavel: number;
   fkUsuarioCrianca: number;
   fkFamiliaId: number;
-  usuarioCrianca?: ApiUser;
-  usuarioResponsavel?: ApiUser;
+  usuarioCrianca?: ApiUser | null;
+  usuarioResponsavel?: ApiUser | null;
   status?: {
     idStatus: number;
     descricao: string;
@@ -32,6 +32,17 @@ const statusById: Record<number, StatusTarefa> = {
   2: "Em Andamento",
   3: "Em Aberto",
   4: "Expirado",
+  5: "Aguardando Aprovação",
+  6: "Recusada",
+};
+
+const statusByText: Record<string, StatusTarefa> = {
+  concluida: "Concluída",
+  "em andamento": "Em Andamento",
+  "em aberto": "Em Aberto",
+  expirado: "Expirado",
+  "aguardando aprovacao": "Aguardando Aprovação",
+  recusada: "Recusada",
 };
 
 export function mapUser(user: ApiUser): Usuario {
@@ -46,7 +57,7 @@ export function mapUser(user: ApiUser): Usuario {
 }
 
 export function mapTarefa(tarefa: ApiTarefa): Tarefa {
-  const status = statusById[tarefa.fkStatusTarefa] ?? "Em Aberto";
+  const status = mapStatusTarefa(tarefa);
 
   return {
     id: String(tarefa.idTarefa),
@@ -66,7 +77,7 @@ export function mapTarefa(tarefa: ApiTarefa): Tarefa {
 }
 
 export function statusToId(status: StatusTarefa) {
-  if (status === "Concluída" || status === "Aguardando Aprovação") {
+  if (status === "Concluída") {
     return 1;
   }
 
@@ -74,8 +85,16 @@ export function statusToId(status: StatusTarefa) {
     return 2;
   }
 
-  if (status === "Expirado" || status === "Recusada") {
+  if (status === "Expirado") {
     return 4;
+  }
+
+  if (status === "Aguardando Aprovação") {
+    return 5;
+  }
+
+  if (status === "Recusada") {
+    return 6;
   }
 
   return 3;
@@ -84,12 +103,37 @@ export function statusToId(status: StatusTarefa) {
 export function dateBrToIso(date: string) {
   const [day, month, year] = date.split("/");
 
-  return new Date(Number(year), Number(month) - 1, Number(day)).toISOString();
+  return new Date(Number(year), Number(month) - 1, Number(day), 12).toISOString();
+}
+
+function mapStatusTarefa(tarefa: ApiTarefa): StatusTarefa {
+  const statusText = normalizeStatus(tarefa.status?.descricao);
+
+  if (statusText && statusByText[statusText]) {
+    return statusByText[statusText];
+  }
+
+  return statusById[tarefa.fkStatusTarefa] ?? "Em Aberto";
+}
+
+function normalizeStatus(status?: string | null) {
+  return status
+    ?.normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
 }
 
 function formatDateForApp(date?: string | null) {
   if (!date) {
     return undefined;
+  }
+
+  const dateOnlyMatch = date.match(/^(\d{4})-\d{2}-\d{2}/);
+
+  if (dateOnlyMatch) {
+    const [year, month, day] = date.slice(0, 10).split("-");
+    return `${day}/${month}/${year}`;
   }
 
   const parsed = new Date(date);

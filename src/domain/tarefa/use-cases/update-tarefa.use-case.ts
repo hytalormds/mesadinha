@@ -16,14 +16,38 @@ export class UpdateTarefaUseCase {
     const tarefa = await this.tarefaRepository.findById(params.idTarefa);
 
     if (!tarefa) {
-      throw new NotFoundError("Tarefa não encontrada");
+      throw new NotFoundError("Tarefa nao encontrada");
     }
 
-    if (
-      tarefa.fkUsuarioResponsavel !== params.userId ||
-      (params.familiaId && tarefa.fkFamiliaId !== params.familiaId)
-    ) {
-      throw new NotFoundError("Tarefa não encontrada para o usuário");
+    if (params.familiaId && tarefa.fkFamiliaId !== params.familiaId) {
+      throw new NotFoundError("Tarefa nao encontrada para a familia");
+    }
+
+    if (params.papel === "crianca") {
+      const atualizacaoSomenteStatus =
+        params.fkStatusTarefa !== undefined &&
+        params.titulo === undefined &&
+        params.descricao === undefined &&
+        params.valorRecompensa === undefined &&
+        params.dataLimite === undefined &&
+        params.fkUsuarioCrianca === undefined;
+
+      if (!atualizacaoSomenteStatus || tarefa.fkUsuarioCrianca !== params.userId) {
+        throw new NotFoundError("Tarefa nao encontrada para o usuario");
+      }
+
+      await this.tarefaRepository.updateTarefa({
+        idTarefa: params.idTarefa,
+        userId: params.userId,
+        familiaId: params.familiaId,
+        fkStatusTarefa: params.fkStatusTarefa,
+      });
+
+      return;
+    }
+
+    if (tarefa.fkUsuarioResponsavel !== params.userId) {
+      throw new NotFoundError("Tarefa nao encontrada para o usuario");
     }
 
     await this.tarefaRepository.updateTarefa(params);

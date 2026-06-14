@@ -62,7 +62,9 @@ export const configure = (fastify: FastifyInstance) => {
     .prop("fkUsuarioResponsavel", S.number().required())
     .prop("fkUsuarioCrianca", S.number().required())
     .prop("fkFamiliaId", S.number().required())
-    .prop("status", S.oneOf([S.ref("StatusTarefa#"), S.null()]));
+    .prop("status", S.oneOf([S.ref("StatusTarefa#"), S.null()]))
+    .prop("usuarioResponsavel", S.oneOf([S.ref("User#"), S.null()]))
+    .prop("usuarioCrianca", S.oneOf([S.ref("User#"), S.null()]));
 
   const orderDirection = S.string()
     .enum(["ASC", "asc", "DESC", "desc"])
