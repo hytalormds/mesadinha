@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { Text, TouchableOpacity } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -71,14 +71,14 @@ function MainTabs() {
       <Tab.Screen
         name="ListaTarefas"
         component={ListaTarefas}
-        options={{ title: "Home" }}
+        options={{ title: "Tarefas(s)" }}
       />
 
       {!usuarioEhFilho && (
         <Tab.Screen
           name="VincularFilho"
           component={VincularFilho}
-          options={{ title: "Filhos" }}
+          options={{ title: "Filhos(s)" }}
         />
       )}
 
