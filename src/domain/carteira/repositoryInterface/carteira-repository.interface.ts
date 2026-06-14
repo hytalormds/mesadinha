@@ -9,6 +9,7 @@ export interface CreateMovimentacaoParams {
 }
 
 export interface CarteiraRepositoryInterface {
+  findById(idCarteira: number): Promise<Carteira | null>;
   findByUsuarioId(userId: number): Promise<Carteira | null>;
   findByFamiliaId(familiaId: number): Promise<Carteira[]>;
   updateSaldo(idCarteira: number, saldo: number): Promise<void>;

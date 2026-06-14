@@ -65,3 +65,10 @@ export async function creditarTarefa(idTarefa: string) {
     idTarefa: Number(idTarefa),
   });
 }
+
+export async function sacarCarteira(idCarteira: string, valor: number) {
+  await mesadinhaApi.post("/carteira/sacar", {
+    idCarteira: Number(idCarteira),
+    valor,
+  });
+}

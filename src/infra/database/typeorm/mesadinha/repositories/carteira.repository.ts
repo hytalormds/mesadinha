@@ -21,6 +21,17 @@ export class CarteiraRepository implements CarteiraRepositoryInterface {
       DtMoneyDataSource.getRepository(UsuarioFamilia);
   }
 
+  async findById(idCarteira: number): Promise<Carteira | null> {
+    try {
+      return await this.carteiraRepository.findOne({
+        where: { idCarteira },
+        relations: { usuario: true },
+      });
+    } catch (error) {
+      throw new DatabaseError("Falha ao buscar carteira", error);
+    }
+  }
+
   async findByUsuarioId(userId: number): Promise<Carteira | null> {
     try {
       return await this.carteiraRepository.findOne({

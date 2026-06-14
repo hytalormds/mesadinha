@@ -13,6 +13,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 
 import { useUsuarioAtual } from "@/hooks/useUsuarioAtual";
 import { useCarteirasFamilia } from "@/hooks/useCarteirasFamilia";
+import { sacarCarteira } from "@/services/mesadinha/carteira.services";
 import {
   converterMoedaParaNumero,
   formatarMoedaDigitada,
@@ -22,17 +23,14 @@ import {
 import styles from "./styles";
 
 export default function Cofrinho() {
-  const {
-    usuario,
-    usuarioEhPai,
-    usuarioEhFilho,
-  } = useUsuarioAtual();
+  const { usuario, usuarioEhPai, usuarioEhFilho } = useUsuarioAtual();
 
   const {
     carteirasVisiveisNoCofrinho,
     movimentacoesVisiveisNoCofrinho,
     saldoTotalCofrinho,
     carregando,
+    carregarDados,
   } = useCarteirasFamilia({
     usuario,
     carregarMovimentacoes: true,
@@ -40,26 +38,23 @@ export default function Cofrinho() {
 
   const [carteiraSaque, setCarteiraSaque] =
     React.useState<(typeof carteirasVisiveisNoCofrinho)[number] | null>(null);
-
   const [valorSaque, setValorSaque] = React.useState("");
 
   function formatarData(data?: string) {
     if (!data) {
-      return "Data não informada";
+      return "Data nao informada";
     }
 
     const dataConvertida = new Date(data);
 
     if (Number.isNaN(dataConvertida.getTime())) {
-      return "Data não informada";
+      return "Data nao informada";
     }
 
     return dataConvertida.toLocaleDateString("pt-BR");
   }
 
-  function abrirSaque(
-    carteira: (typeof carteirasVisiveisNoCofrinho)[number]
-  ) {
+  function abrirSaque(carteira: (typeof carteirasVisiveisNoCofrinho)[number]) {
     setCarteiraSaque(carteira);
     setValorSaque("");
   }
@@ -69,7 +64,7 @@ export default function Cofrinho() {
     setValorSaque("");
   }
 
-  function confirmarSaque() {
+  async function confirmarSaque() {
     if (!carteiraSaque) {
       return;
     }
@@ -77,28 +72,31 @@ export default function Cofrinho() {
     const valor = converterMoedaParaNumero(valorSaque);
 
     if (!valor || valor <= 0) {
-      Alert.alert("Atenção", "Digite um valor válido para sacar.");
+      Alert.alert("Atencao", "Digite um valor valido para sacar.");
       return;
     }
 
     if (valor > carteiraSaque.saldo) {
-      Alert.alert("Atenção", "O valor do saque é maior que o saldo.");
+      Alert.alert("Atencao", "O valor do saque e maior que o saldo.");
       return;
     }
 
-    Alert.alert(
-      "Saque pendente",
-      "A tela já está preparada, mas a rota de saque no back-end ainda será implementada."
-    );
+    try {
+      await sacarCarteira(carteiraSaque.id_carteira, valor);
+      fecharSaque();
+      await carregarDados();
+      Alert.alert("Saque realizado", "O valor foi retirado do cofrinho.");
+    } catch (error) {
+      console.log("Erro ao sacar:", error);
+      Alert.alert("Erro", "Nao foi possivel realizar o saque.");
+    }
   }
 
   if (carregando) {
     return (
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.containerCentralizado}>
-          <Text style={styles.textoCarregando}>
-            Carregando cofrinho...
-          </Text>
+          <Text style={styles.textoCarregando}>Carregando cofrinho...</Text>
         </View>
       </SafeAreaView>
     );
@@ -121,22 +119,16 @@ export default function Cofrinho() {
             {usuarioEhPai ? "Saldo dos filhos" : "Meu saldo"}
           </Text>
 
-          <Text style={styles.valorTotal}>
-            {formatarValor(saldoTotalCofrinho)}
-          </Text>
+          <Text style={styles.valorTotal}>{formatarValor(saldoTotalCofrinho)}</Text>
         </View>
 
         {usuarioEhPai && (
           <>
-            <Text style={styles.secaoTitulo}>
-              Saldos por filho
-            </Text>
+            <Text style={styles.secaoTitulo}>Saldos por filho</Text>
 
             {carteirasVisiveisNoCofrinho.length === 0 ? (
               <View style={styles.cardInfo}>
-                <Text style={styles.infoTitulo}>
-                  Nenhum filho encontrado
-                </Text>
+                <Text style={styles.infoTitulo}>Nenhum filho encontrado</Text>
 
                 <Text style={styles.infoTexto}>
                   Cadastre ou vincule filhos para visualizar os cofrinhos.
@@ -144,16 +136,9 @@ export default function Cofrinho() {
               </View>
             ) : (
               carteirasVisiveisNoCofrinho.map((carteira) => (
-                <View
-                  key={carteira.id_carteira}
-                  style={styles.cardFilho}
-                >
+                <View key={carteira.id_carteira} style={styles.cardFilho}>
                   <View style={styles.cardFilhoIcone}>
-                    <MaterialIcons
-                      name="person"
-                      size={22}
-                      color="#007BFF"
-                    />
+                    <MaterialIcons name="person" size={22} color="#007BFF" />
                   </View>
 
                   <View style={styles.cardFilhoInfo}>
@@ -167,9 +152,7 @@ export default function Cofrinho() {
                   </View>
 
                   <View style={styles.cardFilhoSaldo}>
-                    <Text style={styles.labelSaldo}>
-                      Saldo
-                    </Text>
+                    <Text style={styles.labelSaldo}>Saldo</Text>
 
                     <Text style={styles.valorFilho}>
                       {formatarValor(carteira.saldo)}
@@ -180,9 +163,7 @@ export default function Cofrinho() {
                       activeOpacity={0.7}
                       onPress={() => abrirSaque(carteira)}
                     >
-                      <Text style={styles.botaoSacarTexto}>
-                        Sacar
-                      </Text>
+                      <Text style={styles.botaoSacarTexto}>Sacar</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -193,40 +174,27 @@ export default function Cofrinho() {
 
         {usuarioEhFilho && (
           <>
-            <Text style={styles.secaoTitulo}>
-              Meu cofrinho
-            </Text>
+            <Text style={styles.secaoTitulo}>Meu cofrinho</Text>
 
             {carteirasVisiveisNoCofrinho.length === 0 ? (
               <View style={styles.cardInfo}>
-                <Text style={styles.infoTitulo}>
-                  Cofrinho não encontrado
-                </Text>
+                <Text style={styles.infoTitulo}>Cofrinho nao encontrado</Text>
 
                 <Text style={styles.infoTexto}>
-                  Aguarde o responsável aprovar uma tarefa para movimentar seu
+                  Aguarde o responsavel aprovar uma tarefa para movimentar seu
                   cofrinho.
                 </Text>
               </View>
             ) : (
               carteirasVisiveisNoCofrinho.map((carteira) => (
-                <View
-                  key={carteira.id_carteira}
-                  style={styles.cardFilho}
-                >
+                <View key={carteira.id_carteira} style={styles.cardFilho}>
                   <View style={styles.cardFilhoIcone}>
-                    <MaterialIcons
-                      name="person"
-                      size={22}
-                      color="#007BFF"
-                    />
+                    <MaterialIcons name="person" size={22} color="#007BFF" />
                   </View>
 
                   <View style={styles.cardFilhoInfo}>
                     <Text style={styles.nomeFilho}>
-                      {carteira.usuario?.nome ??
-                        usuario?.nome ??
-                        "Filho"}
+                      {carteira.usuario?.nome ?? usuario?.nome ?? "Filho"}
                     </Text>
 
                     <Text style={styles.emailFilho}>
@@ -237,9 +205,7 @@ export default function Cofrinho() {
                   </View>
 
                   <View style={styles.cardFilhoSaldo}>
-                    <Text style={styles.labelSaldo}>
-                      Saldo
-                    </Text>
+                    <Text style={styles.labelSaldo}>Saldo</Text>
 
                     <Text style={styles.valorFilho}>
                       {formatarValor(carteira.saldo)}
@@ -251,18 +217,14 @@ export default function Cofrinho() {
           </>
         )}
 
-        <Text style={styles.historicoTitulo}>
-          Histórico
-        </Text>
+        <Text style={styles.historicoTitulo}>Historico</Text>
 
         {movimentacoesVisiveisNoCofrinho.length === 0 ? (
           <View style={styles.cardInfo}>
-            <Text style={styles.infoTitulo}>
-              Sem movimentações
-            </Text>
+            <Text style={styles.infoTitulo}>Sem movimentacoes</Text>
 
             <Text style={styles.infoTexto}>
-              As recompensas aprovadas aparecerão aqui.
+              As recompensas aprovadas aparecerao aqui.
             </Text>
           </View>
         ) : (
@@ -322,9 +284,7 @@ export default function Cofrinho() {
       >
         <View style={styles.modalFundo}>
           <View style={styles.modalCard}>
-            <Text style={styles.modalTitulo}>
-              Sacar dinheiro
-            </Text>
+            <Text style={styles.modalTitulo}>Sacar dinheiro</Text>
 
             <Text style={styles.modalTexto}>
               {carteiraSaque
@@ -350,9 +310,7 @@ export default function Cofrinho() {
                 activeOpacity={0.7}
                 onPress={fecharSaque}
               >
-                <Text style={styles.botaoCancelarTexto}>
-                  Cancelar
-                </Text>
+                <Text style={styles.botaoCancelarTexto}>Cancelar</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -360,9 +318,7 @@ export default function Cofrinho() {
                 activeOpacity={0.7}
                 onPress={confirmarSaque}
               >
-                <Text style={styles.botaoConfirmarTexto}>
-                  Sacar
-                </Text>
+                <Text style={styles.botaoConfirmarTexto}>Sacar</Text>
               </TouchableOpacity>
             </View>
           </View>
