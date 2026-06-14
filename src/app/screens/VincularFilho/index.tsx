@@ -14,12 +14,15 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
+import { Button } from "@/componentes/Button";
 import type { RootStackParamList, Usuario } from "@/types/navigation";
 import {
   listChildren,
   registerChild,
+  updateChild,
 } from "@/services/mesadinha/auth.services";
 import { getCurrentUser } from "@/services/mesadinha/session.service";
+
 import styles from "./styles";
 
 export default function VincularFilho() {
@@ -30,12 +33,21 @@ export default function VincularFilho() {
 
   const [nome, setNome] = React.useState("");
   const [email, setEmail] = React.useState("");
-  const [filhos, setFilhos] = React.useState<Usuario[]>([]);
-  const [usuarioLogado, setUsuarioLogado] = React.useState<Usuario | null>(
-    null,
-  );
   const [senha, setSenha] = React.useState("");
+  const [confirmarSenha, setConfirmarSenha] = React.useState("");
+
   const [mostrarSenha, setMostrarSenha] = React.useState(false);
+  const [mostrarConfirmarSenha, setMostrarConfirmarSenha] =
+    React.useState(false);
+
+  const [filhos, setFilhos] = React.useState<Usuario[]>([]);
+  const [usuarioLogado, setUsuarioLogado] =
+    React.useState<Usuario | null>(null);
+
+  const [filhoEditandoId, setFilhoEditandoId] =
+    React.useState<string | null>(null);
+
+  const estaEditando = !!filhoEditandoId;
 
   async function carregarFilhos() {
     try {
@@ -64,7 +76,9 @@ export default function VincularFilho() {
         return;
       }
 
-      setFilhos(await listChildren());
+      const filhosResponse = await listChildren();
+
+      setFilhos(filhosResponse);
     } catch (error) {
       console.log("Erro ao carregar filhos:", error);
       Alert.alert("Erro", "Não foi possível carregar os filhos.");
@@ -100,55 +114,142 @@ export default function VincularFilho() {
   }
 
   function validarFormulario() {
-    if (!nome.trim()) {
+    const nomeTratado = nome.trim();
+    const emailTratado = email.trim().toLowerCase();
+    const senhaTratada = senha.trim();
+    const confirmarSenhaTratada = confirmarSenha.trim();
+
+    if (!nomeTratado) {
       Alert.alert("Atenção", "Digite o nome do filho.");
       return false;
     }
 
-    if (!email.trim() || !email.includes("@")) {
+    if (!emailTratado || !emailTratado.includes("@")) {
       Alert.alert("Atenção", "Digite um e-mail válido para o filho.");
       return false;
     }
 
-    if (!senha.trim()) {
+    const emailJaCadastrado = filhos.some((filho) => {
+      const mesmoFilho = String(filho.id_usuario) === String(filhoEditandoId);
+
+      return !mesmoFilho && filho.email?.toLowerCase() === emailTratado;
+    });
+
+    if (emailJaCadastrado) {
+      Alert.alert("Atenção", "Este e-mail já está cadastrado.");
+      return false;
+    }
+
+    if (!estaEditando && !senhaTratada) {
       Alert.alert("Atenção", "Digite a senha do filho.");
       return false;
     }
 
-    const errosSenha = senhaValida(senha);
-
-    if (errosSenha.length > 0) {
+    if (!senhaTratada && confirmarSenhaTratada) {
       Alert.alert(
-        "Senha inválida",
-        `A senha precisa ter:\n- ${errosSenha.join("\n- ")}`,
+        "Atenção",
+        "Digite a nova senha antes de confirmar.",
       );
       return false;
+    }
+
+    if (senhaTratada) {
+      if (!confirmarSenhaTratada) {
+        Alert.alert("Atenção", "Confirme a senha do filho.");
+        return false;
+      }
+
+      if (senhaTratada !== confirmarSenhaTratada) {
+        Alert.alert("Atenção", "As senhas não conferem.");
+        return false;
+      }
+
+      const errosSenha = senhaValida(senhaTratada);
+
+      if (errosSenha.length > 0) {
+        Alert.alert(
+          "Senha inválida",
+          `A senha precisa ter:\n- ${errosSenha.join("\n- ")}`,
+        );
+        return false;
+      }
     }
 
     return true;
   }
 
-  async function cadastrarFilho() {
+  function limparFormulario() {
+    setNome("");
+    setEmail("");
+    setSenha("");
+    setConfirmarSenha("");
+    setMostrarSenha(false);
+    setMostrarConfirmarSenha(false);
+    setFilhoEditandoId(null);
+  }
+
+  function iniciarEdicaoFilho(filho: Usuario) {
+    setFilhoEditandoId(String(filho.id_usuario));
+    setNome(filho.nome);
+    setEmail(filho.email ?? "");
+    setSenha("");
+    setConfirmarSenha("");
+    setMostrarSenha(false);
+    setMostrarConfirmarSenha(false);
+  }
+
+  function cancelarEdicaoFilho() {
+    limparFormulario();
+  }
+
+  async function salvarFilho() {
     if (!validarFormulario()) {
       return;
     }
 
+    const nomeTratado = nome.trim();
+    const emailTratado = email.trim().toLowerCase();
+    const senhaTratada = senha.trim();
+
     try {
+      if (filhoEditandoId) {
+        const filhoAtualizado = await updateChild(filhoEditandoId, {
+          name: nomeTratado,
+          email: emailTratado,
+          password: senhaTratada || undefined,
+        });
+
+        setFilhos((filhosAtuais) =>
+          filhosAtuais.map((filho) =>
+            String(filho.id_usuario) === String(filhoEditandoId)
+              ? filhoAtualizado
+              : filho,
+          ),
+        );
+
+        limparFormulario();
+
+        Alert.alert(
+          "Sucesso",
+          "Dados do filho atualizados com sucesso.",
+        );
+        return;
+      }
+
       const novoFilho = await registerChild({
-        name: nome.trim(),
-        email: email.trim().toLowerCase(),
-        password: senha.trim(),
+        name: nomeTratado,
+        email: emailTratado,
+        password: senhaTratada,
       });
 
       setFilhos((filhosAtuais) => [...filhosAtuais, novoFilho]);
-      setNome("");
-      setEmail("");
-      setSenha("");
+
+      limparFormulario();
 
       Alert.alert("Sucesso", "Filho cadastrado com sucesso.");
     } catch (error) {
-      console.log("Erro ao cadastrar filho:", error);
-      Alert.alert("Erro", "Não foi possível cadastrar o filho.");
+      console.log("Erro ao salvar filho:", error);
+      Alert.alert("Erro", "Não foi possível salvar os dados do filho.");
     }
   }
 
@@ -178,7 +279,9 @@ export default function VincularFilho() {
           showsVerticalScrollIndicator={false}
         >
           <Text style={styles.subtitulo}>
-            Cadastre os filhos que poderão receber tarefas.
+            {estaEditando
+              ? "Edite os dados do filho. Para redefinir a senha, preencha os campos de senha."
+              : "Cadastre os filhos que poderão receber tarefas."}
           </Text>
 
           <Text style={styles.label}>Nome do filho</Text>
@@ -202,12 +305,18 @@ export default function VincularFilho() {
             autoCapitalize="none"
           />
 
-          <Text style={styles.label}>Senha</Text>
+          <Text style={styles.label}>
+            {estaEditando ? "Nova senha" : "Senha"}
+          </Text>
 
           <View style={styles.passwordContainer}>
             <TextInput
               style={styles.passwordInput}
-              placeholder="Digite uma senha para o filho"
+              placeholder={
+                estaEditando
+                  ? "Digite uma nova senha"
+                  : "Digite uma senha para o filho"
+              }
               value={senha}
               onChangeText={setSenha}
               secureTextEntry={!mostrarSenha}
@@ -225,12 +334,54 @@ export default function VincularFilho() {
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity
+          <Text style={styles.label}>Confirmar senha</Text>
+
+          <View style={styles.passwordContainer}>
+            <TextInput
+              style={styles.passwordInput}
+              placeholder={
+                estaEditando
+                  ? "Confirme a nova senha"
+                  : "Confirme a senha do filho"
+              }
+              value={confirmarSenha}
+              onChangeText={setConfirmarSenha}
+              secureTextEntry={!mostrarConfirmarSenha}
+            />
+
+            <TouchableOpacity
+              style={styles.eyeButton}
+              onPress={() =>
+                setMostrarConfirmarSenha(!mostrarConfirmarSenha)
+              }
+            >
+              <MaterialIcons
+                name={
+                  mostrarConfirmarSenha
+                    ? "visibility-off"
+                    : "visibility"
+                }
+                size={22}
+                color="#666666"
+              />
+            </TouchableOpacity>
+          </View>
+
+          <Button
+            title={estaEditando ? "Salvar Alterações" : "Cadastrar Filho"}
             style={styles.botaoCadastrar}
-            onPress={cadastrarFilho}
-          >
-            <Text style={styles.botaoCadastrarTexto}>Cadastrar Filho</Text>
-          </TouchableOpacity>
+            onPress={salvarFilho}
+          />
+
+          {estaEditando && (
+            <Button
+              title="Cancelar edição"
+              variant="outlineDanger"
+              iconName="close"
+              style={styles.botaoCancelarEdicao}
+              onPress={cancelarEdicaoFilho}
+            />
+          )}
 
           <Text style={styles.secaoTitulo}>Filhos cadastrados</Text>
 
@@ -250,6 +401,18 @@ export default function VincularFilho() {
                     {filho.email || "Sem e-mail informado"}
                   </Text>
                 </View>
+
+                <TouchableOpacity
+                  style={styles.botaoEditarFilho}
+                  activeOpacity={0.7}
+                  onPress={() => iniciarEdicaoFilho(filho)}
+                >
+                  <MaterialIcons
+                    name="edit"
+                    size={24}
+                    color="#007BFF"
+                  />
+                </TouchableOpacity>
               </View>
             ))
           )}

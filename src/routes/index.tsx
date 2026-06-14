@@ -4,7 +4,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { MaterialIcons } from "@expo/vector-icons";
 
-import Login from "@/app/screens/Login";
+import Login from "@/app/screens/login";
 import TelaCadastro from "@/app/screens/CadastroUsuario";
 import CadastroTarefa from "@/app/screens/CadastroTarefa";
 import VincularFilho from "@/app/screens/VincularFilho";

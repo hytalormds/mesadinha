@@ -48,3 +48,31 @@ export const listChildren = async (): Promise<Usuario[]> => {
 
   return data.data.map(mapUser);
 };
+export async function updateChild(
+  idUsuario: string,
+  dados: {
+    name: string;
+    email: string;
+    password?: string;
+  },
+) {
+  const body: {
+    name: string;
+    email: string;
+    password?: string;
+  } = {
+    name: dados.name,
+    email: dados.email,
+  };
+
+  if (dados.password) {
+    body.password = dados.password;
+  }
+
+  const { data } = await mesadinhaApi.put<{ data: ApiUser }>(
+    `/children/${Number(idUsuario)}`,
+    body,
+  );
+
+  return mapUser(data.data);
+}

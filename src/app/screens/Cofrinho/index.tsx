@@ -55,6 +55,10 @@ export default function Cofrinho() {
   }
 
   function abrirSaque(carteira: (typeof carteirasVisiveisNoCofrinho)[number]) {
+    if (carteira.saldo <= 0) {
+      return;
+    }
+
     setCarteiraSaque(carteira);
     setValorSaque("");
   }
@@ -159,11 +163,28 @@ export default function Cofrinho() {
                     </Text>
 
                     <TouchableOpacity
-                      style={styles.botaoSacar}
-                      activeOpacity={0.7}
+                      style={[
+                        styles.botaoSacar,
+                        carteira.saldo <= 0 && {
+                          opacity: 0.45,
+                          backgroundColor: "#f1f3f5",
+                          borderColor: "#dddddd",
+                        },
+                      ]}
+                      activeOpacity={carteira.saldo > 0 ? 0.7 : 1}
+                      disabled={carteira.saldo <= 0}
                       onPress={() => abrirSaque(carteira)}
                     >
-                      <Text style={styles.botaoSacarTexto}>Sacar</Text>
+                      <Text
+                        style={[
+                          styles.botaoSacarTexto,
+                          carteira.saldo <= 0 && {
+                            color: "#999999",
+                          },
+                        ]}
+                      >
+                        Sacar
+                      </Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -288,9 +309,8 @@ export default function Cofrinho() {
 
             <Text style={styles.modalTexto}>
               {carteiraSaque
-                ? `Saldo de ${
-                    carteiraSaque.usuario?.nome ?? "filho"
-                  }: ${formatarValor(carteiraSaque.saldo)}`
+                ? `Saldo de ${carteiraSaque.usuario?.nome ?? "filho"
+                }: ${formatarValor(carteiraSaque.saldo)}`
                 : ""}
             </Text>
 
