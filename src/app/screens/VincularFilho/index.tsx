@@ -14,6 +14,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
+import { Button } from "@/componentes/Button";
 import type { RootStackParamList, Usuario } from "@/types/navigation";
 import {
   listChildren,
@@ -23,7 +24,6 @@ import {
 import { getCurrentUser } from "@/services/mesadinha/session.service";
 
 import styles from "./styles";
-import { Button } from "@/componentes/Button";
 
 export default function VincularFilho() {
   const navigation =
@@ -374,15 +374,13 @@ export default function VincularFilho() {
           />
 
           {estaEditando && (
-            <TouchableOpacity
+            <Button
+              title="Cancelar edição"
+              variant="outlineDanger"
+              iconName="close"
               style={styles.botaoCancelarEdicao}
-              activeOpacity={0.7}
               onPress={cancelarEdicaoFilho}
-            >
-              <Text style={styles.botaoCancelarEdicaoTexto}>
-                Cancelar edição
-              </Text>
-            </TouchableOpacity>
+            />
           )}
 
           <Text style={styles.secaoTitulo}>Filhos cadastrados</Text>
