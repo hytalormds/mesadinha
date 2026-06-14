@@ -229,7 +229,7 @@ export default function CadastroTarefa() {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.containerForm}>
-            <Text style={styles.label}>Filho responsável</Text>
+            <Text style={styles.label}>Filho responsável pela tarefa:</Text>
 
             <SeletorFilho
               filhos={filhosCadastrados}

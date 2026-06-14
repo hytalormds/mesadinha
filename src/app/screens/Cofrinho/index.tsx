@@ -1,54 +1,115 @@
 import React from "react";
-import { Alert, ScrollView, Text, View } from "react-native";
+import {
+  Alert,
+  Modal,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useFocusEffect } from "@react-navigation/native";
 
-import { getCurrentUser } from "@/services/mesadinha/session.service";
+import { useUsuarioAtual } from "@/hooks/useUsuarioAtual";
+import { useCarteirasFamilia } from "@/hooks/useCarteirasFamilia";
 import {
-  CarteiraComUsuario,
-  listarCarteiras,
-  listarMovimentacoes,
-} from "@/services/mesadinha/carteira.services";
-import type { Movimentacao } from "@/types/navigation";
-import { formatarValor } from "@/utils/formatadores";
+  converterMoedaParaNumero,
+  formatarMoedaDigitada,
+  formatarValor,
+} from "@/utils/formatadores";
+
 import styles from "./styles";
 
 export default function Cofrinho() {
-  const usuario = getCurrentUser();
-  const [carteiras, setCarteiras] = React.useState<CarteiraComUsuario[]>([]);
-  const [movimentacoes, setMovimentacoes] = React.useState<Movimentacao[]>([]);
+  const {
+    usuario,
+    usuarioEhPai,
+    usuarioEhFilho,
+  } = useUsuarioAtual();
 
-  async function carregarCofrinho() {
-    try {
-      const [carteirasResponse, movimentacoesResponse] = await Promise.all([
-        listarCarteiras(),
-        listarMovimentacoes(),
-      ]);
+  const {
+    carteirasVisiveisNoCofrinho,
+    movimentacoesVisiveisNoCofrinho,
+    saldoTotalCofrinho,
+    carregando,
+  } = useCarteirasFamilia({
+    usuario,
+    carregarMovimentacoes: true,
+  });
 
-      setCarteiras(carteirasResponse);
-      setMovimentacoes(movimentacoesResponse);
-    } catch (error) {
-      console.log("Erro ao carregar cofrinho:", error);
-      Alert.alert("Erro", "Não foi possível carregar o cofrinho.");
+  const [carteiraSaque, setCarteiraSaque] =
+    React.useState<(typeof carteirasVisiveisNoCofrinho)[number] | null>(null);
+
+  const [valorSaque, setValorSaque] = React.useState("");
+
+  function formatarData(data?: string) {
+    if (!data) {
+      return "Data não informada";
     }
+
+    const dataConvertida = new Date(data);
+
+    if (Number.isNaN(dataConvertida.getTime())) {
+      return "Data não informada";
+    }
+
+    return dataConvertida.toLocaleDateString("pt-BR");
   }
 
-  useFocusEffect(
-    React.useCallback(() => {
-      carregarCofrinho();
-    }, []),
-  );
+  function abrirSaque(
+    carteira: (typeof carteirasVisiveisNoCofrinho)[number]
+  ) {
+    setCarteiraSaque(carteira);
+    setValorSaque("");
+  }
 
-  const saldoTotal = carteiras.reduce(
-    (total, carteira) => total + carteira.saldo,
-    0,
-  );
-  const usuarioEhPai = usuario?.id_tipo === 1;
+  function fecharSaque() {
+    setCarteiraSaque(null);
+    setValorSaque("");
+  }
+
+  function confirmarSaque() {
+    if (!carteiraSaque) {
+      return;
+    }
+
+    const valor = converterMoedaParaNumero(valorSaque);
+
+    if (!valor || valor <= 0) {
+      Alert.alert("Atenção", "Digite um valor válido para sacar.");
+      return;
+    }
+
+    if (valor > carteiraSaque.saldo) {
+      Alert.alert("Atenção", "O valor do saque é maior que o saldo.");
+      return;
+    }
+
+    Alert.alert(
+      "Saque pendente",
+      "A tela já está preparada, mas a rota de saque no back-end ainda será implementada."
+    );
+  }
+
+  if (carregando) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.containerCentralizado}>
+          <Text style={styles.textoCarregando}>
+            Carregando cofrinho...
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.header}>
           <Text style={styles.titulo}>Cofrinho</Text>
         </View>
@@ -57,54 +118,155 @@ export default function Cofrinho() {
           <MaterialIcons name="savings" size={42} color="#007BFF" />
 
           <Text style={styles.resumoTitulo}>
-            {usuarioEhPai ? "Saldo da família" : "Meu saldo"}
+            {usuarioEhPai ? "Saldo dos filhos" : "Meu saldo"}
           </Text>
 
-          <Text style={styles.valorTotal}>{formatarValor(saldoTotal)}</Text>
+          <Text style={styles.valorTotal}>
+            {formatarValor(saldoTotalCofrinho)}
+          </Text>
         </View>
 
         {usuarioEhPai && (
           <>
-            <Text style={styles.secaoTitulo}>Saldos por filho</Text>
+            <Text style={styles.secaoTitulo}>
+              Saldos por filho
+            </Text>
 
-            {carteiras.map((carteira) => (
-              <View key={carteira.id_carteira} style={styles.cardFilho}>
-                <View style={styles.cardFilhoIcone}>
-                  <MaterialIcons name="person" size={22} color="#007BFF" />
-                </View>
+            {carteirasVisiveisNoCofrinho.length === 0 ? (
+              <View style={styles.cardInfo}>
+                <Text style={styles.infoTitulo}>
+                  Nenhum filho encontrado
+                </Text>
 
-                <View style={styles.cardFilhoInfo}>
-                  <Text style={styles.nomeFilho}>
-                    {carteira.usuario?.nome ?? "Usuário"}
-                  </Text>
-
-                  <Text style={styles.emailFilho}>
-                    {carteira.usuario?.email ?? "Sem e-mail"}
-                  </Text>
-                </View>
-
-                <View style={styles.cardFilhoSaldo}>
-                  <Text style={styles.labelSaldo}>Saldo</Text>
-                  <Text style={styles.valorFilho}>
-                    {formatarValor(carteira.saldo)}
-                  </Text>
-                </View>
+                <Text style={styles.infoTexto}>
+                  Cadastre ou vincule filhos para visualizar os cofrinhos.
+                </Text>
               </View>
-            ))}
+            ) : (
+              carteirasVisiveisNoCofrinho.map((carteira) => (
+                <View
+                  key={carteira.id_carteira}
+                  style={styles.cardFilho}
+                >
+                  <View style={styles.cardFilhoIcone}>
+                    <MaterialIcons
+                      name="person"
+                      size={22}
+                      color="#007BFF"
+                    />
+                  </View>
+
+                  <View style={styles.cardFilhoInfo}>
+                    <Text style={styles.nomeFilho}>
+                      {carteira.usuario?.nome ?? "Filho"}
+                    </Text>
+
+                    <Text style={styles.emailFilho}>
+                      {carteira.usuario?.email ?? "Sem e-mail informado"}
+                    </Text>
+                  </View>
+
+                  <View style={styles.cardFilhoSaldo}>
+                    <Text style={styles.labelSaldo}>
+                      Saldo
+                    </Text>
+
+                    <Text style={styles.valorFilho}>
+                      {formatarValor(carteira.saldo)}
+                    </Text>
+
+                    <TouchableOpacity
+                      style={styles.botaoSacar}
+                      activeOpacity={0.7}
+                      onPress={() => abrirSaque(carteira)}
+                    >
+                      <Text style={styles.botaoSacarTexto}>
+                        Sacar
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ))
+            )}
           </>
         )}
 
-        <Text style={styles.historicoTitulo}>Histórico</Text>
+        {usuarioEhFilho && (
+          <>
+            <Text style={styles.secaoTitulo}>
+              Meu cofrinho
+            </Text>
 
-        {movimentacoes.length === 0 ? (
+            {carteirasVisiveisNoCofrinho.length === 0 ? (
+              <View style={styles.cardInfo}>
+                <Text style={styles.infoTitulo}>
+                  Cofrinho não encontrado
+                </Text>
+
+                <Text style={styles.infoTexto}>
+                  Aguarde o responsável aprovar uma tarefa para movimentar seu
+                  cofrinho.
+                </Text>
+              </View>
+            ) : (
+              carteirasVisiveisNoCofrinho.map((carteira) => (
+                <View
+                  key={carteira.id_carteira}
+                  style={styles.cardFilho}
+                >
+                  <View style={styles.cardFilhoIcone}>
+                    <MaterialIcons
+                      name="person"
+                      size={22}
+                      color="#007BFF"
+                    />
+                  </View>
+
+                  <View style={styles.cardFilhoInfo}>
+                    <Text style={styles.nomeFilho}>
+                      {carteira.usuario?.nome ??
+                        usuario?.nome ??
+                        "Filho"}
+                    </Text>
+
+                    <Text style={styles.emailFilho}>
+                      {carteira.usuario?.email ??
+                        usuario?.email ??
+                        "Sem e-mail informado"}
+                    </Text>
+                  </View>
+
+                  <View style={styles.cardFilhoSaldo}>
+                    <Text style={styles.labelSaldo}>
+                      Saldo
+                    </Text>
+
+                    <Text style={styles.valorFilho}>
+                      {formatarValor(carteira.saldo)}
+                    </Text>
+                  </View>
+                </View>
+              ))
+            )}
+          </>
+        )}
+
+        <Text style={styles.historicoTitulo}>
+          Histórico
+        </Text>
+
+        {movimentacoesVisiveisNoCofrinho.length === 0 ? (
           <View style={styles.cardInfo}>
-            <Text style={styles.infoTitulo}>Sem movimentações</Text>
+            <Text style={styles.infoTitulo}>
+              Sem movimentações
+            </Text>
+
             <Text style={styles.infoTexto}>
               As recompensas aprovadas aparecerão aqui.
             </Text>
           </View>
         ) : (
-          movimentacoes.map((movimentacao) => (
+          movimentacoesVisiveisNoCofrinho.map((movimentacao) => (
             <View
               key={movimentacao.id_movimentacao}
               style={styles.cardMovimentacao}
@@ -131,8 +293,9 @@ export default function Cofrinho() {
                     ? "Recompensa recebida"
                     : "Saque"}
                 </Text>
+
                 <Text style={styles.movimentacaoData}>
-                  {new Date(movimentacao.data).toLocaleDateString("pt-BR")}
+                  {formatarData(movimentacao.data)}
                 </Text>
               </View>
 
@@ -143,12 +306,68 @@ export default function Cofrinho() {
                     : styles.movimentacaoValorSaida
                 }
               >
+                {movimentacao.tipo_movimentacao === "entrada" ? "+" : "-"}{" "}
                 {formatarValor(movimentacao.valor)}
               </Text>
             </View>
           ))
         )}
       </ScrollView>
+
+      <Modal
+        visible={!!carteiraSaque}
+        transparent
+        animationType="fade"
+        onRequestClose={fecharSaque}
+      >
+        <View style={styles.modalFundo}>
+          <View style={styles.modalCard}>
+            <Text style={styles.modalTitulo}>
+              Sacar dinheiro
+            </Text>
+
+            <Text style={styles.modalTexto}>
+              {carteiraSaque
+                ? `Saldo de ${
+                    carteiraSaque.usuario?.nome ?? "filho"
+                  }: ${formatarValor(carteiraSaque.saldo)}`
+                : ""}
+            </Text>
+
+            <TextInput
+              style={styles.inputSaque}
+              placeholder="R$ 0,00"
+              keyboardType="numeric"
+              value={valorSaque}
+              onChangeText={(texto) =>
+                setValorSaque(formatarMoedaDigitada(texto))
+              }
+            />
+
+            <View style={styles.modalBotoes}>
+              <TouchableOpacity
+                style={styles.botaoCancelar}
+                activeOpacity={0.7}
+                onPress={fecharSaque}
+              >
+                <Text style={styles.botaoCancelarTexto}>
+                  Cancelar
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.botaoConfirmar}
+                activeOpacity={0.7}
+                onPress={confirmarSaque}
+              >
+                <Text style={styles.botaoConfirmarTexto}>
+                  Sacar
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }

@@ -337,7 +337,7 @@ export default function ListaTarefas() {
                                 <Text style={styles.usuarioLogadoTexto}>
                                     Perfil atual: {usuarioLogado.nome}{" "}
                                     {usuarioEhPai
-                                        ? "(Pai)"
+                                        ? "(Responsável)"
                                         : usuarioEhFilho
                                             ? "(Filho)"
                                             : ""}

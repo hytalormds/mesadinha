@@ -37,42 +37,16 @@ export function CardTarefa({
   onEnviarParaAprovacao,
 }: Props) {
   const tarefaConcluida = status === "Concluída";
-  const podeIniciar = status === "Em Aberto";
+
+  const podeIniciarTarefa =
+    tarefaEhDoFilhoLogado && status === "Em Aberto";
+
   const podeEnviarParaAprovacao =
-    status === "Em Aberto" ||
-    status === "Em Andamento" ||
-    status === "Recusada" ||
-    status === "Expirado";
+    tarefaEhDoFilhoLogado &&
+    (status === "Em Andamento" || status === "Recusada");
 
-  function renderAcoesDoFilho() {
-    if (!tarefaEhDoFilhoLogado || tarefaConcluida) {
-      return null;
-    }
-
-    return (
-      <View style={styles.cardAcoesFilhoTopo}>
-        {podeIniciar && (
-          <ButtonIcon
-            name="play-arrow"
-            size={24}
-            color="#007BFF"
-            style={styles.botaoAcaoTopo}
-            onPress={onIniciar}
-          />
-        )}
-
-        {podeEnviarParaAprovacao && (
-          <ButtonIcon
-            name="check-circle"
-            size={24}
-            color="#095414"
-            style={styles.botaoAcaoTopo}
-            onPress={onEnviarParaAprovacao}
-          />
-        )}
-      </View>
-    );
-  }
+  const deveExibirAcoesDoFilho =
+    podeIniciarTarefa || podeEnviarParaAprovacao;
 
   return (
     <View
@@ -113,8 +87,6 @@ export function CardTarefa({
             <Text style={styles.cardValor}>
               {formatarValor(tarefa.valor_recompensa)}
             </Text>
-
-            {renderAcoesDoFilho()}
 
             <StatusBadge status={status} />
           </View>
@@ -191,6 +163,30 @@ export function CardTarefa({
             style={styles.botaoAcao}
             onPress={onExcluir}
           />
+        </View>
+      )}
+
+      {deveExibirAcoesDoFilho && (
+        <View style={styles.cardAcoes}>
+          {podeIniciarTarefa && (
+            <ButtonIcon
+              name="play-arrow"
+              size={28}
+              color="#007BFF"
+              style={styles.botaoAcao}
+              onPress={onIniciar}
+            />
+          )}
+
+          {podeEnviarParaAprovacao && (
+            <ButtonIcon
+              name="check-circle"
+              size={28}
+              color="#095414"
+              style={styles.botaoAcao}
+              onPress={onEnviarParaAprovacao}
+            />
+          )}
         </View>
       )}
     </View>
