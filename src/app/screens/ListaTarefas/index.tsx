@@ -1,33 +1,29 @@
 ﻿import React from "react";
 import {
-    Platform,
-    Text,
-    View,
-    KeyboardAvoidingView,
-    ScrollView,
-    TouchableOpacity,
     Alert,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import styles from "./styles";
+
 import { Button } from "@/componentes/Button";
 import { Title } from "@/componentes/Title";
 import { CardTarefa } from "@/componentes/CardTarefa";
 import { EmptyState } from "@/componentes/EmptyState";
-import {
-    FiltroStatus,
-    type FiltroStatusTarefa,
-} from "@/componentes/FiltroStatus";
+import { FiltroStatus } from "@/componentes/FiltroStatus";
 
 import type {
     RootStackParamList,
     Tarefa,
-    StatusTarefa,
-    Usuario,
 } from "@/types/navigation";
 
 import {
@@ -35,15 +31,11 @@ import {
     tarefaPertenceAoFilhoLogado,
     validarRecusaTarefa,
 } from "@/services/tarefaService";
-import { clearSession, getCurrentUser } from "@/services/mesadinha/session.service";
-import {
-    atualizarStatusTarefaApi,
-    excluirTarefaApi,
-    listarTarefas,
-} from "@/services/mesadinha/tarefa.services";
-import { creditarTarefa } from "@/services/mesadinha/carteira.services";
+import { clearSession } from "@/services/mesadinha/session.service";
 
-type FiltroStatus = FiltroStatusTarefa;
+import { useUsuarioAtual } from "@/hooks/useUsuarioAtual";
+import { useTarefas } from "@/hooks/useTarefas";
+import { useFiltroTarefas } from "@/hooks/useFiltroTarefas";
 
 export default function ListaTarefas() {
     const navigation =
@@ -51,38 +43,41 @@ export default function ListaTarefas() {
             NativeStackNavigationProp<RootStackParamList, "ListaTarefas">
         >();
 
-    const [tarefas, setTarefas] = React.useState<Tarefa[]>([]);
-    const [carregouTarefas, setCarregouTarefas] = React.useState(false);
-    const [filtroStatus, setFiltroStatus] = React.useState<FiltroStatus>("Todas");
-    const [usuarioLogado, setUsuarioLogado] = React.useState<Usuario | null>(null);
-    async function carregarDados() {
-        try {
-            const usuario = getCurrentUser();
+    const {
+        usuario,
+        usuarioEhPai,
+        usuarioEhFilho,
+    } = useUsuarioAtual();
 
-            if (!usuario) {
-                navigation.reset({
-                    index: 0,
-                    routes: [{ name: "Login" }],
-                });
-                return;
-            }
+    const {
+        tarefas,
+        carregando,
+        alterarStatusTarefa,
+        excluirTarefa,
+        aceitarTarefa,
+    } = useTarefas({
+        usuario,
+    });
 
-            setUsuarioLogado(usuario);
-            setTarefas(await listarTarefas());
-        } catch (error) {
-            console.log("Erro ao carregar tarefas:", error);
-            Alert.alert("Erro", "Não foi possível carregar as tarefas.");
-            setTarefas([]);
-        } finally {
-            setCarregouTarefas(true);
+    const {
+        filtroStatus,
+        setFiltroStatus,
+        tarefasPermitidas,
+        tarefasFiltradas,
+        totalTarefas,
+    } = useFiltroTarefas({
+        tarefas,
+        usuario,
+    });
+
+    React.useEffect(() => {
+        if (!usuario) {
+            navigation.reset({
+                index: 0,
+                routes: [{ name: "Login" }],
+            });
         }
-    }
-
-    useFocusEffect(
-        React.useCallback(() => {
-            carregarDados();
-        }, []),
-    );
+    }, [usuario, navigation]);
 
     function confirmarSair() {
         Alert.alert("Sair", "Deseja realmente sair?", [
@@ -90,10 +85,10 @@ export default function ListaTarefas() {
                 text: "Cancelar",
                 style: "cancel",
             },
-                {
-                    text: "Sair",
-                    style: "destructive",
-                    onPress: async () => {
+            {
+                text: "Sair",
+                style: "destructive",
+                onPress: async () => {
                     clearSession();
 
                     navigation.reset({
@@ -103,28 +98,6 @@ export default function ListaTarefas() {
                 },
             },
         ]);
-    }
-
-    async function alterarStatusTarefa(id: string, novoStatus: StatusTarefa) {
-        try {
-            await atualizarStatusTarefaApi(id, novoStatus);
-        } catch (error) {
-            console.log("Erro ao atualizar tarefa:", error);
-            Alert.alert("Erro", "Não foi possível atualizar a tarefa.");
-            return;
-        }
-
-        setTarefas((tarefasAtuais) =>
-            tarefasAtuais.map((tarefa) =>
-                tarefa.id === id
-                    ? {
-                        ...tarefa,
-                        status: novoStatus,
-                        concluida: novoStatus === "Concluída",
-                    }
-                    : tarefa
-            )
-        );
     }
 
     function confirmarInicioTarefa(id: string) {
@@ -140,7 +113,7 @@ export default function ListaTarefas() {
                     text: "Iniciar",
                     onPress: () => alterarStatusTarefa(id, "Em Andamento"),
                 },
-            ]
+            ],
         );
     }
 
@@ -158,11 +131,11 @@ export default function ListaTarefas() {
                     onPress: () =>
                         alterarStatusTarefa(id, "Aguardando Aprovação"),
                 },
-            ]
+            ],
         );
     }
 
-    function apagarTarefa(id: string) {
+    function confirmarExclusaoTarefa(id: string) {
         Alert.alert(
             "Excluir tarefa",
             "Deseja realmente excluir esta tarefa?",
@@ -174,32 +147,19 @@ export default function ListaTarefas() {
                 {
                     text: "Excluir",
                     style: "destructive",
-                    onPress: async () => {
-                        try {
-                            await excluirTarefaApi(id);
-                        } catch (error) {
-                            console.log("Erro ao excluir tarefa:", error);
-                            Alert.alert("Erro", "Não foi possível excluir a tarefa.");
-                            return;
-                        }
-
-                        setTarefas((tarefasAtuais) =>
-                            tarefasAtuais.filter(
-                                (tarefa) => tarefa.id !== id
-                            )
-                        );
-                    },
+                    onPress: () => excluirTarefa(id),
                 },
-            ]
+            ],
         );
     }
+
     function confirmarRecusaTarefa(tarefa: Tarefa) {
         const statusAtual = obterStatusTarefa(tarefa);
 
         const resultado = validarRecusaTarefa(
             tarefa,
             usuarioEhPai,
-            statusAtual
+            statusAtual,
         );
 
         if (!resultado.valido) {
@@ -221,36 +181,9 @@ export default function ListaTarefas() {
                     onPress: () =>
                         alterarStatusTarefa(tarefa.id, "Recusada"),
                 },
-            ]
+            ],
         );
     }
-    const usuarioEhPai = usuarioLogado?.id_tipo === 1;
-    const usuarioEhFilho = usuarioLogado?.id_tipo === 2;
-
-    const tarefasPermitidas = tarefas;
-
-    const tarefasFiltradas = tarefasPermitidas.filter((tarefa) => {
-        const statusAtual = obterStatusTarefa(tarefa);
-
-        if (filtroStatus === "Todas") {
-            return true;
-        }
-
-        return statusAtual === filtroStatus;
-    });
-
-    if (!usuarioLogado) {
-        return (
-            <SafeAreaView style={styles.safeArea}>
-                <View style={styles.containerForm}>
-                    <EmptyState
-                        icon="person-outline"
-                        title="Carregando usuário..."
-                    />
-                </View>
-            </SafeAreaView>
-        );
-    };
 
     function confirmarAceiteTarefa(tarefa: Tarefa) {
         Alert.alert(
@@ -265,46 +198,24 @@ export default function ListaTarefas() {
                     text: "Aprovar",
                     onPress: () => aceitarTarefa(tarefa),
                 },
-            ]
+            ],
         );
     }
 
-    async function aceitarTarefa(tarefaSelecionada: Tarefa) {
-        const criancaId = String(
-            tarefaSelecionada.fk_usuario_crianca ??
-            tarefaSelecionada.fk_usuario_responsavel ??
-            ""
-        );
-
-        if (!criancaId) {
-            Alert.alert("Atenção", "Criança da tarefa não encontrada.");
-            return;
-        }
-
-        try {
-            await creditarTarefa(tarefaSelecionada.id);
-        } catch (error) {
-            console.log("Erro ao creditar tarefa:", error);
-            Alert.alert("Erro", "Não foi possível creditar a recompensa.");
-            return;
-        }
-
-        setTarefas((tarefasAtuais) =>
-            tarefasAtuais.map((tarefa) =>
-                tarefa.id === tarefaSelecionada.id
-                    ? {
-                        ...tarefa,
-                        status: "Concluída",
-                        concluida: true,
-                        recompensa_creditada: true,
-                    }
-                    : tarefa
-            )
-        );
-
-        Alert.alert(
-            "Tarefa aceita",
-            "A recompensa foi adicionada ao cofrinho da criança."
+    if (!usuario || carregando) {
+        return (
+            <SafeAreaView style={styles.safeArea}>
+                <View style={styles.containerForm}>
+                    <EmptyState
+                        icon="person-outline"
+                        title={
+                            !usuario
+                                ? "Carregando usuário..."
+                                : "Carregando tarefas..."
+                        }
+                    />
+                </View>
+            </SafeAreaView>
         );
     }
 
@@ -329,13 +240,13 @@ export default function ListaTarefas() {
                                 </Title>
 
                                 <Text style={styles.subtitulo}>
-                                    {tarefasPermitidas.length === 1
+                                    {totalTarefas === 1
                                         ? "1 tarefa disponível"
-                                        : `${tarefasPermitidas.length} tarefas disponíveis`}
+                                        : `${totalTarefas} tarefas disponíveis`}
                                 </Text>
 
                                 <Text style={styles.usuarioLogadoTexto}>
-                                    Perfil atual: {usuarioLogado.nome}{" "}
+                                    Perfil atual: {usuario.nome}{" "}
                                     {usuarioEhPai
                                         ? "(Responsável)"
                                         : usuarioEhFilho
@@ -389,10 +300,14 @@ export default function ListaTarefas() {
                                 tarefasFiltradas.map((tarefa, index) => {
                                     const statusAtual = obterStatusTarefa(tarefa);
 
-                                    const tarefaEhDoFilhoLogado = tarefaPertenceAoFilhoLogado(
-                                        tarefa,
-                                        usuarioLogado
-                                    );
+                                    const tarefaEhDoFilhoLogado =
+                                        tarefaPertenceAoFilhoLogado(
+                                            tarefa,
+                                            usuario,
+                                        );
+
+                                    const podeEditarTarefa =
+                                        usuarioEhPai && statusAtual !== "Concluída";
 
                                     return (
                                         <CardTarefa
@@ -402,20 +317,29 @@ export default function ListaTarefas() {
                                             status={statusAtual}
                                             usuarioEhPai={usuarioEhPai}
                                             tarefaEhDoFilhoLogado={tarefaEhDoFilhoLogado}
-                                            onEditar={() =>
-                                                navigation.push("CadastroTarefa", {
-                                                    tarefaEditando: tarefa,
-                                                })
+                                            onEditar={
+                                                podeEditarTarefa
+                                                    ? () =>
+                                                        navigation.push("CadastroTarefa", {
+                                                            tarefaEditando: tarefa,
+                                                        })
+                                                    : undefined
                                             }
-                                            onExcluir={() => apagarTarefa(tarefa.id)}
-                                            onAceitar={() => confirmarAceiteTarefa(tarefa)}
-                                            onRecusar={() => confirmarRecusaTarefa(tarefa)
+                                            onExcluir={() =>
+                                                confirmarExclusaoTarefa(tarefa.id)
+                                            }
+                                            onAceitar={() =>
+                                                confirmarAceiteTarefa(tarefa)
+                                            }
+                                            onRecusar={() =>
+                                                confirmarRecusaTarefa(tarefa)
                                             }
                                             onIniciar={() =>
                                                 confirmarInicioTarefa(tarefa.id)
                                             }
                                             onEnviarParaAprovacao={() =>
-                                                confirmarFinalizacaoTarefa(tarefa.id)}
+                                                confirmarFinalizacaoTarefa(tarefa.id)
+                                            }
                                         />
                                     );
                                 })

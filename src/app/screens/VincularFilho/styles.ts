@@ -136,4 +136,32 @@ export default StyleSheet.create({
         color: "#666666",
         marginTop: 4,
     },
+
+    botaoCancelarEdicao: {
+        marginTop: 10,
+        height: 48,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: "#dc3545",
+        backgroundColor: "#fff5f5",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 8,
+    },
+
+    botaoCancelarEdicaoTexto: {
+        color: "#dc3545",
+        fontSize: 15,
+        fontWeight: "700",
+    },
+
+    botaoEditarFilho: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "#eef6ff",
+    },
 });
