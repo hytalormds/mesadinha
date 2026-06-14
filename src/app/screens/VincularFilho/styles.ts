@@ -72,19 +72,12 @@ export default StyleSheet.create({
     },
 
     botaoCadastrar: {
-        height: 50,
-        borderRadius: 10,
-        backgroundColor: "#007BFF",
-        alignItems: "center",
-        justifyContent: "center",
         marginTop: 4,
-        marginBottom: 28,
+        marginBottom: 10,
     },
 
-    botaoCadastrarTexto: {
-        color: "#ffffff",
-        fontSize: 16,
-        fontWeight: "700",
+    botaoCancelarEdicao: {
+        marginBottom: 28,
     },
 
     secaoTitulo: {
@@ -92,6 +85,7 @@ export default StyleSheet.create({
         fontWeight: "700",
         color: "#1a1a1a",
         marginBottom: 12,
+        marginTop: 18,
     },
 
     cardVazio: {
@@ -135,5 +129,14 @@ export default StyleSheet.create({
         fontSize: 13,
         color: "#666666",
         marginTop: 4,
+    },
+
+    botaoEditarFilho: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "#eef6ff",
     },
 });
