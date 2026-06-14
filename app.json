@@ -15,10 +15,10 @@
     },
     "android": {
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "softwareKeyboardLayoutMode": "resize",
+      "package": "com.luchaoliveira.mesadinha"
     },
-    "plugins": [
-      "expo-sqlite"
-    ]
+    "plugins": ["@react-native-community/datetimepicker", "expo-font"]
   }
 }

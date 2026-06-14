@@ -3,16 +3,16 @@ import { NavigationContainer } from "@react-navigation/native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { SQLiteProvider } from "expo-sqlite";
 import Routes from "./src/routes";
-import { migrate } from "@/database/migrations/MigrationCorrigida";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function App() {
   return (
-    <SafeAreaProvider>
-      <SQLiteProvider databaseName="mesadinha.db" onInit={migrate}>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
         <NavigationContainer>
           <Routes />
         </NavigationContainer>
-      </SQLiteProvider>
-    </SafeAreaProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
